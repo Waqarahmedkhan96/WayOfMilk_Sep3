@@ -34,5 +34,23 @@
     "approvedForStorage": true,
     "cowId": 1,
     "containerId": 2
+  },
+  {
+    "id": 5,
+    "dateOnly": "2025-11-16",
+    "volumeL": 12,
+    "milkTestResult": 1,
+    "approvedForStorage": true,
+    "cowId": 2,
+    "containerId": 2
+  },
+  {
+    "id": 6,
+    "dateOnly": "2025-11-16",
+    "volumeL": 8,
+    "milkTestResult": 1,
+    "approvedForStorage": true,
+    "cowId": 1,
+    "containerId": 3
   }
 ]

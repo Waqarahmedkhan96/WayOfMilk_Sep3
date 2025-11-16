@@ -1,0 +1,93 @@
+@page "/users"
+@rendermode InteractiveServer
+
+@using ApiContracts.Users
+@using WoM_BlazorApp.Http
+@inject WoM_BlazorApp.Http.IUserService UserService
+@inject NavigationManager Nav
+
+<PageTitle>Users</PageTitle>
+
+<h1>Users</h1>
+
+<button class="btn btn-primary mb-3"
+        @onclick="@(() => Nav.NavigateTo("/users/create"))">
+    Add new user
+</button>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+else if (users is null || users.Count == 0)
+{
+    <p>No users yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Role</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in users)
+        {
+            <tr>
+                <td>@user.Id</td>
+                <td>@user.Name</td>
+                <td>@user.Role</td>
+                <td>
+                    <button class="btn btn-sm btn-danger"
+                            @onclick="() => DeleteAsync(user.Id)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private bool isLoading = true;
+    private string? error;
+    private ICollection<UserDto>? users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            users = await UserService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteAsync(int id)
+    {
+        error = null;
+        try
+        {
+            await UserService.DeleteAsync(id);
+            users = await UserService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}

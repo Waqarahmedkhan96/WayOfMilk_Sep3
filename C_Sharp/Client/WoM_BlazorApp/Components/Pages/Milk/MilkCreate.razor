@@ -1,0 +1,95 @@
+@page "/milk/create"
+@rendermode InteractiveServer
+
+@using ApiContracts.Milk
+@using WoM_BlazorApp.Http
+@using Entities
+@inject IMilkService MilkService
+@inject NavigationManager Nav
+
+<PageTitle>Add Milk</PageTitle>
+
+<h1>Add new milk entry</h1>
+
+<div class="mb-3">
+    <label class="form-label">Date</label>
+    <InputDate @bind-Value="date" TValue="DateOnly" class="form-control" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Volume (liters)</label>
+    <InputNumber @bind-Value="volumeL" class="form-control" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Cow Id</label>
+    <InputNumber @bind-Value="cowId" class="form-control" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Container Id</label>
+    <InputNumber @bind-Value="containerId" class="form-control" />  
+</div>
+
+<div class="mb-3 form-check">
+    <InputCheckbox @bind-Value="approvedForStorage" class="form-check-input" id="approvedCheck" />
+    <label class="form-check-label" for="approvedCheck">Approved For Storage</label>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Milk Test Result</label>
+    <InputSelect @bind-Value="milkTestResult" class="form-control">
+        @foreach (var resultName in Enum.GetNames(typeof(MilkTestResult)))
+        {
+            <option value="@resultName">@resultName</option>
+        }
+    </InputSelect>
+</div>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+
+<button class="btn btn-success" @onclick="CreateAsync">Save</button>
+<button class="btn btn-secondary ms-2" @onclick="@(() => Nav.NavigateTo("/milk"))">
+    Cancel
+</button>
+
+@code {
+    private DateOnly date = DateOnly.FromDateTime(DateTime.Today);
+    private double volumeL;
+    private int cowId;
+    private int containerId;
+    private bool approvedForStorage;
+    private string milkTestResult = MilkTestResult.Unknown.ToString();
+    private string? error;
+
+    private async Task CreateAsync()
+    {
+        error = null;
+        try
+        {
+            var dto = new CreateMilkDto
+            {
+                DateOnly = date,
+                VolumeL = volumeL,
+                CowId = cowId,
+                ContainerId = containerId,
+                ApprovedForStorage = approvedForStorage,
+                MilkTestResult =
+                    !string.IsNullOrWhiteSpace(milkTestResult)
+                    && Enum.TryParse<MilkTestResult>(milkTestResult, true, out var parsedMilkTestResult)
+                        ? parsedMilkTestResult
+                        : MilkTestResult.Unknown
+            };
+
+            await MilkService.CreateAsync(dto);
+            Nav.NavigateTo("/milk");
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}

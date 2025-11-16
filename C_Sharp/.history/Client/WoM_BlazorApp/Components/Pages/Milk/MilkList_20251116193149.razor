@@ -1,0 +1,101 @@
+@page "/milk"
+@rendermode InteractiveServer
+
+@using ApiContracts.Milk
+@using WoM_BlazorApp.Http
+@inject WoM_BlazorApp.Http.IMilkService MilkService
+@inject NavigationManager Nav
+
+<PageTitle>Milk</PageTitle>
+
+<h1>Milk</h1>
+
+<button class="btn btn-primary mb-3"
+        @onclick="@(() => Nav.NavigateTo("/milk/create"))">
+    Add new milk entry
+</button>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+else if (milkEntries is null || milkEntries.Count == 0)
+{
+    <p>No milk entries yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Date</th>
+            <th>VolumeL</th>
+            <th>MilkTestResult</th>
+            <th>ApprovedForStorage</th>
+            <th>CowId</th>
+            <th>ContainerId</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var milkEntry in milkEntries)
+        {
+            <tr>
+                <td>@milkEntry.Id</td>
+                <td>@milkEntry.DateOnly</td>
+                <td>@milkEntry.VolumeL</td>
+                <td>@milkEntry.MilkTestResult</td>
+                <td>@milkEntry.ApprovedForStorage</td>
+                <td>@milkEntry.CowId</td>
+                <td>@milkEntry.ContainerId</td>
+                <td>
+                    <button class="btn btn-sm btn-danger"
+                            @onclick="() => DeleteAsync(milkEntry.Id)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private bool isLoading = true;
+    private string? error;
+    private ICollection<MilkDto>? milkEntries;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            milkEntries = await MilkService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteAsync(int id)
+    {
+        error = null;
+        try
+        {
+            await MilkService.DeleteAsync(id);
+            milkEntries = await MilkService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}

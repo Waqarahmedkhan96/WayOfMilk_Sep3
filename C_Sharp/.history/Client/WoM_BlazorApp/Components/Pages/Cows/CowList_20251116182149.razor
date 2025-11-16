@@ -1,0 +1,92 @@
+@page "/cows"
+@rendermode InteractiveServer
+
+@using ApiContracts.Cows
+@using WoM_BlazorApp.Http
+@inject ICowService CowService
+@inject NavigationManager Nav
+
+<PageTitle>Cows</PageTitle>
+
+<h1>Cows</h1>
+
+<button class="btn btn-primary mb-3"
+        @onclick="@(() => Nav.NavigateTo("/cows/create"))">
+    Add new cow
+</button>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+else if (cows is null || cows.Count == 0)
+{
+    <p>No cows yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Birth date</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var cow in cows)
+        {
+            <tr>
+                <td>@cow.Id</td>
+                <td>@cow.BirthDate</td>
+                <td>
+                    <button class="btn btn-sm btn-danger"
+                            @onclick="() => DeleteAsync(cow.Id)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private bool isLoading = true;
+    private string? error;
+    private ICollection<CowDto>? cows;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            cows = await CowService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteAsync(int id)
+    {
+        error = null;
+        try
+        {
+            await CowService.DeleteAsync(id);
+            cows = await CowService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}

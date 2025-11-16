@@ -2,7 +2,7 @@
   {
     "id": 1,
     "createdByUserId": 0,
-    "dateTime": "2025-11-12T14:46:47.475Z",
+    "dateOnly": "0001-01-01",
     "containerId": 1,
     "quantityL": 100,
     "price": 500,
@@ -12,7 +12,7 @@
   {
     "id": 2,
     "createdByUserId": 1,
-    "dateTime": "2025-11-15T21:53:53.691Z",
+    "dateOnly": "0001-01-01",
     "containerId": 1,
     "quantityL": 50,
     "price": 250,
@@ -22,10 +22,20 @@
   {
     "id": 3,
     "createdByUserId": 1,
-    "dateTime": "2025-11-15T21:53:53.691Z",
+    "dateOnly": "0001-01-01",
     "containerId": 1,
     "quantityL": 50,
     "price": 250,
+    "recallCase": false,
+    "customerId": 1
+  },
+  {
+    "id": 4,
+    "createdByUserId": 1,
+    "dateOnly": "2025-11-16",
+    "containerId": 0,
+    "quantityL": 100,
+    "price": 20000,
     "recallCase": false,
     "customerId": 1
   }

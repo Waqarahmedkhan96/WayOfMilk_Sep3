@@ -1,0 +1,101 @@
+@page "/sales"
+@rendermode InteractiveServer
+
+@using ApiContracts.Sales
+@using WoM_BlazorApp.Http
+@inject WoM_BlazorApp.Http.ISaleService SaleService
+@inject NavigationManager Nav
+
+<PageTitle>Sales</PageTitle>
+
+<h1>Sales</h1>
+
+<button class="btn btn-primary mb-3"
+        @onclick="@(() => Nav.NavigateTo("/sales/create"))">
+    Add new sale
+</button>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+else if (sales is null || sales.Count == 0)
+{
+    <p>No sales yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Date</th>
+            <th>Quantity (l)</th>
+            <th>Price</th>
+            <th>Customer (id)</th>
+            <th>Employee (id)</th>
+            <th>Recall case</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var sale in sales)
+        {
+            <tr>
+                <td>@sale.Id</td>
+                <td>@sale.DateOnly</td>
+                <td>@sale.QuantityL</td>
+                <td>@sale.Price</td>
+                <td>@sale.CustomerId</td>
+                <td>@sale.CreatedByUserId</td>
+                <td>@sale.RecallCase</td>
+                <td>
+                    <button class="btn btn-sm btn-danger"
+                            @onclick="() => DeleteAsync(sale.Id)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private bool isLoading = true;
+    private string? error;
+    private ICollection<SaleDto>? sales;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            sales = await SaleService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteAsync(int id)
+    {
+        error = null;
+        try
+        {
+            await SaleService.DeleteAsync(id);
+            sales = await SaleService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}

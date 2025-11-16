@@ -1,0 +1,80 @@
+@page "/sales/create"
+@rendermode InteractiveServer
+
+@using ApiContracts.Sales
+@using WoM_BlazorApp.Http
+@inject ISaleService SaleService
+@inject NavigationManager Nav
+
+<PageTitle>Add Sale</PageTitle>
+
+<h1>Add new sale</h1>
+
+<div class="mb-3">
+    <label class="form-label">Date</label>
+    <InputDate @bind-Value="dateOnly" class="form-control" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Quantity (l)</label>
+    <InputNumber @bind-Value="quantityL" class="form-control" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Price</label>
+    <InputNumber @bind-Value="price" class="form-control" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Customer ID</label>
+    <InputNumber @bind-Value="customerId" class="form-control" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Employee ID</label>
+    <InputNumber @bind-Value="createdByUserId" class="form-control" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Recall Case</label>
+    <InputText @bind-Value="recallCase" class="form-control" />
+</div>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+
+<button class="btn btn-success" @onclick="CreateAsync">Save</button>
+<button class="btn btn-secondary ms-2" @onclick="@(() => Nav.NavigateTo("/sales"))">
+    Cancel
+</button>
+
+@code {
+    private DateOnly dateOnly = DateOnly.FromDateTime(DateTime.Today);
+    private double quantityL;
+    private decimal price;
+    private int customerId;
+    private int createdByUserId;
+    private string? recallCase;
+    private string? error;
+
+    private async Task CreateAsync()
+    {
+        error = null;
+        try
+        {
+            var dto = new CreateSaleDto
+            {
+                DateOnly = dateOnly
+            };
+
+            await SaleService.CreateAsync(dto);
+            Nav.NavigateTo("/sales");
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}

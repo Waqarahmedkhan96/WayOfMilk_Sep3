@@ -1,0 +1,50 @@
+@page "/containers/create"
+@rendermode InteractiveServer
+
+@using ApiContracts.Containers
+@using WoM_BlazorApp.Http
+@inject IContainerService ContainerService
+@inject NavigationManager Nav
+
+<PageTitle>Add Container</PageTitle>
+
+<h1>Add new container</h1>
+
+<div class="mb-3">
+    <label class="form-label">Capacity (l)</label>
+    <InputNumber @bind-Value="capacityL" class="form-control" />
+</div>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+
+<button class="btn btn-success" @onclick="CreateAsync">Save</button>
+<button class="btn btn-secondary ms-2" @onclick="@(() => Nav.NavigateTo("/containers"))">
+    Cancel
+</button>
+
+@code {
+    private int capacityL;
+    private string? error;
+
+    private async Task CreateAsync()
+    {
+        error = null;
+        try
+        {
+            var dto = new CreateContainerDto
+            {
+                CapacityL = capacityL
+            };
+
+            await ContainerService.CreateAsync(dto);
+            Nav.NavigateTo("/containers");
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}
