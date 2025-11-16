@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "createdByUserId": 0,
+    "dateTime": "2025-11-12T14:46:47.475Z",
+    "containerId": 1,
+    "quantityL": 100,
+    "price": 500,
+    "recallCase": false,
+    "customerId": 1
+  },
+  {
+    "id": 2,
+    "createdByUserId": 1,
+    "dateTime": "2025-11-15T21:53:53.691Z",
+    "containerId": 1,
+    "quantityL": 50,
+    "price": 250,
+    "recallCase": false,
+    "customerId": 1
+  },
+  {
+    "id": 3,
+    "createdByUserId": 1,
+    "dateTime": "2025-11-15T21:53:53.691Z",
+    "containerId": 1,
+    "quantityL": 50,
+    "price": 250,
+    "recallCase": false,
+    "customerId": 1
+  }
+]
