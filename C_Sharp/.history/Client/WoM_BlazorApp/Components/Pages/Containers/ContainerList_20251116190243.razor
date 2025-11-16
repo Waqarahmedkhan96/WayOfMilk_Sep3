@@ -1,0 +1,92 @@
+@page "/containers"
+@rendermode InteractiveServer
+
+@using ApiContracts.Containers
+@using WoM_BlazorApp.Http
+@inject WoM_BlazorApp.Http.IContainerService ContainerService
+@inject NavigationManager Nav
+
+<PageTitle>Containers</PageTitle>
+
+<h1>Containers</h1>
+
+<button class="btn btn-primary mb-3"
+        @onclick="@(() => Nav.NavigateTo("/containers/create"))">
+    Add new container
+</button>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+else if (containers is null || containers.Count == 0)
+{
+    <p>No containers yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Capacity (l)</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var container in containers)
+        {
+            <tr>
+                <td>@container.Id</td>
+                <td>@container.CapacityL</td>
+                <td>
+                    <button class="btn btn-sm btn-danger"
+                            @onclick="() => DeleteAsync(container.Id)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private bool isLoading = true;
+    private string? error;
+    private ICollection<ContainerDto>? containers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            containers = await ContainerService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteAsync(int id)
+    {
+        error = null;
+        try
+        {
+            await ContainerService.DeleteAsync(id);
+            containers = await ContainerService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}

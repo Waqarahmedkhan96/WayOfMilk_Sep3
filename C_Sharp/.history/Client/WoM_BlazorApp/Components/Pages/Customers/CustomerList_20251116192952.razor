@@ -1,0 +1,97 @@
+@page "/customers"
+@rendermode InteractiveServer
+
+@using ApiContracts.Customers
+@using WoM_BlazorApp.Http
+@inject WoM_BlazorApp.Http.ICustomerService CustomerService
+@inject NavigationManager Nav
+
+<PageTitle>Customers</PageTitle>
+
+<h1>Customers</h1>
+
+<button class="btn btn-primary mb-3"
+        @onclick="@(() => Nav.NavigateTo("/customers/create"))">
+    Add new customer
+</button>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+else if (customers is null || customers.Count == 0)
+{
+    <p>No customers yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Company Name</th>
+            <th>PhoneNo</th>
+            <th>Email</th>
+            <th>CompanyCVR</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var customer in customers)
+        {
+            <tr>
+                <td>@customer.Id</td>
+                <td>@customer.CompanyName</td>
+                <td>@customer.PhoneNo</td>
+                <td>@customer.Email</td>
+                <td>@customer.CompanyCVR</td>
+                <td>
+                    <button class="btn btn-sm btn-danger"
+                            @onclick="() => DeleteAsync(customer.Id)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private bool isLoading = true;
+    private string? error;
+    private ICollection<CustomerDto>? customers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            customers = await CustomerService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteAsync(int id)
+    {
+        error = null;
+        try
+        {
+            await CustomerService.DeleteAsync(id);
+            customers = await CustomerService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}

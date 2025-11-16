@@ -1,0 +1,68 @@
+@page "/customers/create"
+@rendermode InteractiveServer
+
+@using ApiContracts.Customers
+@using WoM_BlazorApp.Http
+@inject ICustomerService CustomerService
+@inject NavigationManager Nav
+
+<PageTitle>Add Customer</PageTitle>
+
+<h1>Add new customer</h1>
+
+<div class="mb-3">
+    <label class="form-label">Company Name</label>
+    <InputText @bind-Value="companyName" class="form-control" />
+</div>
+<div class="mb-3">
+    <label class="form-label">Phone No</label>
+    <InputText @bind-Value="phoneNo" class="form-control" />
+</div>
+<div class="mb-3">
+    <label class="form-label">Email</label>
+    <InputText @bind-Value="email" class="form-control" />
+</div>
+<div class="mb-3">
+    <label class="form-label">Company CVR</label>
+    <InputText @bind-Value="companyCVR" class="form-control" />
+</div>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+
+<button class="btn btn-success" @onclick="CreateAsync">Save</button>
+<button class="btn btn-secondary ms-2" @onclick="@(() => Nav.NavigateTo("/customers"))">
+    Cancel
+</button>
+
+@code {
+    private string companyName = "";
+    private string phoneNo = "";
+    private string email = "";
+    private string companyCVR = "";
+    private string? error;
+
+    private async Task CreateAsync()
+    {
+        error = null;
+        try
+        {
+            var dto = new CreateCustomerDto
+            {
+                CompanyName = companyName,
+                PhoneNo = phoneNo,
+                Email = email,
+                CompanyCVR = companyCVR
+            };
+
+            await CustomerService.CreateAsync(dto);
+            Nav.NavigateTo("/customers");
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}

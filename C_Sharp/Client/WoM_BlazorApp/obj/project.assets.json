@@ -11,6 +11,29 @@
         "buildMultiTargeting": {
           "buildMultiTargeting/Microsoft.AspNetCore.App.Internal.Assets.targets": {}
         }
+      },
+      "ApiContracts/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "Entities": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/ApiContracts.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ApiContracts.dll": {}
+        }
+      },
+      "Entities/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/Entities.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Entities.dll": {}
+        }
       }
     }
   },
@@ -37,45 +60,53 @@
         "microsoft.aspnetcore.app.internal.assets.10.0.0-preview.7.25380.108.nupkg.sha512",
         "microsoft.aspnetcore.app.internal.assets.nuspec"
       ]
+    },
+    "ApiContracts/1.0.0": {
+      "type": "project",
+      "path": "../../Shared/ApiContracts/ApiContracts.csproj",
+      "msbuildProject": "../../Shared/ApiContracts/ApiContracts.csproj"
+    },
+    "Entities/1.0.0": {
+      "type": "project",
+      "path": "../../Server/Entities/Entities.csproj",
+      "msbuildProject": "../../Server/Entities/Entities.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net10.0": [
+      "ApiContracts >= 1.0.0",
       "Microsoft.AspNetCore.App.Internal.Assets >= 10.0.0-preview.7.25380.108"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\waqar\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\piter\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\waqar\\IT-SEP3Y - Source\\SEP3_WayOfMilk\\c_sharp\\Client\\WoM_BlazorApp\\WoM_BlazorApp.csproj",
+      "projectUniqueName": "C:\\Users\\piter\\WayOfMilk_Sep3\\WayOfMilk\\WayOfMilk_Sep3\\C_Sharp\\Client\\WoM_BlazorApp\\WoM_BlazorApp.csproj",
       "projectName": "WoM_BlazorApp",
-      "projectPath": "C:\\Users\\waqar\\IT-SEP3Y - Source\\SEP3_WayOfMilk\\c_sharp\\Client\\WoM_BlazorApp\\WoM_BlazorApp.csproj",
-      "packagesPath": "C:\\Users\\waqar\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\waqar\\IT-SEP3Y - Source\\SEP3_WayOfMilk\\c_sharp\\Client\\WoM_BlazorApp\\obj\\",
+      "projectPath": "C:\\Users\\piter\\WayOfMilk_Sep3\\WayOfMilk\\WayOfMilk_Sep3\\C_Sharp\\Client\\WoM_BlazorApp\\WoM_BlazorApp.csproj",
+      "packagesPath": "C:\\Users\\piter\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\piter\\WayOfMilk_Sep3\\WayOfMilk\\WayOfMilk_Sep3\\C_Sharp\\Client\\WoM_BlazorApp\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\waqar\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\piter\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\piter\\WayOfMilk_Sep3\\WayOfMilk\\WayOfMilk_Sep3\\C_Sharp\\Shared\\ApiContracts\\ApiContracts.csproj": {
+              "projectPath": "C:\\Users\\piter\\WayOfMilk_Sep3\\WayOfMilk\\WayOfMilk_Sep3\\C_Sharp\\Shared\\ApiContracts\\ApiContracts.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

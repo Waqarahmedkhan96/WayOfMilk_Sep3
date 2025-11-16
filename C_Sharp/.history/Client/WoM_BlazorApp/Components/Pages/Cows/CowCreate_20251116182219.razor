@@ -1,0 +1,50 @@
+@page "/cows/create"
+@rendermode InteractiveServer
+
+@using ApiContracts.Cows
+@using WoM_BlazorApp.Http
+@inject ICowService CowService
+@inject NavigationManager Nav
+
+<PageTitle>Add Cow</PageTitle>
+
+<h1>Add new cow</h1>
+
+<div class="mb-3">
+    <label class="form-label">Birth date</label>
+    <InputDate @bind-Value="birthDate" class="form-control" />
+</div>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+
+<button class="btn btn-success" @onclick="CreateAsync">Save</button>
+<button class="btn btn-secondary ms-2" @onclick="@(() => Nav.NavigateTo("/cows"))">
+    Cancel
+</button>
+
+@code {
+    private DateOnly birthDate = DateOnly.FromDateTime(DateTime.Today);
+    private string? error;
+
+    private async Task CreateAsync()
+    {
+        error = null;
+        try
+        {
+            var dto = new CreateCowDto
+            {
+                BirthDate = birthDate
+            };
+
+            await CowService.CreateAsync(dto);
+            Nav.NavigateTo("/cows");
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}

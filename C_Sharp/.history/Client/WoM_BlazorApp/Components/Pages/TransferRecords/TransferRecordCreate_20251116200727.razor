@@ -1,0 +1,89 @@
+@page "/transfer-records/create"
+@rendermode InteractiveServer
+
+@using ApiContracts.TransferRecords
+@using Entities
+@using WoM_BlazorApp.Http
+@using System.Linq
+@inject ITransferRecordService TransferRecordService
+@inject NavigationManager Nav
+
+<PageTitle>Add Transfer Record</PageTitle>
+
+<h1>Add new transfer record</h1>
+
+<div class="mb-3">
+    <label class="form-label">Cow Id</label>
+    <InputNumber @bind-Value="cowId" class="form-control" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Move Date</label>
+    <InputDate @bind-Value="moveDate" class="form-control" />
+</div>
+<div class="mb-3">
+    <label class="form-label">From Department</label>
+    <InputSelect @bind-Value="fromDept" class="form-control">
+        @foreach (var d in Enum.GetValues(typeof(Department)).Cast<Department>())
+        {
+            <option value="@d">@d</option>
+        }
+    </InputSelect>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">To Department</label>
+    <InputSelect @bind-Value="toDept" class="form-control">
+        @foreach (var d in Enum.GetValues(typeof(Department)).Cast<Department>())
+        {
+            <option value="@d">@d</option>
+        }
+    </InputSelect>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Requested By Employee Id</label>
+    <InputNumber @bind-Value="requestedByUserId" class="form-control" />
+</div>
+@code {
+    private int cowId;
+    private DateOnly moveDate = DateOnly.FromDateTime(DateTime.Today);
+    private string fromDept = Enum.GetNames(typeof(Department)).FirstOrDefault() ?? string.Empty;
+    private string toDept = Enum.GetNames(typeof(Department)).FirstOrDefault() ?? string.Empty;
+    private int requestedByUserId;
+    private string? error;
+<button class="btn btn-secondary ms-2" @onclick="@(() => Nav.NavigateTo("/transfer-records"))">
+    Cancel
+</button>
+
+@code {
+    private int cowId;
+            var dto = new CreateTransferRecordDto
+            {
+                CowId = cowId,
+                MovedAt = moveDate,
+                FromDept = Enum.Parse<Department>(fromDept),
+                ToDept = Enum.Parse<Department>(toDept),
+                RequestedByUserId = requestedByUserId
+            };
+        error = null;
+        try
+        {
+            var dto = new CreateTransferRecordDto
+            {
+                CowId = cowId,
+                MovedAt = moveDate,
+                FromDept = fromDept,
+                ToDept = toDept,
+                RequestedByUserId = requestedByUserId
+            };
+
+            await TransferRecordService.CreateAsync(dto);
+            Nav.NavigateTo("/transfer-records");
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}
