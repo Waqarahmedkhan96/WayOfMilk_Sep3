@@ -1,0 +1,113 @@
+###############################################
+#          GLOBAL IGNORE (Windows/Mac)
+###############################################
+.DS_Store
+Thumbs.db
+
+###############################################
+#          VISUAL STUDIO / VS CODE
+###############################################
+.vs/
+.vscode/
+*.code-workspace
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+###############################################
+#          RIDER / JETBRAINS
+###############################################
+.idea/
+*.iml
+
+###############################################
+#          .NET BUILD + PACKAGE FOLDERS
+###############################################
+bin/
+obj/
+**/bin/
+**/obj/
+
+# Auto-generated static web assets (Blazor)
+**/staticwebassets/
+**/wwwroot/_framework/
+**/wwwroot/staticwebassets/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+project.lock.json
+project.fragment.lock.json
+
+# Auto-generated project files
+*.generated.cs
+*.g.cs
+*.g.i.cs
+
+###############################################
+#          LOGS / TEMP / CACHE
+###############################################
+*.log
+*.tlog
+*.tmp
+*.temp
+*.cache
+*.bak
+
+###############################################
+#          ARCHIVE FILES
+###############################################
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+
+###############################################
+#          PUBLISH FOLDERS
+###############################################
+publish/
+AppPackages/
+BundleArtifacts/
+node_modules/
+
+###############################################
+#          JAVA / MAVEN IGNORE
+###############################################
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+###############################################
+#          SECRETS (LOCAL ONLY)
+###############################################
+appsettings.Development.json
+appsettings.Local.json
+*.env
+.env.*
+
+
+###############################################
+#          CUSTOM FOR YOUR PROJECT
+###############################################
+
+# Ignore build folders inside team folder
+C_Sharp/**/bin/
+C_Sharp/**/obj/
+C_Sharp/**/staticwebassets/
+
+# Ignore build folders inside your personal folder
+c_sharp/**/bin/
+c_sharp/**/obj/
+c_sharp/**/staticwebassets/
+
+# DO NOT ignore your personal folder itself
+!c_sharp/
