@@ -1,4 +1,4 @@
-package DTOs;
+package sep3.DTOs;
 
 
 public class UserInfoDTO

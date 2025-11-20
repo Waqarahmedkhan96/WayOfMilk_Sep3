@@ -1,10 +1,10 @@
-package RequestHandlers;
+package sep3.RequestHandlers;
 
-import DTOs.CowCreationDTO;
-import DTOs.CowInfoDTO;
-import entities.Cow;
-import DAOs.CowDAO;
-import Mapping.CowMappper;
+import sep3.DTOs.CowCreationDTO;
+import sep3.DTOs.CowInfoDTO;
+import sep3.entities.Cow;
+import sep3.DAOs.CowDAO;
+import sep3.Mapping.CowMappper;
 
 import org.springframework.stereotype.Service;
 import java.util.List;

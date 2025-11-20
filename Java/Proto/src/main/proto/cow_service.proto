@@ -1,6 +1,9 @@
 
 syntax = "proto3";
 
+//if importing related proto files:
+//import "other_service.proto";
+
 // Defining the Java package where the generated code will live
 option java_package = "sep3.wayofmilk.grpc";
 option java_multiple_files = true;
@@ -9,7 +12,7 @@ option java_multiple_files = true;
 service CowService {
   rpc GetAllCows (Empty) returns (CowList);
   rpc AddCow (CowCreationRequest) returns (CowData);
-  // rpc AddCow (CowCreationRequest) returns (CowIdResponse); // for the next feature
+  // rpc UpdateCow (CowData) returns (CowData) // for the next feature
 }
 
 // The messages (equivalents of the DTOs)

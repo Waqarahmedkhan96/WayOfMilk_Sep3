@@ -1,4 +1,4 @@
-package entities;
+package sep3.entities;
 
 //no annotations needed in this class, since the inheritance was already
 // declared in the parent class and jpa is smart enough to figure it out

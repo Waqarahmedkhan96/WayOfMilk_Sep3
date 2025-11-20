@@ -1,5 +1,5 @@
-package app;
-//moved to a package bc spring boot is extra like that today
+package sep3;
+//moved everything to a new package bc spring boot is extra like that
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

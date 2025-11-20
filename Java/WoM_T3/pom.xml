@@ -67,11 +67,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>sep3.wayofmilk</groupId>
-            <artifactId>shared-dtos</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
+
         <dependency>
             <groupId>sep3</groupId>
             <artifactId>wom-grpc-contract</artifactId>
@@ -82,11 +78,7 @@
             <groupId>net.devh</groupId>
             <artifactId>grpc-server-spring-boot-starter</artifactId>
             <version>2.15.0.RELEASE</version> </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-all</artifactId>
-            <version>1.51.0</version>
-        </dependency>
+
 
         <dependency>
             <groupId>javax.annotation</groupId>
