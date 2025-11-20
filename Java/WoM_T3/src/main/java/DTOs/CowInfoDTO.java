@@ -1,5 +1,46 @@
-package main.java.DTOs;
+package DTOs;
+
+
+import java.time.LocalDate;
 
 public class CowInfoDTO
 {
+  private long id;
+  private String regNo;
+  private LocalDate birthDate;
+  private boolean isHealthy;
+
+  public CowInfoDTO()
+  {
+  }
+
+  public CowInfoDTO(long id, String regNo, LocalDate birthDate, boolean isHealthy)
+  {
+    this.id = id;
+    this.regNo = regNo;
+    this.birthDate = birthDate;
+    this.isHealthy = isHealthy;
+  }
+
+  //Getters only for now, since it's an information retrieval dto
+  public long getId()
+  {
+    return id;
+  }
+
+  public String getRegNo()
+  {
+    return regNo;
+  }
+
+  public LocalDate getBirthDate()
+  {
+    return birthDate;
+  }
+
+  public boolean isHealthy()
+  {
+    return isHealthy;
+  }
 }
+
