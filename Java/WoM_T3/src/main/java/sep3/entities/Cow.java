@@ -18,6 +18,7 @@ import java.time.LocalDate;
   //LocalDate accounts for time differences, so it's more accurate
   private boolean isHealthy; //upon adding a new cow to a herd,
   // it will be quarantined until health is confirmed, so the default is false
+  private long departmentId;
 
   //JPA requirement: Public or protected no-argument constructor
   //protected reserves this constructor for JPA only
@@ -31,6 +32,7 @@ import java.time.LocalDate;
     this.regNo = regNo;
     this.birthDate = birthDate;
     this.isHealthy = false; //new cows are unhealthy by default
+    this.departmentId = 0; //TODO: make sure this is the quarantine department
   }
 
   //getters and setters
@@ -73,5 +75,15 @@ import java.time.LocalDate;
   public void setHealthy(boolean healthy)
   {
     isHealthy = healthy;
+  }
+
+  public long getDepartmentId()
+  {
+    return departmentId;
+  }
+
+  public void setDepartmentId(long departmentId)
+  {
+    this.departmentId = departmentId;
   }
 }

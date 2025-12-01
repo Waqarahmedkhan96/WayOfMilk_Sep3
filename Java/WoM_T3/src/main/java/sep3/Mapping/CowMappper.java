@@ -1,6 +1,6 @@
 package sep3.Mapping;
 
-import sep3.DTOs.CowInfoDTO;
+import sep3.DTOs.CowDataDTO;
 import sep3.entities.Cow;
 
 public class CowMappper
@@ -8,10 +8,10 @@ public class CowMappper
   //static methods to map between entities and DTOs for request handlers
   public CowMappper(){}
 
-  public static CowInfoDTO convertCowToDto(Cow cow)
+  public static CowDataDTO convertCowToDto(Cow cow)
   {
-    // You use the parameterized constructor of the CowInfoDTO
-    return new CowInfoDTO(cow.getId(), cow.getRegNo(), cow.getBirthDate(),
+    // You use the parameterized constructor of the CowDataDTO
+    return new CowDataDTO(cow.getId(), cow.getRegNo(), cow.getBirthDate(),
         cow.isHealthy() // Use the isHealthy getter
     );
   }

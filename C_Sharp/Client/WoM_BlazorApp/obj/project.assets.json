@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     "net10.0": {
-      "Microsoft.AspNetCore.App.Internal.Assets/10.0.0-preview.7.25380.108": {
+      "Microsoft.AspNetCore.App.Internal.Assets/10.0.0": {
         "type": "package",
         "build": {
           "build/Microsoft.AspNetCore.App.Internal.Assets.props": {},
@@ -38,10 +38,10 @@
     }
   },
   "libraries": {
-    "Microsoft.AspNetCore.App.Internal.Assets/10.0.0-preview.7.25380.108": {
-      "sha512": "WSgFVVye9pnrNmGnlEYVuKwahLf4ow2AAmjmdb9i+ASkZQswKwrtqqW+4+kGTr6AVoKRr9fgt7rh2NnoXOq+1g==",
+    "Microsoft.AspNetCore.App.Internal.Assets/10.0.0": {
+      "sha512": "0gZrESKwnlmbE8Br8XIy3kk7Pj0++9T2Ly+A8BFYYgo5EgfqWEln26cho+l92KOaHUzclhvz314RiwE910s24g==",
       "type": "package",
-      "path": "microsoft.aspnetcore.app.internal.assets/10.0.0-preview.7.25380.108",
+      "path": "microsoft.aspnetcore.app.internal.assets/10.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -57,7 +57,7 @@
         "build/Microsoft.AspNetCore.App.Internal.Assets.targets",
         "buildMultiTargeting/Microsoft.AspNetCore.App.Internal.Assets.targets",
         "buildTransitive/Microsoft.AspNetCore.App.Internal.Assets.targets",
-        "microsoft.aspnetcore.app.internal.assets.10.0.0-preview.7.25380.108.nupkg.sha512",
+        "microsoft.aspnetcore.app.internal.assets.10.0.0.nupkg.sha512",
         "microsoft.aspnetcore.app.internal.assets.nuspec"
       ]
     },
@@ -75,23 +75,28 @@
   "projectFileDependencyGroups": {
     "net10.0": [
       "ApiContracts >= 1.0.0",
-      "Microsoft.AspNetCore.App.Internal.Assets >= 10.0.0-preview.7.25380.108"
+      "Microsoft.AspNetCore.App.Internal.Assets >= 10.0.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\piter\\.nuget\\packages\\": {}
+    "C:\\Users\\amycl\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\piter\\WayOfMilk_Sep3\\WayOfMilk\\WayOfMilk_Sep3\\C_Sharp\\Client\\WoM_BlazorApp\\WoM_BlazorApp.csproj",
+      "projectUniqueName": "D:\\Docs\\courses\\SE Software Engineering\\sem 3\\Semester Project\\code\\Source_Code\\WayOfMilk_Sep3\\C_Sharp\\Client\\WoM_BlazorApp\\WoM_BlazorApp.csproj",
       "projectName": "WoM_BlazorApp",
-      "projectPath": "C:\\Users\\piter\\WayOfMilk_Sep3\\WayOfMilk\\WayOfMilk_Sep3\\C_Sharp\\Client\\WoM_BlazorApp\\WoM_BlazorApp.csproj",
-      "packagesPath": "C:\\Users\\piter\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\piter\\WayOfMilk_Sep3\\WayOfMilk\\WayOfMilk_Sep3\\C_Sharp\\Client\\WoM_BlazorApp\\obj\\",
+      "projectPath": "D:\\Docs\\courses\\SE Software Engineering\\sem 3\\Semester Project\\code\\Source_Code\\WayOfMilk_Sep3\\C_Sharp\\Client\\WoM_BlazorApp\\WoM_BlazorApp.csproj",
+      "packagesPath": "C:\\Users\\amycl\\.nuget\\packages\\",
+      "outputPath": "D:\\Docs\\courses\\SE Software Engineering\\sem 3\\Semester Project\\code\\Source_Code\\WayOfMilk_Sep3\\C_Sharp\\Client\\WoM_BlazorApp\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\piter\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\amycl\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
@@ -103,8 +108,8 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\Users\\piter\\WayOfMilk_Sep3\\WayOfMilk\\WayOfMilk_Sep3\\C_Sharp\\Shared\\ApiContracts\\ApiContracts.csproj": {
-              "projectPath": "C:\\Users\\piter\\WayOfMilk_Sep3\\WayOfMilk\\WayOfMilk_Sep3\\C_Sharp\\Shared\\ApiContracts\\ApiContracts.csproj"
+            "D:\\Docs\\courses\\SE Software Engineering\\sem 3\\Semester Project\\code\\Source_Code\\WayOfMilk_Sep3\\C_Sharp\\Shared\\ApiContracts\\ApiContracts.csproj": {
+              "projectPath": "D:\\Docs\\courses\\SE Software Engineering\\sem 3\\Semester Project\\code\\Source_Code\\WayOfMilk_Sep3\\C_Sharp\\Shared\\ApiContracts\\ApiContracts.csproj"
             }
           }
         }
@@ -128,7 +133,7 @@
           "Microsoft.AspNetCore.App.Internal.Assets": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[10.0.0-preview.7.25380.108, )",
+            "version": "[10.0.0, )",
             "autoReferenced": true
           }
         },
@@ -151,7 +156,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100-preview.7.25380.108/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
@@ -242,51 +247,50 @@
           "Microsoft.AspNetCore.WebSockets": "(,10.0.32767]",
           "Microsoft.AspNetCore.WebUtilities": "(,10.0.32767]",
           "Microsoft.CSharp": "(,4.7.32767]",
-          "Microsoft.Extensions.Caching.Abstractions": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Caching.Memory": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Configuration": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Configuration.Abstractions": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Configuration.Binder": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Configuration.CommandLine": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Configuration.EnvironmentVariables": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Configuration.FileExtensions": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Configuration.Ini": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Configuration.Json": "(,10.0.0-preview.7.25380.108]",
+          "Microsoft.Extensions.Caching.Abstractions": "(,10.0.32767]",
+          "Microsoft.Extensions.Caching.Memory": "(,10.0.32767]",
+          "Microsoft.Extensions.Configuration": "(,10.0.32767]",
+          "Microsoft.Extensions.Configuration.Abstractions": "(,10.0.32767]",
+          "Microsoft.Extensions.Configuration.Binder": "(,10.0.32767]",
+          "Microsoft.Extensions.Configuration.CommandLine": "(,10.0.32767]",
+          "Microsoft.Extensions.Configuration.EnvironmentVariables": "(,10.0.32767]",
+          "Microsoft.Extensions.Configuration.FileExtensions": "(,10.0.32767]",
+          "Microsoft.Extensions.Configuration.Ini": "(,10.0.32767]",
+          "Microsoft.Extensions.Configuration.Json": "(,10.0.32767]",
           "Microsoft.Extensions.Configuration.KeyPerFile": "(,10.0.32767]",
-          "Microsoft.Extensions.Configuration.UserSecrets": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Configuration.Xml": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.DependencyInjection": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Diagnostics": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Diagnostics.Abstractions": "(,10.0.0-preview.7.25380.108]",
+          "Microsoft.Extensions.Configuration.UserSecrets": "(,10.0.32767]",
+          "Microsoft.Extensions.Configuration.Xml": "(,10.0.32767]",
+          "Microsoft.Extensions.DependencyInjection": "(,10.0.32767]",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "(,10.0.32767]",
+          "Microsoft.Extensions.Diagnostics": "(,10.0.32767]",
+          "Microsoft.Extensions.Diagnostics.Abstractions": "(,10.0.32767]",
           "Microsoft.Extensions.Diagnostics.HealthChecks": "(,10.0.32767]",
           "Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions": "(,10.0.32767]",
           "Microsoft.Extensions.Features": "(,10.0.32767]",
-          "Microsoft.Extensions.FileProviders.Abstractions": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.FileProviders.Composite": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.FileProviders.Embedded": "(,10.0.32767]",
-          "Microsoft.Extensions.FileProviders.Physical": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.FileSystemGlobbing": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Hosting": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Hosting.Abstractions": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Http": "(,10.0.0-preview.7.25380.108]",
+          "Microsoft.Extensions.FileProviders.Abstractions": "(,10.0.32767]",
+          "Microsoft.Extensions.FileProviders.Composite": "(,10.0.32767]",
+          "Microsoft.Extensions.FileProviders.Physical": "(,10.0.32767]",
+          "Microsoft.Extensions.FileSystemGlobbing": "(,10.0.32767]",
+          "Microsoft.Extensions.Hosting": "(,10.0.32767]",
+          "Microsoft.Extensions.Hosting.Abstractions": "(,10.0.32767]",
+          "Microsoft.Extensions.Http": "(,10.0.32767]",
           "Microsoft.Extensions.Identity.Core": "(,10.0.32767]",
           "Microsoft.Extensions.Identity.Stores": "(,10.0.32767]",
           "Microsoft.Extensions.Localization": "(,10.0.32767]",
           "Microsoft.Extensions.Localization.Abstractions": "(,10.0.32767]",
-          "Microsoft.Extensions.Logging": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Logging.Abstractions": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Logging.Configuration": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Logging.Console": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Logging.Debug": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Logging.EventLog": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Logging.EventSource": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Logging.TraceSource": "(,10.0.0-preview.7.25380.108]",
+          "Microsoft.Extensions.Logging": "(,10.0.32767]",
+          "Microsoft.Extensions.Logging.Abstractions": "(,10.0.32767]",
+          "Microsoft.Extensions.Logging.Configuration": "(,10.0.32767]",
+          "Microsoft.Extensions.Logging.Console": "(,10.0.32767]",
+          "Microsoft.Extensions.Logging.Debug": "(,10.0.32767]",
+          "Microsoft.Extensions.Logging.EventLog": "(,10.0.32767]",
+          "Microsoft.Extensions.Logging.EventSource": "(,10.0.32767]",
+          "Microsoft.Extensions.Logging.TraceSource": "(,10.0.32767]",
           "Microsoft.Extensions.ObjectPool": "(,10.0.32767]",
-          "Microsoft.Extensions.Options": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Options.DataAnnotations": "(,10.0.0-preview.7.25380.108]",
-          "Microsoft.Extensions.Primitives": "(,10.0.0-preview.7.25380.108]",
+          "Microsoft.Extensions.Options": "(,10.0.32767]",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "(,10.0.32767]",
+          "Microsoft.Extensions.Options.DataAnnotations": "(,10.0.32767]",
+          "Microsoft.Extensions.Primitives": "(,10.0.32767]",
           "Microsoft.Extensions.Validation": "(,10.0.32767]",
           "Microsoft.Extensions.WebEncoders": "(,10.0.32767]",
           "Microsoft.JSInterop": "(,10.0.32767]",
@@ -436,7 +440,7 @@
           "System.Buffers": "(,5.0.32767]",
           "System.Collections": "(,4.3.32767]",
           "System.Collections.Concurrent": "(,4.3.32767]",
-          "System.Collections.Immutable": "(,10.0.0-preview.7.25380.108]",
+          "System.Collections.Immutable": "(,10.0.32767]",
           "System.Collections.NonGeneric": "(,4.3.32767]",
           "System.Collections.Specialized": "(,4.3.32767]",
           "System.ComponentModel": "(,4.3.32767]",
@@ -449,8 +453,8 @@
           "System.Data.DataSetExtensions": "(,4.4.32767]",
           "System.Diagnostics.Contracts": "(,4.3.32767]",
           "System.Diagnostics.Debug": "(,4.3.32767]",
-          "System.Diagnostics.DiagnosticSource": "(,10.0.0-preview.7.25380.108]",
-          "System.Diagnostics.EventLog": "(,10.0.0-preview.7.25380.108]",
+          "System.Diagnostics.DiagnosticSource": "(,10.0.32767]",
+          "System.Diagnostics.EventLog": "(,10.0.32767]",
           "System.Diagnostics.FileVersionInfo": "(,4.3.32767]",
           "System.Diagnostics.Process": "(,4.3.32767]",
           "System.Diagnostics.StackTrace": "(,4.3.32767]",
@@ -460,9 +464,9 @@
           "System.Diagnostics.Tracing": "(,4.3.32767]",
           "System.Drawing.Primitives": "(,4.3.32767]",
           "System.Dynamic.Runtime": "(,4.3.32767]",
-          "System.Formats.Asn1": "(,10.0.0-preview.7.25380.108]",
-          "System.Formats.Cbor": "(,10.0.0-preview.7.25380.108]",
-          "System.Formats.Tar": "(,10.0.0-preview.7.25380.108]",
+          "System.Formats.Asn1": "(,10.0.32767]",
+          "System.Formats.Cbor": "(,10.0.32767]",
+          "System.Formats.Tar": "(,10.0.32767]",
           "System.Globalization": "(,4.3.32767]",
           "System.Globalization.Calendars": "(,4.3.32767]",
           "System.Globalization.Extensions": "(,4.3.32767]",
@@ -476,25 +480,25 @@
           "System.IO.FileSystem.Watcher": "(,4.3.32767]",
           "System.IO.IsolatedStorage": "(,4.3.32767]",
           "System.IO.MemoryMappedFiles": "(,4.3.32767]",
-          "System.IO.Pipelines": "(,10.0.0-preview.7.25380.108]",
+          "System.IO.Pipelines": "(,10.0.32767]",
           "System.IO.Pipes": "(,4.3.32767]",
           "System.IO.Pipes.AccessControl": "(,5.0.32767]",
           "System.IO.UnmanagedMemoryStream": "(,4.3.32767]",
           "System.Linq": "(,4.3.32767]",
-          "System.Linq.AsyncEnumerable": "(,10.0.0-preview.7.25380.108]",
+          "System.Linq.AsyncEnumerable": "(,10.0.32767]",
           "System.Linq.Expressions": "(,4.3.32767]",
           "System.Linq.Parallel": "(,4.3.32767]",
           "System.Linq.Queryable": "(,4.3.32767]",
           "System.Memory": "(,5.0.32767]",
           "System.Net.Http": "(,4.3.32767]",
-          "System.Net.Http.Json": "(,10.0.0-preview.7.25380.108]",
+          "System.Net.Http.Json": "(,10.0.32767]",
           "System.Net.NameResolution": "(,4.3.32767]",
           "System.Net.NetworkInformation": "(,4.3.32767]",
           "System.Net.Ping": "(,4.3.32767]",
           "System.Net.Primitives": "(,4.3.32767]",
           "System.Net.Requests": "(,4.3.32767]",
           "System.Net.Security": "(,4.3.32767]",
-          "System.Net.ServerSentEvents": "(,10.0.0-preview.7.25380.108]",
+          "System.Net.ServerSentEvents": "(,10.0.32767]",
           "System.Net.Sockets": "(,4.3.32767]",
           "System.Net.WebHeaderCollection": "(,4.3.32767]",
           "System.Net.WebSockets": "(,4.3.32767]",
@@ -509,7 +513,7 @@
           "System.Reflection.Emit.ILGeneration": "(,4.7.32767]",
           "System.Reflection.Emit.Lightweight": "(,4.7.32767]",
           "System.Reflection.Extensions": "(,4.3.32767]",
-          "System.Reflection.Metadata": "(,10.0.0-preview.7.25380.108]",
+          "System.Reflection.Metadata": "(,10.0.32767]",
           "System.Reflection.Primitives": "(,4.3.32767]",
           "System.Reflection.TypeExtensions": "(,4.3.32767]",
           "System.Resources.Reader": "(,4.3.32767]",
@@ -537,22 +541,23 @@
           "System.Security.Cryptography.OpenSsl": "(,5.0.32767]",
           "System.Security.Cryptography.Primitives": "(,4.3.32767]",
           "System.Security.Cryptography.X509Certificates": "(,4.3.32767]",
-          "System.Security.Cryptography.Xml": "(,10.0.0-preview.7.25380.108]",
+          "System.Security.Cryptography.Xml": "(,10.0.32767]",
           "System.Security.Principal": "(,4.3.32767]",
           "System.Security.Principal.Windows": "(,5.0.32767]",
           "System.Security.SecureString": "(,4.3.32767]",
           "System.Text.Encoding": "(,4.3.32767]",
-          "System.Text.Encoding.CodePages": "(,10.0.0-preview.7.25380.108]",
+          "System.Text.Encoding.CodePages": "(,10.0.32767]",
           "System.Text.Encoding.Extensions": "(,4.3.32767]",
-          "System.Text.Encodings.Web": "(,10.0.0-preview.7.25380.108]",
-          "System.Text.Json": "(,10.0.0-preview.7.25380.108]",
+          "System.Text.Encodings.Web": "(,10.0.32767]",
+          "System.Text.Json": "(,10.0.32767]",
           "System.Text.RegularExpressions": "(,4.3.32767]",
           "System.Threading": "(,4.3.32767]",
-          "System.Threading.Channels": "(,10.0.0-preview.7.25380.108]",
+          "System.Threading.AccessControl": "(,10.0.32767]",
+          "System.Threading.Channels": "(,10.0.32767]",
           "System.Threading.Overlapped": "(,4.3.32767]",
-          "System.Threading.RateLimiting": "(,10.0.0-preview.7.25380.108]",
+          "System.Threading.RateLimiting": "(,10.0.32767]",
           "System.Threading.Tasks": "(,4.3.32767]",
-          "System.Threading.Tasks.Dataflow": "(,10.0.0-preview.7.25380.108]",
+          "System.Threading.Tasks.Dataflow": "(,10.0.32767]",
           "System.Threading.Tasks.Extensions": "(,5.0.32767]",
           "System.Threading.Tasks.Parallel": "(,4.3.32767]",
           "System.Threading.Thread": "(,4.3.32767]",

@@ -27,9 +27,10 @@ message CowCreationRequest {
 }
 
 message CowData {
-  int64 id = 1;         // Corresponds to 'long' in Java
+  int64 id = 1;         // Corresponds to 'long' in Java (int is int32, double is float)
   string regNo = 2;
   // Using string for dates, and handling conversion (LocalDate <-> string) in the service layer
   string birthDate = 3;
   bool isHealthy = 4;
+  int64 departmentId = 5; //TODO: consider whether it should be a translated string instead of an id
 }

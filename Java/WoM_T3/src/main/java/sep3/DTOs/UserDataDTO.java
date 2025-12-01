@@ -1,7 +1,7 @@
 package sep3.DTOs;
 
 
-public class UserInfoDTO
+public class UserDataDTO
 {
   private String name;
   private String email;
@@ -10,11 +10,11 @@ public class UserInfoDTO
   private long id;
   //the id has only informative value, this dto is not used to create or update employees
 
-  public UserInfoDTO()
+  public UserDataDTO()
   {
   }
 
-  public UserInfoDTO(String name, String email, String address, String phone, long id)
+  public UserDataDTO(String name, String email, String address, String phone, long id)
   {
     this.name = name;
     this.email = email;

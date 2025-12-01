@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "2q/7WlkA2uI=",
+  "dgSpecHash": "UW2oAuxB80A=",
   "success": true,
-  "projectFilePath": "C:\\Users\\piter\\WayOfMilk_Sep3\\WayOfMilk\\WayOfMilk_Sep3\\C_Sharp\\Client\\WoM_BlazorApp\\WoM_BlazorApp.csproj",
+  "projectFilePath": "D:\\Docs\\courses\\SE Software Engineering\\sem 3\\Semester Project\\code\\Source_Code\\WayOfMilk_Sep3\\C_Sharp\\Client\\WoM_BlazorApp\\WoM_BlazorApp.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\piter\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.0-preview.7.25380.108\\microsoft.aspnetcore.app.internal.assets.10.0.0-preview.7.25380.108.nupkg.sha512"
+    "C:\\Users\\amycl\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.0\\microsoft.aspnetcore.app.internal.assets.10.0.0.nupkg.sha512"
   ],
   "logs": []
 }

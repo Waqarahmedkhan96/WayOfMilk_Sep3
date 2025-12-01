@@ -1,8 +1,8 @@
 package sep3.grpc;
 import net.devh.boot.grpc.server.service.GrpcService;
 import sep3.DTOs.CowCreationDTO;
-import sep3.DTOs.CowInfoDTO;
-import sep3.RequestHandlers.CowInfoService;
+import sep3.DTOs.CowDataDTO;
+import sep3.RequestHandlers.CowDataService;
 // Import generated message classes:
 
 import io.grpc.stub.StreamObserver;
@@ -14,22 +14,22 @@ import java.util.List;
 @GrpcService // Marks this as a gRPC service implementation
 public class CowServiceImpl extends CowServiceGrpc.CowServiceImplBase {
 
-  private final CowInfoService coreService;
+  private final CowDataService coreService;
 
-  public CowServiceImpl(CowInfoService coreService) {
+  public CowServiceImpl(CowDataService coreService) {
     this.coreService = coreService;
   }
 
   @Override
   public void getAllCows(Empty request, StreamObserver<CowList> responseObserver) {
 
-    // 1. Call the existing business logic service (returns List<CowInfoDTO>)
-    List<CowInfoDTO> dtos = coreService.getAllCows();
+    // 1. Call the existing business logic service (returns List<CowDataDTO>)
+    List<CowDataDTO> dtos = coreService.getAllCows();
 
-    // 2. Map the DTOs (CowInfoDTO) to the gRPC messages (CowData)
+    // 2. Map the DTOs (CowDataDTO) to the gRPC messages (CowData)
     CowList.Builder cowListBuilder = CowList.newBuilder();
 
-    for (CowInfoDTO dto : dtos) {
+    for (CowDataDTO dto : dtos) {
       CowData cowData = CowData.newBuilder()
           .setId(dto.getId())
           .setRegNo(dto.getRegNo())
@@ -55,9 +55,9 @@ public class CowServiceImpl extends CowServiceGrpc.CowServiceImplBase {
     );
 
     // 2. Call the Core Business Service
-    CowInfoDTO createdDto = coreService.addCow(creationDto);
+    CowDataDTO createdDto = coreService.addCow(creationDto);
 
-    // 3. Convert the resulting CowInfoDTO back into the gRPC response message (CowData)
+    // 3. Convert the resulting CowDataDTO back into the gRPC response message (CowData)
     CowData responseData = CowData.newBuilder()
         .setId(createdDto.getId())
         .setRegNo(createdDto.getRegNo())

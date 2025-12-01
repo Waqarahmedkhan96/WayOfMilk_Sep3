@@ -3,18 +3,18 @@ package sep3.DTOs;
 
 import java.time.LocalDate;
 
-public class CowInfoDTO
+public class CowDataDTO
 {
   private long id;
   private String regNo;
   private LocalDate birthDate;
   private boolean isHealthy;
 
-  public CowInfoDTO()
+  public CowDataDTO()
   {
   }
 
-  public CowInfoDTO(long id, String regNo, LocalDate birthDate, boolean isHealthy)
+  public CowDataDTO(long id, String regNo, LocalDate birthDate, boolean isHealthy)
   {
     this.id = id;
     this.regNo = regNo;
