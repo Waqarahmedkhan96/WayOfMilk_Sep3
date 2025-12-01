@@ -2,6 +2,21 @@ namespace ApiContracts.Milk;
 
 using Entities; // enums
 
+// Create
+public class CreateMilkDto
+{
+    public DateOnly DateOnly { get; set; }
+    public double VolumeL { get; set; }
+    public int CowId { get; set; }
+    public int? ContainerId { get; set; }
+    public int CreatedByUserId { get; set; }
+
+    // for approval by worker while adding
+    public bool ApprovedForStorage { get; set; }    // approve?
+    public MilkTestResult MilkTestResult { get; set; } // must be pass when approving
+
+}
+
 // Read
 public class MilkDto
 {
@@ -12,20 +27,7 @@ public class MilkDto
     public bool ApprovedForStorage { get; set; }
     public int CowId { get; set; }
     public int? ContainerId { get; set; }
-}
-
-// Create
-public class CreateMilkDto
-{
-    public DateOnly DateOnly { get; set; }
-    public double VolumeL { get; set; }
-    public int CowId { get; set; }
-    public int? ContainerId { get; set; }
-
-    // for approval by worker while adding
-    public bool ApprovedForStorage { get; set; }    // approve?
-    public MilkTestResult MilkTestResult { get; set; } // must be pass when approving
-
+    public int CreatedByUserId { get; set; }
 }
 
 // Update
@@ -37,13 +39,14 @@ public class UpdateMilkDto
     public bool ApprovedForStorage { get; set; }
     public int CowId { get; set; }
     public int? ContainerId { get; set; }
+    public int CreatedByUserId { get; set; }
 }
 
 // Action: approve
 public class ApproveMilkDto
 {
     public bool ApprovedForStorage { get; set; }
-    public MilkTestResult MilkTestResult { get; set; }
+    public MilkTestResult MilkTestResult { get; set;}
 }
 
 // Delete (batch)

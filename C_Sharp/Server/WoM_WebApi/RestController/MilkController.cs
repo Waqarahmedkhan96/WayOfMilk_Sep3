@@ -2,9 +2,8 @@ using ApiContracts.Milk;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryContracts;
-using System.Linq;
 
-namespace WoM_WebApi.Controllers;
+namespace WoM_WebApi.RestController;
 
 [ApiController]
 [Route("[controller]")]
@@ -34,9 +33,10 @@ public class MilkController : ControllerBase
             DateOnly = request.DateOnly,
             VolumeL = request.VolumeL,
             CowId = request.CowId,
-            ContainerId = request.ContainerId,                 // OK if approved; null otherwise
-            ApprovedForStorage = request.ApprovedForStorage,   // worker may approve at create
-            MilkTestResult = request.MilkTestResult            // must be Pass when approved
+            ContainerId = request.ContainerId,
+            ApprovedForStorage = request.ApprovedForStorage,
+            MilkTestResult = request.MilkTestResult,
+            CreatedByUserId = request.CreatedByUserId
         });
 
         var dto = new MilkDto
@@ -47,7 +47,8 @@ public class MilkController : ControllerBase
             MilkTestResult = created.MilkTestResult,
             ApprovedForStorage = created.ApprovedForStorage,
             CowId = created.CowId,
-            ContainerId = created.ContainerId
+            ContainerId = created.ContainerId,
+            CreatedByUserId = created.CreatedByUserId
         };
         return Created($"/milks/{dto.Id}", dto);
     }
@@ -65,14 +66,19 @@ public class MilkController : ControllerBase
             MilkTestResult = m.MilkTestResult,
             ApprovedForStorage = m.ApprovedForStorage,
             CowId = m.CowId,
-            ContainerId = m.ContainerId
+            ContainerId = m.ContainerId,
+            CreatedByUserId = m.CreatedByUserId
         };
         return Ok(dto);
     }
 
     // GET /milks?cowId=...&containerId=...&from=...&to=...
     [HttpGet]
-    public ActionResult<IEnumerable<MilkDto>> GetMilks([FromQuery] int? cowId, [FromQuery] int? containerId, [FromQuery] DateOnly? from, [FromQuery] DateOnly? to)
+    public ActionResult<IEnumerable<MilkDto>> GetMilks(
+        [FromQuery] int? cowId,
+        [FromQuery] int? containerId,
+        [FromQuery] DateOnly? from,
+        [FromQuery] DateOnly? to)
     {
         var query = _milk.GetManyAsync();
 
@@ -93,7 +99,8 @@ public class MilkController : ControllerBase
             MilkTestResult = m.MilkTestResult,
             ApprovedForStorage = m.ApprovedForStorage,
             CowId = m.CowId,
-            ContainerId = m.ContainerId
+            ContainerId = m.ContainerId,
+            CreatedByUserId = m.CreatedByUserId
         }).ToList();
 
         return Ok(list);
@@ -119,7 +126,8 @@ public class MilkController : ControllerBase
             MilkTestResult = request.MilkTestResult,
             ApprovedForStorage = request.ApprovedForStorage,
             CowId = request.CowId,
-            ContainerId = request.ContainerId
+            ContainerId = request.ContainerId,
+            CreatedByUserId = request.CreatedByUserId
         };
         await _milk.UpdateAsync(milk);
         return NoContent();

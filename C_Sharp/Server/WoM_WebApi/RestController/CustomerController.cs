@@ -2,9 +2,8 @@ using ApiContracts.Customers;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryContracts;
-using System.Linq;
 
-namespace WebApi.Controllers;
+namespace WoM_WebApi.RestController;
 
 [ApiController]
 [Route("[controller]")]
@@ -58,7 +57,9 @@ public class CustomersController : ControllerBase
 
     // GET /customers?companyContains=...&cvrEquals=...
     [HttpGet]
-    public ActionResult<IEnumerable<CustomerDto>> GetCustomers([FromQuery] string? companyContains, [FromQuery] string? cvrEquals)
+    public ActionResult<IEnumerable<CustomerDto>> GetCustomers(
+        [FromQuery] string? companyContains,
+        [FromQuery] string? cvrEquals)
     {
         var query = _customers.GetManyAsync();
 

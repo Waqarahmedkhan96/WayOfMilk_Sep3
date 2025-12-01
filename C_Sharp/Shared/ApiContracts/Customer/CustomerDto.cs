@@ -1,5 +1,14 @@
 namespace ApiContracts.Customers;
 
+// Create
+public class CreateCustomerDto
+{
+    public required string CompanyName { get; set; }
+    public string PhoneNo { get; set; } = "";
+    public string Email { get; set; } = "";
+    public string CompanyCVR { get; set; } = "";
+}
+
 // Read
 public class CustomerDto
 {
@@ -10,14 +19,6 @@ public class CustomerDto
     public string CompanyCVR { get; set; } = "";
 }
 
-// Create
-public class CreateCustomerDto
-{
-    public required string CompanyName { get; set; }
-    public string PhoneNo { get; set; } = "";
-    public string Email { get; set; } = "";
-    public string CompanyCVR { get; set; } = "";
-}
 
 // Update
 public class UpdateCustomerDto

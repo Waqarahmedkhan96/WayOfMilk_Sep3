@@ -1,10 +1,10 @@
-using ApiContracts.Containers;
+using ApiContracts.Container;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryContracts;
-using System.Linq;
 
-namespace WebApi.Controllers;
+
+namespace WoM_WebApi.RestController;
 
 [ApiController]
 [Route("[controller]")]
@@ -38,7 +38,9 @@ public class ContainersController : ControllerBase
 
     // GET /containers?minCapacityL=...&maxCapacityL=...
     [HttpGet]
-    public ActionResult<IEnumerable<ContainerDto>> GetContainers([FromQuery] double? minCapacityL, [FromQuery] double? maxCapacityL)
+    public ActionResult<IEnumerable<ContainerDto>> GetContainers(
+        [FromQuery] double? minCapacityL,
+        [FromQuery] double? maxCapacityL)
     {
         var query = _containers.GetManyAsync();
 

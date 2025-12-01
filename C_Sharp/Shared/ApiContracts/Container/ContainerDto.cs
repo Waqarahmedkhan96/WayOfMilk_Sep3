@@ -1,4 +1,10 @@
-namespace ApiContracts.Containers;
+namespace ApiContracts.Container;
+
+// Create
+public class CreateContainerDto
+{
+    public double CapacityL { get; set; }
+}
 
 // Read
 public class ContainerDto
@@ -7,11 +13,6 @@ public class ContainerDto
     public double CapacityL { get; set; }
 }
 
-// Create
-public class CreateContainerDto
-{
-    public double CapacityL { get; set; }
-}
 
 // Update
 public class UpdateContainerDto

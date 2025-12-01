@@ -1,10 +1,9 @@
-using ApiContracts.TransferRecords;
+using ApiContracts.TransferRecord;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryContracts;
-using System.Linq;
 
-namespace WoM_WebApi.Controllers;
+namespace WoM_WebApi.RestController;
 
 [ApiController]
 [Route("[controller]")]
@@ -23,23 +22,23 @@ public class TransferRecordsController : ControllerBase
     {
         var created = await _transfers.AddAsync(new TransferRecord
         {
+            Department = request.Department,
             MovedAt = request.MovedAt,
             FromDept = request.FromDept,
             ToDept = request.ToDept,
             RequestedByUserId = request.RequestedByUserId,
-            CowId = request.CowId,
-            Department = request.ToDept
+            CowId = request.CowId
         });
 
         var dto = new TransferRecordDto
         {
             Id = created.Id,
+            Department = created.Department,
             MovedAt = created.MovedAt,
             FromDept = created.FromDept,
             ToDept = created.ToDept,
             RequestedByUserId = created.RequestedByUserId,
             ApprovedByVetUserId = created.ApprovedByVetUserId,
-            Department = created.Department,
             CowId = created.CowId
         };
         return Created($"/transferrecords/{dto.Id}", dto);
@@ -53,12 +52,12 @@ public class TransferRecordsController : ControllerBase
         var dto = new TransferRecordDto
         {
             Id = t.Id,
+            Department = t.Department,
             MovedAt = t.MovedAt,
             FromDept = t.FromDept,
             ToDept = t.ToDept,
             RequestedByUserId = t.RequestedByUserId,
             ApprovedByVetUserId = t.ApprovedByVetUserId,
-            Department = t.Department,
             CowId = t.CowId
         };
         return Ok(dto);
@@ -66,7 +65,11 @@ public class TransferRecordsController : ControllerBase
 
     // GET /transferrecords?cowId=...&department=...&fromMovedAt=...&toMovedAt=...
     [HttpGet]
-    public ActionResult<IEnumerable<TransferRecordDto>> GetTransfers([FromQuery] int? cowId, [FromQuery] Department? department, [FromQuery] DateOnly? fromMovedAt, [FromQuery] DateOnly? toMovedAt)
+    public ActionResult<IEnumerable<TransferRecordDto>> GetTransfers(
+        [FromQuery] int? cowId,
+        [FromQuery] Department? department,
+        [FromQuery] DateOnly? fromMovedAt,
+        [FromQuery] DateOnly? toMovedAt)
     {
         var query = _transfers.GetManyAsync();
 
@@ -82,12 +85,12 @@ public class TransferRecordsController : ControllerBase
         var list = query.Select(t => new TransferRecordDto
         {
             Id = t.Id,
+            Department = t.Department,
             MovedAt = t.MovedAt,
             FromDept = t.FromDept,
             ToDept = t.ToDept,
             RequestedByUserId = t.RequestedByUserId,
             ApprovedByVetUserId = t.ApprovedByVetUserId,
-            Department = t.Department,
             CowId = t.CowId
         }).ToList();
 
@@ -101,12 +104,12 @@ public class TransferRecordsController : ControllerBase
         var transfer = new TransferRecord
         {
             Id = id,
+            Department = request.Department,
             MovedAt = request.MovedAt,
             FromDept = request.FromDept,
             ToDept = request.ToDept,
             RequestedByUserId = request.RequestedByUserId,
             ApprovedByVetUserId = request.ApprovedByVetUserId,
-            Department = request.Department,
             CowId = request.CowId
         };
         await _transfers.UpdateAsync(transfer);

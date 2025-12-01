@@ -1,6 +1,18 @@
-namespace ApiContracts.Sales;
+namespace ApiContracts.Sale;
 
-// Read
+
+// Create
+public class CreateSaleDto
+{
+    public int CreatedByUserId { get; set; }
+    public DateOnly DateOnly { get; set; }
+    public int ContainerId { get; set; }
+    public double QuantityL { get; set; }
+    public decimal Price { get; set; }
+    public int CustomerId { get; set; }
+}
+
+// Read/ Get
 public class SaleDto
 {
     public int Id { get; set; }
@@ -13,16 +25,6 @@ public class SaleDto
     public int CustomerId { get; set; }
 }
 
-// Create
-public class CreateSaleDto
-{
-    public int CreatedByUserId { get; set; }
-    public DateOnly DateOnly { get; set; }
-    public int ContainerId { get; set; }
-    public double QuantityL { get; set; }
-    public decimal Price { get; set; }
-    public int CustomerId { get; set; }
-}
 
 // Update
 public class UpdateSaleDto

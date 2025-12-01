@@ -1,10 +1,9 @@
-using ApiContracts.Sales;
+using ApiContracts.Sale;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryContracts;
-using System.Linq;
 
-namespace WoM_WebApi.Controllers;
+namespace WoM_WebApi.RestController;
 
 [ApiController]
 [Route("[controller]")]
@@ -66,7 +65,11 @@ public class SalesController : ControllerBase
 
     // GET /sales?customerId=...&createdByUserId=...&from=...&to=...
     [HttpGet]
-    public ActionResult<IEnumerable<SaleDto>> GetSales([FromQuery] int? customerId, [FromQuery] int? createdByUserId, [FromQuery] DateOnly? from, [FromQuery] DateOnly? to)
+    public ActionResult<IEnumerable<SaleDto>> GetSales(
+        [FromQuery] int? customerId,
+        [FromQuery] int? createdByUserId,
+        [FromQuery] DateOnly? from,
+        [FromQuery] DateOnly? to)
     {
         var query = _sales.GetManyAsync();
 

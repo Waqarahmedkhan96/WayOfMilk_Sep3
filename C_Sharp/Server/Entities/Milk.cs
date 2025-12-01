@@ -1,4 +1,3 @@
-using Entities;
 namespace Entities;
 
 public class Milk
@@ -11,4 +10,5 @@ public class Milk
 
     public int CowId { get; set; }
     public int? ContainerId { get; set; }
+    public int CreatedByUserId { get; set; }
 }

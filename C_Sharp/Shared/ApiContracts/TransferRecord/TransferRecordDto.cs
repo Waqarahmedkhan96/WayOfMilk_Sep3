@@ -1,39 +1,40 @@
-namespace ApiContracts.TransferRecords;
+namespace ApiContracts.TransferRecord;
 
-using Entities; // enums
+using Entities;
+
+// Create
+public class CreateTransferRecordDto
+{
+    public Department Department { get; set; }
+    public DateOnly MovedAt { get; set; }
+    public Department FromDept { get; set; }
+    public Department ToDept { get; set; }
+    public int RequestedByUserId { get; set; }
+    public int CowId { get; set; }
+}
 
 // Read
 public class TransferRecordDto
 {
     public int Id { get; set; }
+    public Department Department { get; set; }
     public DateOnly MovedAt { get; set; }
     public Department FromDept { get; set; }
     public Department ToDept { get; set; }
     public int RequestedByUserId { get; set; }
     public int? ApprovedByVetUserId { get; set; }
-    public Department Department { get; set; }
-    public int CowId { get; set; }
-}
-
-// Create
-public class CreateTransferRecordDto
-{
-    public DateOnly MovedAt { get; set; }
-    public Department FromDept { get; set; }
-    public Department ToDept { get; set; }
-    public int RequestedByUserId { get; set; }
     public int CowId { get; set; }
 }
 
 // Update
 public class UpdateTransferRecordDto
 {
+    public Department Department { get; set; }
     public DateOnly MovedAt { get; set; }
     public Department FromDept { get; set; }
     public Department ToDept { get; set; }
     public int RequestedByUserId { get; set; }
     public int? ApprovedByVetUserId { get; set; }
-    public Department Department { get; set; }
     public int CowId { get; set; }
 }
 
