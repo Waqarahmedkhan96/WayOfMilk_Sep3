@@ -5,25 +5,29 @@ import java.time.LocalDate;
 
 public class CowDataDTO
 {
-  private long id;
+  private Long id;
   private String regNo;
   private LocalDate birthDate;
-  private boolean isHealthy;
+  private Boolean isHealthy;
+  private Long departmentId;
 
+  //using Boolean instead of boolean and Long instead of long to allow null values
+  //and avoid conversion errors
   public CowDataDTO()
   {
   }
 
-  public CowDataDTO(long id, String regNo, LocalDate birthDate, boolean isHealthy)
+  public CowDataDTO(Long id, String regNo, LocalDate birthDate, Boolean isHealthy, Long departmentId)
   {
     this.id = id;
     this.regNo = regNo;
     this.birthDate = birthDate;
     this.isHealthy = isHealthy;
+    this.departmentId = departmentId;
   }
 
-  //Getters only for now, since it's an information retrieval dto
-  public long getId()
+  //Getters
+  public Long getId()
   {
     return id;
   }
@@ -38,9 +42,41 @@ public class CowDataDTO
     return birthDate;
   }
 
-  public boolean isHealthy()
+  public Boolean isHealthy()
   {
     return isHealthy;
+  }
+
+  public Long getDepartmentId()
+  {
+    return departmentId;
+  }
+
+  //Setters
+
+  public void setId(Long id)
+  {
+    this.id = id;
+  }
+
+  public void setRegNo(String regNo)
+  {
+    this.regNo = regNo;
+  }
+
+  public void setBirthDate(LocalDate birthDate)
+  {
+    this.birthDate = birthDate;
+  }
+
+  public void setHealthy(Boolean healthy)
+  {
+    isHealthy = healthy;
+  }
+
+  public void setDepartmentId(Long departmentId)
+  {
+    this.departmentId = departmentId;
   }
 }
 

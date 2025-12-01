@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Column;
 
 import java.time.LocalDate;
 
@@ -13,6 +14,7 @@ import java.time.LocalDate;
   // DB handles ID generation
   //long instead of int because this is the standard for JPA entities
   private long id;
+  @Column(unique = true) //making sure the same cow is not registered twice
   private String regNo;
   private LocalDate birthDate; //LocalDate works better with JPA than Date
   //LocalDate accounts for time differences, so it's more accurate
@@ -32,7 +34,17 @@ import java.time.LocalDate;
     this.regNo = regNo;
     this.birthDate = birthDate;
     this.isHealthy = false; //new cows are unhealthy by default
-    this.departmentId = 0; //TODO: make sure this is the quarantine department
+    this.departmentId = 1; //TODO: make sure this is the quarantine department
+  }
+
+  //constructor ONLY for updating an existing cow's data
+  public Cow(long id, String regNo, LocalDate birthDate, boolean isHealthy, long departmentId)
+  {
+    this.id = id;
+    this.regNo = regNo;
+    this.birthDate = birthDate;
+    this.isHealthy = isHealthy;
+    this.departmentId = departmentId;
   }
 
   //getters and setters

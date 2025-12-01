@@ -12,7 +12,13 @@ option java_multiple_files = true;
 service CowService {
   rpc GetAllCows (Empty) returns (CowList);
   rpc AddCow (CowCreationRequest) returns (CowData);
-  // rpc UpdateCow (CowData) returns (CowData) // for the next feature
+  rpc UpdateCow (CowData) returns (CowData);
+  rpc GetCowById (CowIdRequest) returns (CowData);
+  rpc DeleteCow (CowIdRequest) returns (Empty);
+  //TODO: consider whether transfer requests should be handled here or in a separate proto/service
+  rpc TransferCow (CowTransferRequest) returns (CowData);
+  //since health update is allowed only by a specific type of user, a separate method is created
+  rpc UpdateCowHealth (CowData) returns (CowData);
 }
 
 // The messages (equivalents of the DTOs)
@@ -28,9 +34,21 @@ message CowCreationRequest {
 
 message CowData {
   int64 id = 1;         // Corresponds to 'long' in Java (int is int32, double is float)
-  string regNo = 2;
+  // 'optional' tells gRPC to generate 'has...()' methods in Java
+  //necessary for null checks in Long, Boolean and LocalDate fields especially during updates
+  optional string regNo = 2;
   // Using string for dates, and handling conversion (LocalDate <-> string) in the service layer
-  string birthDate = 3;
-  bool isHealthy = 4;
-  int64 departmentId = 5; //TODO: consider whether it should be a translated string instead of an id
+  optional string birthDate = 3;
+  optional bool isHealthy = 4;
+  optional int64 departmentId = 5; //TODO: consider whether it should be a translated string instead of an id
+}
+
+message CowIdRequest {
+  int64 id = 1;
+}
+
+message CowTransferRequest {
+  int64 cowId = 1;
+  int64 newDepartmentId = 2;
+  optional bool isHealthy = 3;
 }
