@@ -68,11 +68,11 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>sep3</groupId>
-            <artifactId>wom-grpc-contract</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>sep3</groupId>-->
+<!--            <artifactId>wom-grpc-contract</artifactId>-->
+<!--            <version>0.0.1-SNAPSHOT</version>-->
+<!--        </dependency>-->
         <!-- gRPC dependencies -->
         <dependency>
             <groupId>net.devh</groupId>

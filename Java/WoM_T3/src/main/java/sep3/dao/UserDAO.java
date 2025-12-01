@@ -1,6 +1,6 @@
-package sep3.DAOs;
+package sep3.dao;
 
-import sep3.entities.User;
+import sep3.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

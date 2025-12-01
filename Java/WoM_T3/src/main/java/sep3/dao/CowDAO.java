@@ -1,8 +1,8 @@
-package sep3.DAOs;
+package sep3.dao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import sep3.entities.Cow;
+import sep3.entity.Cow;
 
 @Repository public interface CowDAO extends JpaRepository<Cow, Long>
 {

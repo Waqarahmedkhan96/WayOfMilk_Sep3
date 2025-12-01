@@ -1,7 +1,7 @@
 package sep3.Mapping;
 
-import sep3.DTOs.CowDataDTO;
-import sep3.entities.Cow;
+import sep3.dto.CowDataDTO;
+import sep3.entity.Cow;
 
 public class CowMappper
 {
