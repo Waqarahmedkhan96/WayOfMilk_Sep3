@@ -24,6 +24,8 @@ message CowList {
 message CowCreationRequest {
   string regNo = 1;
   string birthDate = 2; // Using string for dates, and handling conversion (LocalDate <-> string) in the service layer
+  int64 registeredByUserId = 3;
+
 }
 
 message CowData {

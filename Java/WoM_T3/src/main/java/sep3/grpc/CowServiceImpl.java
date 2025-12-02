@@ -1,13 +1,13 @@
 package sep3.grpc;
+import com.google.protobuf.Empty;
 import net.devh.boot.grpc.server.service.GrpcService;
-import sep3.DTOs.CowCreationDTO;
-import sep3.DTOs.CowDataDTO;
+import sep3.dto.CowCreationDTO;
+import sep3.dto.CowDataDTO;
 import sep3.RequestHandlers.CowDataService;
 // Import generated message classes:
 
 import io.grpc.stub.StreamObserver;
 import sep3.wayofmilk.grpc.*;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -51,7 +51,8 @@ public class CowServiceImpl extends CowServiceGrpc.CowServiceImplBase {
     // 1. Convert the gRPC Request message into the Spring DTO
     CowCreationDTO creationDto = new CowCreationDTO(
         request.getRegNo(),
-        LocalDate.parse(request.getBirthDate()) // Convert string to LocalDate
+        LocalDate.parse(request.getBirthDate()), // Convert string to LocalDate
+        request.getRegisteredByUserId()
     );
 
     // 2. Call the Core Business Service

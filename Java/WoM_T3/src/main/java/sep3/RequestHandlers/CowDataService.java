@@ -1,12 +1,15 @@
 package sep3.RequestHandlers;
 
-import sep3.DTOs.CowCreationDTO;
-import sep3.DTOs.CowDataDTO;
-import sep3.entities.Cow;
-import sep3.DAOs.CowDAO;
+import sep3.dto.CowCreationDTO;
+import sep3.dto.CowDataDTO;
+import sep3.entity.Cow;
+import sep3.dao.CowDAO;
+import sep3.dao.UserDAO;
 import sep3.Mapping.CowMappper;
 
 import org.springframework.stereotype.Service;
+import sep3.entity.User;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,11 +20,13 @@ public class CowDataService
 
   // Inject the Data Access Object (DAO) / Repository
   private final CowDAO cowDAO;
+  private final UserDAO userDAO;
 
   // Constructor Injection (Spring automatically provides the CowDAO instance)
-  public CowDataService(CowDAO cowDAO)
+  public CowDataService(CowDAO cowDAO, UserDAO userDAO)
   {
     this.cowDAO = cowDAO;
+    this.userDAO = userDAO;
   }
 
   /**
@@ -43,11 +48,16 @@ public class CowDataService
         .collect(Collectors.toList());
   }
 
-  public CowDataDTO addCow(CowCreationDTO cow)
-  {
-    Cow addedCow = cowDAO.save(new Cow(cow.getRegNo(), cow.getBirthDate()));
-    return convertToDto(addedCow);
-  }
+public CowDataDTO addCow(CowCreationDTO cow)
+{
+  User user = userDAO.findById(cow.getRegisteredByUserId())
+      .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + cow.getRegisteredByUserId()));
+  Cow addedCow = cowDAO.save(
+    new Cow(cow.getRegNo(), cow.getBirthDate(), true, user)
+  );
+
+  return convertToDto(addedCow);
+}
 
   //using a static mapper class to convert between entity and DTO because direct conversion is not effective everywhere
   private CowDataDTO convertToDto(Cow cow)
