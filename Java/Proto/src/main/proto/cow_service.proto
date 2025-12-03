@@ -7,6 +7,9 @@ syntax = "proto3";
 // Defining the Java package where the generated code will live
 option java_package = "sep3.wayofmilk.grpc";
 option java_multiple_files = true;
+//c# namespace
+option csharp_namespace = "Sep3.WayOfMilk.Grpc";
+
 
 // The service T3 will implement and T2 will call
 service CowService {
