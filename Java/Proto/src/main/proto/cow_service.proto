@@ -1,4 +1,3 @@
-
 syntax = "proto3";
 
 //if importing related proto files:
