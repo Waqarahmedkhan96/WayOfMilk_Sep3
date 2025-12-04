@@ -13,6 +13,8 @@ import jakarta.persistence.*;
   private String address;
   private String hashedPassword;
   //database will only retain the hashed version of the password
+  private UserRole role;
+  //since we have the enum, we can still use it, but it will be initiated null in the parent
 
   //TODO think of security since true password will be parsed between servers to get here so maybe hash somewhere earlier on the way?
 
@@ -29,6 +31,7 @@ import jakarta.persistence.*;
     this.phone = phone;
     this.address = address;
     this.hashedPassword = hashPassword(rawPassword);
+    this.role = null;
   }
 
   //constructor for authentication only
