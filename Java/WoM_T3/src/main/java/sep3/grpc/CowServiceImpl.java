@@ -90,6 +90,21 @@ public class CowServiceImpl extends CowServiceGrpc.CowServiceImplBase
     responseObserver.onCompleted();
   }
 
+  public void updateCowHealth(CowData request, StreamObserver<CowData> responseObserver)
+  {
+    // Convert partial gRPC request -> DTO with nulls
+    CowDataDTO changesToCow = GrpcMapper.convertCowProtoToDto(request);
+
+    // Call Service (which is designed for this DTO)
+    CowDataDTO updatedDto = coreService.updateCowHealth(changesToCow);
+
+    // Convert full result DTO -> gRPC response
+    CowData responseData = GrpcMapper.convertCowDtoToProto(updatedDto);
+
+    responseObserver.onNext(responseData);
+    responseObserver.onCompleted();
+  }
+
   //DELETE
 
   @Override public void deleteCow(CowIdRequest request, StreamObserver<Empty> responseObserver)

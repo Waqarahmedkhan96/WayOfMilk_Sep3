@@ -52,4 +52,18 @@ public class DepartmentDataService implements IDepartmentDataService {
         .map(DepartmentMapper::convertDepartmentToDto)
         .orElseThrow(() -> new IllegalArgumentException("Department not found type: " + type));
   }
+
+  @Override
+  public DepartmentDataDTO updateDepartment (DepartmentDataDTO request)
+  {
+    Department departmentToUpdate = departmentDAO.findById(request.getId()).orElseThrow(() -> new RuntimeException("Department not found: " + request.getId()));
+    Department updatedDepartment = departmentDAO.save(departmentToUpdate);
+    return DepartmentMapper.convertDepartmentToDto(updatedDepartment);
+  }
+
+  @Override
+  public void deleteDepartment(long departmentId)
+  {
+    departmentDAO.deleteById(departmentId);
+  }
 }

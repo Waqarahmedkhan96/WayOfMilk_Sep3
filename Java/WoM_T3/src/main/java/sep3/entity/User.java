@@ -4,7 +4,11 @@ import jakarta.persistence.*;
 
 @Entity
 // Specify the inheritance strategy
-@Inheritance(strategy = InheritanceType.JOINED) public abstract class User
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+//switched from JOINED to SINGLE_TABLE because joined would have made separate tables for each child class
+@DiscriminatorColumn(name = "user_type")
+//this will be used to determine the type of user
+public abstract class User
 {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private long id;
   private String name;
@@ -13,8 +17,11 @@ import jakarta.persistence.*;
   private String address;
   private String hashedPassword;
   //database will only retain the hashed version of the password
+  @Enumerated(EnumType.STRING) // Always use String for Enums!
+  // (the default is integers and that can cause problems if new roles are added in the future)
   private UserRole role;
-  //since we have the enum, we can still use it, but it will be initiated null in the parent
+  //since we have the enum, we can still use it for role management,
+  // but we'll force the children to declare their own roles upon creation
 
   //TODO think of security since true password will be parsed between servers to get here so maybe hash somewhere earlier on the way?
 
@@ -24,14 +31,14 @@ import jakarta.persistence.*;
 
   //for creating a new user
   public User(String name, String email, String phone, String address,
-      String rawPassword)
+      String rawPassword, UserRole role)
   {
     this.name = name;
     this.email = email;
     this.phone = phone;
     this.address = address;
     this.hashedPassword = hashPassword(rawPassword);
-    this.role = null;
+    this.role = role;
   }
 
   //constructor for authentication only
@@ -103,6 +110,11 @@ import jakarta.persistence.*;
     this.hashedPassword = hashPassword(rawPassword);
   }
 
+  public UserRole getRole()
+  {
+    return role;
+  }
+
   //HELPERS for password hashing
 
   private String hashPassword(String password)
@@ -110,11 +122,11 @@ import jakarta.persistence.*;
     return Integer.toString(password.hashCode());
   }
 
-  private void checkPassword(String password)
-  {
-    if (!password.equals(hashPassword(password)))
-    {
+  public boolean checkPassword(String rawPassword) {
+    // Compare 'this.hashedPassword' (DB) with 'hashPassword(raw)' (Input)
+    if (!this.hashedPassword.equals(hashPassword(rawPassword))) {
       throw new RuntimeException("Invalid password");
     }
+    return true;
   }
 }

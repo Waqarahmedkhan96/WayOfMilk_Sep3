@@ -78,10 +78,26 @@ import java.util.stream.Collectors;
     //now we can safely update the cow
     Cow savedCow = cowDAO.save(cowToUpdate);
     //since this cow will already have an ID, JPA will automatically look for the corresponding cow
-    // and perform the UPDATE operation instead
+    // and perform the UPDATE operation instead of creating a new one
     //ahh, convenience
     return CowMapper.convertCowToDto(savedCow);
 
+  }
+
+  //update cow health specifically (t2 must permit this to vet only)
+  @Override
+  public CowDataDTO updateCowHealth(CowDataDTO cow)
+  {
+    //check if the health status is declared
+    if (cow.isHealthy() == null)
+    {
+      throw new RuntimeException("Health status must be declared.");
+    }
+    Cow cowToUpdate = cowDAO.findById(cow.getId())
+        .orElseThrow(() -> new RuntimeException("Cow not found: " + cow.getId()));
+    cowToUpdate.setHealthy(cow.isHealthy());
+    Cow savedCow = cowDAO.save(cowToUpdate);
+    return CowMapper.convertCowToDto(savedCow);
   }
 
   //DELETE

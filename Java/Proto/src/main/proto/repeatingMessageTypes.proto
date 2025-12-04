@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+option java_package = "sep3.wayofmilk.grpc";
+option java_multiple_files = true;
+option csharp_namespace = "Sep3.WayOfMilk.Grpc";
+
+message Empty {};

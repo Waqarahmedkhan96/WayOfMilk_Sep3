@@ -7,6 +7,7 @@ public interface ICowDataService {
   CowDataDTO addCow(CowCreationDTO cow);
   List<CowDataDTO> getAllCows();
   CowDataDTO updateCow(CowDataDTO changesToCow);
+  CowDataDTO updateCowHealth(CowDataDTO changesToCow);
   void deleteCow(long id);
   CowDataDTO getCowById(long cowToFindId);
 }

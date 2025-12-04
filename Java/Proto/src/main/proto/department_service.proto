@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "cow_service.proto";
+import "repeatingMessageTypes.proto";
 
 option java_package = "sep3.wayofmilk.grpc";
 option java_multiple_files = true;
