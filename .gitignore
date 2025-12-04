@@ -94,10 +94,12 @@ appsettings.Local.json
 *.env
 .env.*
 
-
 ###############################################
 #          CUSTOM FOR YOUR PROJECT
 ###############################################
+
+# Do NOT ignore your personal folder itself
+!c_sharp/
 
 # Ignore build folders inside team folder
 C_Sharp/**/bin/
@@ -108,6 +110,3 @@ C_Sharp/**/staticwebassets/
 c_sharp/**/bin/
 c_sharp/**/obj/
 c_sharp/**/staticwebassets/
-
-# DO NOT ignore your personal folder itself
-!c_sharp/
