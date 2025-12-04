@@ -1,7 +1,7 @@
 package sep3.grpc;
 import net.devh.boot.grpc.server.service.GrpcService;
-import sep3.DTOs.CowCreationDTO;
-import sep3.DTOs.CowDataDTO;
+import sep3.dto.CowCreationDTO;
+import sep3.dto.CowDataDTO;
 import sep3.Mapping.GrpcMapper;
 // Import generated message classes:
 

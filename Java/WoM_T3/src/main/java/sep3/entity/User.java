@@ -1,57 +1,117 @@
 package sep3.entity;
 
 import jakarta.persistence.*;
-import java.util.List;
 
 @Entity
-@Table(name = "users") // "user" is a reserved keyword in some SQL databases
-public class User
+// Specify the inheritance strategy
+@Inheritance(strategy = InheritanceType.JOINED) public abstract class User
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+  @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private long id;
+  private String name;
+  private String email;
+  private String phone;
+  private String address;
+  private String hashedPassword;
+  //database will only retain the hashed version of the password
 
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+  //TODO think of security since true password will be parsed between servers to get here so maybe hash somewhere earlier on the way?
 
-    private String name;
-    private String email;
-    private String phoneNumber;
-    private String password;
+  protected User()
+  {
+  }
 
-    @OneToMany(mappedBy = "registeredBy")
-    private List<Cow> cows;
+  //for creating a new user
+  public User(String name, String email, String phone, String address,
+      String rawPassword)
+  {
+    this.name = name;
+    this.email = email;
+    this.phone = phone;
+    this.address = address;
+    this.hashedPassword = hashPassword(rawPassword);
+  }
 
-    @OneToMany(mappedBy = "registeredBy")
-    private List<Milk> milks;
+  //constructor for authentication only
+  public User(String email, String rawPassword)
+  {
+    this.email = email;
+    checkPassword(rawPassword);
+  }
 
-    @OneToMany(mappedBy = "registeredBy")
-    private List<Customer> customers;
+  //getters and setters here unless we add any new attributes in child classes
 
-    @OneToMany(mappedBy = "createdBy")
-    private List<Sale> sales;
+  public long getId()
+  {
+    return id;
+  }
 
-    protected User() {}
+  public void setId(long id)
+  {
+    this.id = id;
+  }
 
-    public User(UserRole role, String name, String email, String phoneNumber, String password)
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  public String getEmail()
+  {
+    return email;
+  }
+
+  public void setEmail(String email)
+  {
+    this.email = email;
+  }
+
+  public String getPhone()
+  {
+    return phone;
+  }
+
+  public void setPhone(String phone)
+  {
+    this.phone = phone;
+  }
+
+  public String getAddress()
+  {
+    return address;
+  }
+
+  public void setAddress(String address)
+  {
+    this.address = address;
+  }
+
+  public String getPassword()
+  {
+    return hashedPassword;
+  }
+
+  public void setPassword(String rawPassword)
+  {
+    this.hashedPassword = hashPassword(rawPassword);
+  }
+
+  //HELPERS for password hashing
+
+  private String hashPassword(String password)
+  {
+    return Integer.toString(password.hashCode());
+  }
+
+  private void checkPassword(String password)
+  {
+    if (!password.equals(hashPassword(password)))
     {
-        this.role = role;
-        this.name = name;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.password = password;
+      throw new RuntimeException("Invalid password");
     }
-
-    // Gettery/settery
-    public long getId() { return id; }
-    public UserRole getRole() { return role; }
-    public void setRole(UserRole role) { this.role = role; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+  }
 }

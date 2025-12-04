@@ -9,16 +9,17 @@ public class Department
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String name;
+    private DepartmentType type;
 
     protected Department() {}
 
-    public Department(String name)
+    public Department(DepartmentType type)
     {
-        this.name = name;
+        this.type = type;
     }
 
     public long getId() { return id; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public DepartmentType getType() { return type; }
+    public void setName(DepartmentType type) { this.type = type; }
+
 }

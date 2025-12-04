@@ -1,12 +1,18 @@
 package sep3.RequestHandlers;
 
-import sep3.DTOs.CowCreationDTO;
-import sep3.DTOs.CowDataDTO;
-import sep3.entities.Cow;
-import sep3.DAOs.CowDAO;
+import sep3.dao.CowDAO;
+import sep3.dao.DepartmentDAO;
+import sep3.dao.UserDAO;
+import sep3.dto.CowCreationDTO;
+import sep3.dto.CowDataDTO;
 import sep3.Mapping.CowMapper;
+import sep3.entity.Cow;
 
 import org.springframework.stereotype.Service;
+import sep3.entity.Department;
+import sep3.entity.DepartmentType;
+import sep3.entity.User;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,17 +22,24 @@ import java.util.stream.Collectors;
 
   // Inject the Data Access Object (DAO) / Repository
   private final CowDAO cowDAO;
+  private final DepartmentDAO departmentDAO;
+  private final UserDAO userDAO;
 
   // Constructor Injection (Spring automatically provides the CowDAO instance)
-  public CowDataService(CowDAO cowDAO)
+  public CowDataService(CowDAO cowDAO, DepartmentDAO departmentDAO, UserDAO userDAO)
   {
     this.cowDAO = cowDAO;
+    this.departmentDAO = departmentDAO;
+    this.userDAO = userDAO;
   }
 
   //CREATE/ADD
   public CowDataDTO addCow(CowCreationDTO cow)
   {
-    Cow addedCow = cowDAO.save(new Cow(cow.getRegNo(), cow.getBirthDate()));
+    //making sure new cows are added to a quarrantine department
+    Department quarantine = departmentDAO.findByType(DepartmentType.QUARANTINE).orElseThrow(() -> new RuntimeException("Quarantine department not found"));
+    User addedBy = userDAO.findById(cow.getRegisteredByUserId()).orElseThrow(() -> new RuntimeException("User not found: " + cow.getRegisteredByUserId()));
+    Cow addedCow = cowDAO.save(new Cow(cow.getRegNo(), cow.getBirthDate(), quarantine, addedBy));
     return CowMapper.convertCowToDto(addedCow);
 
     //JPA is smart and performs the INSERT operation here since the cow object doesn't have an ID yet
@@ -51,9 +64,16 @@ import java.util.stream.Collectors;
   {
     Cow cowToUpdate = cowDAO.findById(changesToCow.getId()).orElseThrow(() -> new RuntimeException("Cow not found: " + changesToCow.getId()));
     //with throw because findbyid returns an optional, so we need to handle the case where the cow isn't found
+    //create the department object to be attached to the cow
+    // FIX START: Only fetch department if the DTO actually has a new Department ID
+    Department department = null;
+    if (changesToCow.getDepartmentId() != null) {
+      department = departmentDAO.findById(changesToCow.getDepartmentId())
+          .orElseThrow(() -> new RuntimeException("Department not found"));
+    }
 
     //making sure everything is mapped safe to update
-    CowMapper.updateCowFromDto(cowToUpdate, changesToCow);
+    CowMapper.updateCowFromDto(cowToUpdate, changesToCow, department);
 
     //now we can safely update the cow
     Cow savedCow = cowDAO.save(cowToUpdate);
@@ -72,7 +92,8 @@ import java.util.stream.Collectors;
 
   public CowDataDTO getCowById(long cowToFindId)
   {
-    Cow foundCow = cowDAO.findById(cowToFindId).orElseThrow(() -> new RuntimeException("Cow not found: " + cowToFindId));
+    Cow foundCow = cowDAO.findById(cowToFindId)
+        .orElseThrow(() -> new RuntimeException("Cow not found: " + cowToFindId));
     return CowMapper.convertCowToDto(foundCow);
   }
 }

@@ -20,6 +20,8 @@ public class Milk
     private boolean approvedForStorage;
 
     @ManyToOne
+    @JoinColumn(name = "cow_id")
+    // This creates a foreign key 'cow_id' in the milk table automatically.
     private Cow cow;
 
     @ManyToOne
