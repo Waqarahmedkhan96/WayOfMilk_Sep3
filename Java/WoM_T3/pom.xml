@@ -68,12 +68,12 @@
             <scope>test</scope>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>sep3</groupId>-->
-<!--            <artifactId>wom-grpc-contract</artifactId>-->
-<!--            <version>0.0.1-SNAPSHOT</version>-->
-<!--        </dependency>-->
         <!-- gRPC dependencies -->
+        <dependency>
+            <groupId>sep3</groupId>
+            <artifactId>wom-grpc-contract</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>net.devh</groupId>
             <artifactId>grpc-server-spring-boot-starter</artifactId>
@@ -85,9 +85,37 @@
             <artifactId>javax.annotation-api</artifactId>
             <version>1.3.2</version>
         </dependency>
+
+        <!-- testing relevant -->
+        <!-- Test DB: H2 only for tests -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
+        <!-- mockito java agent plugin for mocking final classes but doing it like their website suggests
+         is finicky, so I'll get back to this if/whenever I have the time -->
+<!--        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>properties</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+                <argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar}</argLine>
+            </configuration>
+        </plugin>-->
     </build>
 
 </project>

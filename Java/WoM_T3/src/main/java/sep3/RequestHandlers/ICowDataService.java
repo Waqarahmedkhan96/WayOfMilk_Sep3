@@ -1,0 +1,12 @@
+package sep3.RequestHandlers;
+import sep3.DTOs.CowCreationDTO;
+import sep3.DTOs.CowDataDTO;
+import java.util.List;
+
+public interface ICowDataService {
+  CowDataDTO addCow(CowCreationDTO cow);
+  List<CowDataDTO> getAllCows();
+  CowDataDTO updateCow(CowDataDTO changesToCow);
+  void deleteCow(long id);
+  CowDataDTO getCowById(long cowToFindId);
+}

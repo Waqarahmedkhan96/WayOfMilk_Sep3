@@ -1,5 +1,5 @@
 package sep3.RequestHandlers;
 
-public class UserInfoService
+public class UserDataService
 {
 }
