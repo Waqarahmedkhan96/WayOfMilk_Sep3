@@ -6,32 +6,19 @@ option java_package = "sep3.wayofmilk.grpc";
 option java_multiple_files = true;
 option csharp_namespace = "Sep3.WayOfMilk.Grpc";
 
-// =========================
-//   DEPARTMENT SERVICE
-// =========================
+// ========== MESSAGES ==========
 
-service DepartmentService {
-  rpc GetAllDepartments (Empty) returns (DepartmentList);
-  rpc AddDepartment (DepartmentCreationRequest) returns (DepartmentData);
-  rpc GetDepartmentById (DepartmentIdRequest) returns (DepartmentData);
-  rpc GetDepartmentByType (DepartmentTypeRequest) returns (DepartmentData);
-}
-
-// =========================
-//         MESSAGES
-// =========================
-
-message DepartmentList {
-  repeated DepartmentData departments = 1;
-}
-
-message DepartmentCreationRequest {
-  string type = 1; // QUARANTINE, MILKING etc.
-}
-
+// Matches DepartmentDataDTO
 message DepartmentData {
   int64 id = 1;
-  string type = 2; // ENUM -> represented as string
+  string name = 2;
+  string type = 3; // MILKING / RESTING / QUARANTINE
+}
+
+// Matches DepartmentCreationDTO
+message DepartmentCreationRequest {
+  string name = 1;
+  string type = 2; // enum as string because we parse in mapper/service
 }
 
 message DepartmentIdRequest {
@@ -39,5 +26,18 @@ message DepartmentIdRequest {
 }
 
 message DepartmentTypeRequest {
-  string type = 1; // QUARANTINE, MILKING etc.
+  string type = 1; // MILKING/RESTING/QUARANTINE
+}
+
+message DepartmentList {
+  repeated DepartmentData departments = 1;
+}
+
+// ========== SERVICE ==========
+
+service DepartmentService {
+  rpc GetAllDepartments (Empty) returns (DepartmentList);
+  rpc AddDepartment (DepartmentCreationRequest) returns (DepartmentData);
+  rpc GetDepartmentById (DepartmentIdRequest) returns (DepartmentData);
+  rpc GetDepartmentByType (DepartmentTypeRequest) returns (DepartmentData);
 }
