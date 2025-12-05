@@ -23,7 +23,7 @@ public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
   // CREATE
   @Override
   public void addUser(UserCreationRequest request, StreamObserver<UserData> responseObserver) {
-    try {
+
       // 1. Map Proto -> DTO
       UserCreationDTO creationDTO = GrpcMapper.userCreationProtoToDto(request);
 
@@ -36,15 +36,13 @@ public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
       // 4. Respond
       responseObserver.onNext(response);
       responseObserver.onCompleted();
-    } catch (Exception e) {
-      responseObserver.onError(e);
-    }
+
   }
 
   // READ (Get By ID)
   @Override
-  public void getUserById(sentId request, StreamObserver<UserData> responseObserver) {
-    try {
+  public void getUserById(SentId request, StreamObserver<UserData> responseObserver) {
+
       // Assuming 'sentId' message has a field 'id' -> getId()
       long id = request.getId();
 
@@ -53,15 +51,13 @@ public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
 
       responseObserver.onNext(response);
       responseObserver.onCompleted();
-    } catch (Exception e) {
-      responseObserver.onError(e);
-    }
+
   }
 
   // READ (Get All)
   @Override
   public void getAllUsers(Empty request, StreamObserver<UserList> responseObserver) {
-    try {
+
       List<UserDataDTO> users = userService.getAllUsers();
 
       UserList.Builder listBuilder = UserList.newBuilder();
@@ -71,15 +67,13 @@ public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
 
       responseObserver.onNext(listBuilder.build());
       responseObserver.onCompleted();
-    } catch (Exception e) {
-      responseObserver.onError(e);
-    }
+
   }
 
   // READ (Get By Name)
   @Override
-  public void getUsersByName(sentString request, StreamObserver<UserList> responseObserver) {
-    try {
+  public void getUsersByName(SentString request, StreamObserver<UserList> responseObserver) {
+
       String nameToSearch = request.getValue();
 
       List<UserDataDTO> users = userService.getUsersByName(nameToSearch);
@@ -91,15 +85,13 @@ public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
 
       responseObserver.onNext(listBuilder.build());
       responseObserver.onCompleted();
-    } catch (Exception e) {
-      responseObserver.onError(e);
-    }
+
   }
 
   // UPDATE
   @Override
   public void updateUser(UserData request, StreamObserver<UserData> responseObserver) {
-    try {
+
       // Map partial update request to DTO
       UserDataDTO changesDto = GrpcMapper.convertUserProtoToDto(request);
 
@@ -108,28 +100,23 @@ public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
 
       responseObserver.onNext(response);
       responseObserver.onCompleted();
-    } catch (Exception e) {
-      responseObserver.onError(e);
-    }
+
   }
 
   // DELETE
   @Override
-  public void deleteUser(sentId request, StreamObserver<Empty> responseObserver) {
-    try {
+  public void deleteUser(SentId request, StreamObserver<Empty> responseObserver) {
+
       userService.deleteUser(request.getId());
 
       responseObserver.onNext(Empty.getDefaultInstance());
       responseObserver.onCompleted();
-    } catch (Exception e) {
-      responseObserver.onError(e);
-    }
   }
 
   // AUTHENTICATE / VALIDATE
   @Override
   public void authenticateUser(AuthenticationRequest request, StreamObserver<UserData> responseObserver) {
-    try {
+
       // 1. Map Proto (Email/Pass) -> LoginDTO
       UserLoginDTO loginDTO = GrpcMapper.convertLoginProtoToDto(request);
 
@@ -141,9 +128,26 @@ public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
 
       responseObserver.onNext(response);
       responseObserver.onCompleted();
-    } catch (Exception e) {
-      // Returns a gRPC error to T2 (e.g., INVALID_ARGUMENT or UNKNOWN)
-      responseObserver.onError(e);
-    }
+  }
+
+  @Override
+  public void changePassword(ChangePasswordRequest request, StreamObserver<SentBool> responseObserver) {
+
+    long userId = request.getId();
+    String oldPassword = request.getOldPassword();
+    String newPassword = request.getNewPassword();
+
+    userService.changePassword(oldPassword, newPassword, userId);
+
+    responseObserver.onNext(SentBool.newBuilder().setValue(true).build());
+    responseObserver.onCompleted();
+  }
+
+  @Override public void resetPassword(SentId request, StreamObserver<Empty> responseObserver)
+  {
+    userService.resetPassword(request.getId());
+
+    responseObserver.onNext(Empty.getDefaultInstance());
+    responseObserver.onCompleted();
   }
 }

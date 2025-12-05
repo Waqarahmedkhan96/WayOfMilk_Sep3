@@ -18,16 +18,17 @@ public abstract class User
   private String email;
   private String phone;
   private String address;
-  private String hashedPassword;
+
+  //private String hashedPassword;
   //database will only retain the hashed version of the password
+  //now handling the hashing via bcrypt configuration from the service layer
+  private String password;
   @Enumerated(EnumType.STRING) // Always use String for Enums!
   // (the default is integers and that can cause problems if new roles are added in the future)
   private UserRole role;
   //since we have the enum, we can still use it for role management,
   // but we'll force the children to declare their own roles upon creation
 
-  //TODO think of security since true password will be parsed between servers to get here so maybe hash somewhere earlier on the way?
-  //TLSCert?
 
   protected User()
   {
@@ -35,13 +36,14 @@ public abstract class User
 
   //for creating a new user
   public User(String name, String email, String phone, String address,
-      String rawPassword, UserRole role)
+      String password, UserRole role)
   {
     this.name = name;
     this.email = email;
     this.phone = phone;
     this.address = address;
-    this.hashedPassword = hashPassword(rawPassword);
+    this.password = password;
+    //this.hashedPassword = hashPassword(rawPassword);
     this.role = role;
   }
 
@@ -49,7 +51,7 @@ public abstract class User
   public User(String email, String rawPassword)
   {
     this.email = email;
-    checkPassword(rawPassword);
+    this.password = rawPassword;
   }
 
   //getters and setters here unless we add any new attributes in child classes
@@ -106,12 +108,13 @@ public abstract class User
 
   public String getPassword()
   {
-    return hashedPassword;
+    return password;
   }
 
-  public void setPassword(String rawPassword)
+  public void setPassword(String password)
   {
-    this.hashedPassword = hashPassword(rawPassword);
+    //this.hashedPassword = hashPassword(rawPassword);
+    this.password = password;
   }
 
   public UserRole getRole()
@@ -120,17 +123,19 @@ public abstract class User
   }
 
   //HELPERS for password hashing
+  //no longer needed
+  //
+  //  private String hashPassword(String password)
+  //  {
+  //    return Integer.toString(password.hashCode());
+  //  }
+  //
+  //  public boolean checkPassword(String rawPassword) {
+  //    // Compare 'this.hashedPassword' (DB) with 'hashPassword(raw)' (Input)
+  //    if (!this.hashedPassword.equals(hashPassword(rawPassword))) {
+  //      throw new RuntimeException("Invalid password");
+  //    }
+  //    return true;
+  //  }
 
-  private String hashPassword(String password)
-  {
-    return Integer.toString(password.hashCode());
-  }
-
-  public boolean checkPassword(String rawPassword) {
-    // Compare 'this.hashedPassword' (DB) with 'hashPassword(raw)' (Input)
-    if (!this.hashedPassword.equals(hashPassword(rawPassword))) {
-      throw new RuntimeException("Invalid password");
-    }
-    return true;
-  }
 }

@@ -10,10 +10,12 @@ service UserService {
   rpc GetAllUsers (Empty) returns (UserList);
   rpc AddUser (UserCreationRequest) returns (UserData);
   rpc UpdateUser (UserData) returns (UserData);
-  rpc GetUserById (sentId) returns (UserData);
-  rpc DeleteUser (sentId) returns (Empty);
-  rpc GetUsersByName (sentString) returns (UserList);
+  rpc GetUserById (SentId) returns (UserData);
+  rpc DeleteUser (SentId) returns (Empty);
+  rpc GetUsersByName (SentString) returns (UserList);
   rpc AuthenticateUser (AuthenticationRequest) returns (UserData);
+  rpc ChangePassword (ChangePasswordRequest) returns (SentBool);
+  rpc ResetPassword (SentId) returns (Empty);
 }
 
 message UserList {
@@ -46,6 +48,11 @@ message NameRequest {
 message AuthenticationRequest {
   string email = 1;
   string password = 2;
+}
+message ChangePasswordRequest {
+  int64 id = 1;
+  string oldPassword = 2;
+  string newPassword = 3;
 }
 
 

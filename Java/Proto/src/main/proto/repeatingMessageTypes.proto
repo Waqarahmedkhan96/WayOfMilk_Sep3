@@ -6,18 +6,21 @@ option csharp_namespace = "Sep3.WayOfMilk.Grpc";
 
 message Empty {};
 
-message sentId {
+message SentId {
   int64 id = 1;
 }
 
-message sentIds {
+message SentIds {
   repeated int64 ids = 1;
 }
 
-message sentString {
+message SentString {
   string value = 1;
 }
 
-message sentStrings {
+message SentStrings {
   repeated string values = 1;
+}
+message SentBool {
+  bool value = 1;
 }

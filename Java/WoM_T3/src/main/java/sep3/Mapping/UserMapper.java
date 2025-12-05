@@ -53,6 +53,32 @@ public class UserMapper {
     }
   }
 
+  //DTO -> Entity for updating
+  public static User updateEntity(UserDataDTO dto, User userToUpdate)
+  {
+    if(dto.getName() != null && !dto.getName().isBlank()) {
+      userToUpdate.setName(dto.getName());
+    }
+    if(dto.getEmail() != null && !dto.getEmail().isBlank()) {
+      userToUpdate.setEmail(dto.getEmail());
+    }
+    if(dto.getPhone() != null && !dto.getPhone().isBlank()) {
+      userToUpdate.setPhone(dto.getPhone());
+    }
+    if(dto.getAddress() != null && !dto.getAddress().isBlank()) {
+      userToUpdate.setAddress(dto.getAddress());
+    }
+
+    // Polymorphism check for Vet License
+    if (dto.getLicenseNumber() != null && !dto.getLicenseNumber().isBlank()) {
+      if (userToUpdate instanceof Vet) {
+        ((Vet) userToUpdate).setLicenseNumber(dto.getLicenseNumber());
+      }
+    }
+
+    return userToUpdate;
+  }
+
   // Entity -> DTO (For Viewing Users)
   public static UserDataDTO toDTO(User user) {
     String licenseNumber = null;
@@ -72,4 +98,6 @@ public class UserMapper {
         licenseNumber // Will be null for Owners and Workers
     );
   }
+
+
 }

@@ -9,6 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 //general error handler for grpc, so we get a hint on what went wrong
 //instead of the error unknown that grpc normally gives
+//also instead of putting everything in try-catch blocks
 @GrpcAdvice public class GlobalGrpcExceptionHandler
 {
 
@@ -39,6 +40,12 @@ import jakarta.persistence.EntityNotFoundException;
       EntityNotFoundException e)
   {
     return Status.NOT_FOUND.withDescription(e.getMessage()); // Gets the "Cow not found with id: 123" message
+  }
+
+  // NEW: Catch Enum errors or bad arguments
+  @GrpcExceptionHandler(IllegalArgumentException.class)
+  public Status handleIllegalArgument(IllegalArgumentException e) {
+    return Status.INVALID_ARGUMENT.withDescription(e.getMessage());
   }
 
   // A final catch-all for any other server error.
