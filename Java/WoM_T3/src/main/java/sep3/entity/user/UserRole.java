@@ -1,4 +1,4 @@
-package sep3.entity;
+package sep3.entity.user;
 
 public enum UserRole {
     OWNER,

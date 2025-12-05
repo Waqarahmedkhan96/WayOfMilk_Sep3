@@ -1,6 +1,7 @@
 package sep3.entity;
 
 import jakarta.persistence.*;
+import sep3.entity.user.User;
 
 @Entity
 public class Customer

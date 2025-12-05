@@ -1,6 +1,6 @@
-package sep3.RequestHandlers;
-import sep3.dto.CowCreationDTO;
-import sep3.dto.CowDataDTO;
+package sep3.RequestHandlers.CowService;
+import sep3.dto.cowDTO.CowCreationDTO;
+import sep3.dto.cowDTO.CowDataDTO;
 import java.util.List;
 
 public interface ICowDataService {

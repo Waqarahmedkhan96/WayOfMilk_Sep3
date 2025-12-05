@@ -1,4 +1,4 @@
-package sep3.dto;
+package sep3.dto.cowDTO;
 
 
 import java.time.LocalDate;

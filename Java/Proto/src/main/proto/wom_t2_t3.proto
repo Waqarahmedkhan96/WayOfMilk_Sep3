@@ -1,11 +1,10 @@
 syntax = "proto3";
+import "repeatingMessageTypes.proto";
 
 option java_package = "sep3.wayofmilk.grpc";
 option java_multiple_files = true;
 
-// =================== Common ===================
-
-message Empty {}
+/*
 
 // =================== COW INFO =================
 
@@ -50,7 +49,7 @@ message UserData {
   int64 id = 1;
   string username = 2;
   string fullName = 3;
-  string role = 4;       // e.g. "farmer", "admin"
+  string role = 4;       // e.g. "owner", "vet"
   int64 departmentId = 5;
 }
 
@@ -184,3 +183,6 @@ message ContainerData {
   double capacityLiters = 2;
   string status = 3; // e.g. "FULL", "EMPTY", "IN_USE"
 }
+
+
+ */

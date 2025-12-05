@@ -1,10 +1,8 @@
 package sep3.RequestHandlers;
 
-import sep3.Mapping.UserMapper;
-import sep3.dto.UserCreationDTO;
-import sep3.dto.UserDataDTO;
-import sep3.dto.UserLoginDTO;
-import sep3.entity.User;
+import sep3.dto.userDTO.UserCreationDTO;
+import sep3.dto.userDTO.UserDataDTO;
+import sep3.dto.userDTO.UserLoginDTO;
 
 import java.util.List;
 

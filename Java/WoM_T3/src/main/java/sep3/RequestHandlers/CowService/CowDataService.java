@@ -1,17 +1,17 @@
-package sep3.RequestHandlers;
+package sep3.RequestHandlers.CowService;
 
 import sep3.dao.CowDAO;
 import sep3.dao.DepartmentDAO;
 import sep3.dao.UserDAO;
-import sep3.dto.CowCreationDTO;
-import sep3.dto.CowDataDTO;
+import sep3.dto.cowDTO.CowCreationDTO;
+import sep3.dto.cowDTO.CowDataDTO;
 import sep3.Mapping.CowMapper;
 import sep3.entity.Cow;
 
 import org.springframework.stereotype.Service;
 import sep3.entity.Department;
 import sep3.entity.DepartmentType;
-import sep3.entity.User;
+import sep3.entity.user.User;
 
 import java.util.List;
 import java.util.stream.Collectors;

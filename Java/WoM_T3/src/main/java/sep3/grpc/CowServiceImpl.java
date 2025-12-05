@@ -1,12 +1,12 @@
 package sep3.grpc;
 import net.devh.boot.grpc.server.service.GrpcService;
-import sep3.dto.CowCreationDTO;
-import sep3.dto.CowDataDTO;
+import sep3.dto.cowDTO.CowCreationDTO;
+import sep3.dto.cowDTO.CowDataDTO;
 import sep3.Mapping.GrpcMapper;
 // Import generated message classes:
 
 import io.grpc.stub.StreamObserver;
-import sep3.RequestHandlers.ICowDataService;
+import sep3.RequestHandlers.CowService.ICowDataService;
 import sep3.wayofmilk.grpc.*;
 
 import java.util.List;

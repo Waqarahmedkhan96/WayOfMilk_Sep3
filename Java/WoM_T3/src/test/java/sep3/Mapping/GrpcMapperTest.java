@@ -2,7 +2,7 @@ package sep3.Mapping;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import sep3.dto.CowDataDTO;
+import sep3.dto.cowDTO.CowDataDTO;
 import sep3.wayofmilk.grpc.CowData;
 
 import java.time.LocalDate;

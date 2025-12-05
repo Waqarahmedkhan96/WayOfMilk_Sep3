@@ -1,6 +1,7 @@
 package sep3.entity;
 
 import jakarta.persistence.*;
+import sep3.entity.user.User;
 
 import java.time.LocalDateTime;
 

@@ -1,4 +1,4 @@
-package sep3.entity;
+package sep3.entity.user;
 
 import jakarta.persistence.*;
 
@@ -24,6 +24,7 @@ public abstract class User
   // but we'll force the children to declare their own roles upon creation
 
   //TODO think of security since true password will be parsed between servers to get here so maybe hash somewhere earlier on the way?
+  //TLSCert?
 
   protected User()
   {

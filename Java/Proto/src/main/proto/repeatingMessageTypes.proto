@@ -5,3 +5,19 @@ option java_multiple_files = true;
 option csharp_namespace = "Sep3.WayOfMilk.Grpc";
 
 message Empty {};
+
+message sentId {
+  int64 id = 1;
+}
+
+message sentIds {
+  repeated int64 ids = 1;
+}
+
+message sentString {
+  string value = 1;
+}
+
+message sentStrings {
+  repeated string values = 1;
+}

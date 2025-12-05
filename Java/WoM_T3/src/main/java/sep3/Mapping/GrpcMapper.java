@@ -1,6 +1,6 @@
 package sep3.Mapping;
-import sep3.dto.CowCreationDTO;
-import sep3.dto.CowDataDTO;
+import sep3.dto.cowDTO.CowCreationDTO;
+import sep3.dto.cowDTO.CowDataDTO;
 import sep3.wayofmilk.grpc.CowCreationRequest; // Import your generated classes
 import sep3.wayofmilk.grpc.CowData; // Import your generated classes
 import java.time.LocalDate;

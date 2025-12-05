@@ -1,9 +1,9 @@
 package sep3.dao;
 
-import sep3.entity.User;
+import sep3.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import sep3.entity.UserRole;
+import sep3.entity.user.UserRole;
 
 import java.util.List;
 import java.util.Optional;

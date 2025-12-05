@@ -1,4 +1,4 @@
-package sep3.entity;
+package sep3.entity.user;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;

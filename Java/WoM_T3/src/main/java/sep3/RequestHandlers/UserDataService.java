@@ -3,10 +3,10 @@ package sep3.RequestHandlers;
 import org.springframework.stereotype.Service;
 import sep3.Mapping.UserMapper;
 import sep3.dao.UserDAO;
-import sep3.dto.UserCreationDTO;
-import sep3.dto.UserDataDTO;
-import sep3.dto.UserLoginDTO;
-import sep3.entity.User;
+import sep3.dto.userDTO.UserCreationDTO;
+import sep3.dto.userDTO.UserDataDTO;
+import sep3.dto.userDTO.UserLoginDTO;
+import sep3.entity.user.User;
 
 import java.util.List;
 
@@ -69,6 +69,9 @@ import java.util.List;
     User updatedUser = userDAO.save(userToUpdate);
     return UserMapper.toDTO(updatedUser);
   }
+
+  //TODO Update and Reset password
+
 
   //DELETE A USER
   @Override

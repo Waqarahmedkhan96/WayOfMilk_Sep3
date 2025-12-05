@@ -1,8 +1,8 @@
 package sep3.Mapping;
 
-import sep3.dto.UserCreationDTO;
-import sep3.dto.UserDataDTO;
-import sep3.entity.*;
+import sep3.dto.userDTO.UserCreationDTO;
+import sep3.dto.userDTO.UserDataDTO;
+import sep3.entity.user.*;
 
 public class UserMapper {
 

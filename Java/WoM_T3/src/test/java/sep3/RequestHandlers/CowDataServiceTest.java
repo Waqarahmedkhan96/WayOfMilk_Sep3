@@ -6,12 +6,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sep3.RequestHandlers.CowService.CowDataService;
 import sep3.dao.CowDAO;
 import sep3.dao.DepartmentDAO;
 import sep3.dao.UserDAO;
-import sep3.dto.CowCreationDTO;
-import sep3.dto.CowDataDTO;
+import sep3.dto.cowDTO.CowCreationDTO;
+import sep3.dto.cowDTO.CowDataDTO;
 import sep3.entity.*;
+import sep3.entity.user.Owner;
+import sep3.entity.user.User;
 
 import java.time.LocalDate;
 import java.util.List;

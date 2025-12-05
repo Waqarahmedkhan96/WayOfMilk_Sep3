@@ -1,7 +1,7 @@
 package sep3.Mapping;
 
 
-import sep3.dto.CowDataDTO;
+import sep3.dto.cowDTO.CowDataDTO;
 import sep3.entity.Cow;
 import sep3.entity.Department;
 
