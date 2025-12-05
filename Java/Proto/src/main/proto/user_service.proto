@@ -44,7 +44,7 @@ message NameRequest {
   string name = 1;
 }
 message AuthenticationRequest {
-  string username = 1;
+  string email = 1;
   string password = 2;
 }
 

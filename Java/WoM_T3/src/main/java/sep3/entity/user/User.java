@@ -3,6 +3,9 @@ package sep3.entity.user;
 import jakarta.persistence.*;
 
 @Entity
+//"user" is a reserved keyword in PostgreSQL.
+// We must explicitly name the table "users" (plural) to avoid the syntax error.
+@Table(name = "users")
 // Specify the inheritance strategy
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 //switched from JOINED to SINGLE_TABLE because joined would have made separate tables for each child class
