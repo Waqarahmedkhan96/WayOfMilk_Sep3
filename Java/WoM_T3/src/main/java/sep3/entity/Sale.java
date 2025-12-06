@@ -27,7 +27,7 @@ public class Sale
   @ManyToOne
   private Customer customer;
 
-  protected Sale() {}
+  public Sale() {}
 
   public Sale(User createdBy, LocalDateTime dateTime, Container container,
               double quantityL, double price, boolean recallCase, Customer customer)
