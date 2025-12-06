@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option java_package = "sep3.wayofmilk.grpc";
+option java_multiple_files = true;
+
+import "repeatingMessageTypes.proto";
+
+
+// ========= SERVICE =========
+service CustomerService {
+  rpc GetCustomerById (CustomerIdRequest) returns (CustomerData);
+  rpc GetAllCustomers (Empty) returns (CustomerList);
+  rpc CreateCustomer (CustomerCreationRequest) returns (CustomerData);
+}
+
+// ========= COMMON =========
+message CustomerIdRequest {
+  int64 id = 1;
+}
+
+message CustomerList {
+  repeated CustomerData customers = 1;
+}
+
+// ========= DATA =========
+message CustomerCreationRequest {
+  string companyName = 1;
+  string phoneNo     = 2;
+  string email       = 3;
+  string companyCVR  = 4;
+}
+
+message CustomerData {
+  int64 id          = 1;
+  string companyName = 2;
+  string phoneNo     = 3;
+  string email       = 4;
+  string companyCVR  = 5;
+}

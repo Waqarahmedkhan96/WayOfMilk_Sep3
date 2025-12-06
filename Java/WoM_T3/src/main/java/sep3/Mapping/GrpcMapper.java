@@ -5,6 +5,11 @@ import sep3.dto.departmentDTO.DepartmentDataDTO;
 import sep3.dto.transferRecordDTO.TransferRecordCreationDTO;
 import sep3.dto.transferRecordDTO.TransferRecordDataDTO;
 import sep3.dto.userDTO.*;
+import sep3.dto.customerDTO.CustomerCreationDTO;
+import sep3.dto.customerDTO.CustomerDataDTO;
+import sep3.dto.saleDTO.SaleCreationDTO;
+import sep3.dto.saleDTO.SaleDataDTO;
+
 import sep3.entity.DepartmentType;
 import sep3.wayofmilk.grpc.CowCreationRequest; // Import your generated classes
 import sep3.wayofmilk.grpc.CowData; // Import your generated classes
@@ -15,6 +20,10 @@ import sep3.wayofmilk.grpc.DepartmentData;
 import sep3.wayofmilk.grpc.TransferRecordCreationRequest;
 import sep3.wayofmilk.grpc.TransferRecordData;
 import sep3.wayofmilk.grpc.AuthenticationRequest;
+import sep3.wayofmilk.grpc.CustomerCreationRequest;
+import sep3.wayofmilk.grpc.CustomerData;
+import sep3.wayofmilk.grpc.SaleCreationRequest;
+import sep3.wayofmilk.grpc.SaleData;
 
 
 import java.time.LocalDate;
@@ -228,4 +237,137 @@ public class GrpcMapper {
                 movedAt
         );
     }
+
+    // =================== CUSTOMER MAPPERS ===================
+
+    // DTO -> Proto (for sending CustomerData back to T2)
+    public static CustomerData convertCustomerDtoToProto(CustomerDataDTO dto) {
+        CustomerData.Builder builder = CustomerData.newBuilder();
+
+        if (dto.getId() != null) {
+            builder.setId(dto.getId());
+        }
+        if (dto.getCompanyName() != null) {
+            builder.setCompanyName(dto.getCompanyName());
+        }
+        if (dto.getPhoneNo() != null) {
+            builder.setPhoneNo(dto.getPhoneNo());
+        }
+        if (dto.getEmail() != null) {
+            builder.setEmail(dto.getEmail());
+        }
+        if (dto.getCompanyCVR() != null) {
+            builder.setCompanyCVR(dto.getCompanyCVR());
+        }
+
+        return builder.build();
+    }
+
+    // Proto -> DTO (for incoming updates, if ever used)
+    public static CustomerDataDTO convertCustomerProtoToDto(CustomerData proto) {
+        CustomerDataDTO dto = new CustomerDataDTO();
+
+        // id is always present in our design
+        dto.setId(proto.getId());
+
+        if (!proto.getCompanyName().isBlank()) {
+            dto.setCompanyName(proto.getCompanyName());
+        }
+        if (!proto.getPhoneNo().isBlank()) {
+            dto.setPhoneNo(proto.getPhoneNo());
+        }
+        if (!proto.getEmail().isBlank()) {
+            dto.setEmail(proto.getEmail());
+        }
+        if (!proto.getCompanyCVR().isBlank()) {
+            dto.setCompanyCVR(proto.getCompanyCVR());
+        }
+
+        return dto;
+    }
+
+    // Creation: Proto -> DTO
+    public static CustomerCreationDTO convertCustomerProtoCreationToDto(CustomerCreationRequest proto) {
+        CustomerCreationDTO dto = new CustomerCreationDTO();
+        dto.setCompanyName(proto.getCompanyName());
+        dto.setPhoneNo(proto.getPhoneNo());
+        dto.setEmail(proto.getEmail());
+        dto.setCompanyCVR(proto.getCompanyCVR());
+        return dto;
+    }
+
+    // =================== SALE MAPPERS ===================
+
+    // DTO -> Proto (for sending sale info back to T2)
+    public static SaleData convertSaleDtoToProto(SaleDataDTO dto) {
+        SaleData.Builder builder = SaleData.newBuilder();
+
+        if (dto.getId() != null) {
+            builder.setId(dto.getId());
+        }
+        if (dto.getCustomerId() != null) {
+            builder.setCustomerId(dto.getCustomerId());
+        }
+        if (dto.getContainerId() != null) {
+            builder.setContainerId(dto.getContainerId());
+        }
+        if (dto.getQuantityL() != null) {
+            builder.setQuantityL(dto.getQuantityL());
+        }
+        if (dto.getPrice() != null) {
+            builder.setPrice(dto.getPrice());
+        }
+        if (dto.getDateTime() != null) {
+            builder.setDateTime(dto.getDateTime().toString());
+        }
+        if (dto.getRecallCase() != null) {
+            builder.setRecallCase(dto.getRecallCase());
+        }
+        if (dto.getCreatedByUserId() != null) {
+            builder.setCreatedByUserId(dto.getCreatedByUserId());
+        }
+
+        return builder.build();
+    }
+
+    // Proto -> DTO (for incoming updates, if needed)
+    public static SaleDataDTO convertSaleProtoToDto(SaleData proto) {
+        SaleDataDTO dto = new SaleDataDTO();
+
+        dto.setId(proto.getId());
+
+        // If 0 means "not set" in your design, you can wrap these in checks;
+        // for now we simply set them.
+        dto.setCustomerId(proto.getCustomerId());
+        dto.setContainerId(proto.getContainerId());
+        dto.setQuantityL(proto.getQuantityL());
+        dto.setPrice(proto.getPrice());
+
+        if (!proto.getDateTime().isBlank()) {
+            dto.setDateTime(java.time.LocalDateTime.parse(proto.getDateTime()));
+        }
+
+        dto.setRecallCase(proto.getRecallCase());
+        dto.setCreatedByUserId(proto.getCreatedByUserId());
+
+        return dto;
+    }
+
+    // Creation: Proto -> DTO
+    public static SaleCreationDTO convertSaleProtoCreationToDto(SaleCreationRequest proto) {
+        java.time.LocalDateTime dateTime = null;
+        if (!proto.getDateTime().isBlank()) {
+            dateTime = java.time.LocalDateTime.parse(proto.getDateTime());
+        }
+
+        return new SaleCreationDTO(
+                proto.getCustomerId(),
+                proto.getContainerId(),
+                proto.getQuantityL(),
+                proto.getPrice(),
+                proto.getCreatedByUserId(),
+                dateTime
+        );
+    }
+
 }
