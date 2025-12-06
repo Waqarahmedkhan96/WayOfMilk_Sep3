@@ -1,13 +1,24 @@
 package sep3.Mapping;
 import sep3.dto.cowDTO.*;
+import sep3.dto.departmentDTO.DepartmentCreationDTO;
+import sep3.dto.departmentDTO.DepartmentDataDTO;
+import sep3.dto.transferRecordDTO.TransferRecordCreationDTO;
+import sep3.dto.transferRecordDTO.TransferRecordDataDTO;
 import sep3.dto.userDTO.*;
+import sep3.entity.DepartmentType;
 import sep3.wayofmilk.grpc.CowCreationRequest; // Import your generated classes
 import sep3.wayofmilk.grpc.CowData; // Import your generated classes
 import sep3.wayofmilk.grpc.UserCreationRequest;
 import sep3.wayofmilk.grpc.UserData;
+import sep3.wayofmilk.grpc.DepartmentCreationRequest;
+import sep3.wayofmilk.grpc.DepartmentData;
+import sep3.wayofmilk.grpc.TransferRecordCreationRequest;
+import sep3.wayofmilk.grpc.TransferRecordData;
 import sep3.wayofmilk.grpc.AuthenticationRequest;
 
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
 public class GrpcMapper {
@@ -150,4 +161,71 @@ public class GrpcMapper {
     dto.setPassword(proto.getPassword());
     return dto;
   }
+
+  // Department mappers
+
+    public static DepartmentData convertDepartmentDtoToProto(DepartmentDataDTO dto)
+    {
+        return DepartmentData.newBuilder()
+                .setId(dto.getId())
+                .setType(dto.getType().name())
+                .build();
+    }
+
+    public static DepartmentDataDTO convertDepartmentProtoToDto(DepartmentData proto)
+    {
+        DepartmentType type = convertDepartmentTypeStringToEnum(proto.getType());
+        return new DepartmentDataDTO(proto.getId(), type);
+    }
+
+    public static DepartmentCreationDTO convertDepartmentProtoCreationToDto(
+            DepartmentCreationRequest proto)
+    {
+        DepartmentType type = convertDepartmentTypeStringToEnum(proto.getType());
+        return new DepartmentCreationDTO(type);
+    }
+
+    public static DepartmentType convertDepartmentTypeStringToEnum(String typeString)
+    {
+        if (typeString == null)
+        {
+            throw new IllegalArgumentException("Department type cannot be null.");
+        }
+        return DepartmentType.valueOf(typeString.toUpperCase());
+    }
+
+    // Transfer Record Mapping
+    public static TransferRecordData convertTransferDtoToProto(TransferRecordDataDTO dto)
+    {
+        TransferRecordData.Builder builder = TransferRecordData.newBuilder();
+
+        if (dto.getId() != null) builder.setId(dto.getId());
+        if (dto.getMovedAt() != null) builder.setMovedAt(dto.getMovedAt().toString());
+
+        if (dto.getFromDepartmentId() != null) builder.setFromDepartmentId(dto.getFromDepartmentId());
+        if (dto.getToDepartmentId() != null) builder.setToDepartmentId(dto.getToDepartmentId());
+        if (dto.getDepartmentId() != null) builder.setDepartmentId(dto.getDepartmentId());
+
+        if (dto.getRequestedByUserId() != null) builder.setRequestedByUserId(dto.getRequestedByUserId());
+        if (dto.getApprovedByVetUserId() != null) builder.setApprovedByVetUserId(dto.getApprovedByVetUserId());
+
+        if (dto.getCowId() != null) builder.setCowId(dto.getCowId());
+
+        return builder.build();
+    }
+
+    public static TransferRecordCreationDTO convertTransferProtoCreationToDto(
+            TransferRecordCreationRequest proto)
+    {
+        LocalDateTime movedAt =
+                proto.getMovedAt().isBlank() ? null : LocalDateTime.parse(proto.getMovedAt());
+
+        return new TransferRecordCreationDTO(
+                proto.getCowId(),
+                proto.getFromDepartmentId(),
+                proto.getToDepartmentId(),
+                proto.getRequestedByUserId(),
+                movedAt
+        );
+    }
 }

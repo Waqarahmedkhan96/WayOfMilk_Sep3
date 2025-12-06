@@ -1,6 +1,8 @@
 
 syntax = "proto3";
 
+//if importing related proto files:
+//import "other_service.proto";
 import "repeatingMessageTypes.proto";
 
 // Defining the Java package where the generated code will live
@@ -17,11 +19,14 @@ service CowService {
   rpc UpdateCow (CowData) returns (CowData);
   rpc GetCowById (CowIdRequest) returns (CowData);
   rpc DeleteCow (CowIdRequest) returns (Empty);
+  //TODO: consider whether transfer requests should be handled here or in a separate proto/service
+  rpc TransferCow (CowTransferRequest) returns (CowData);
   //since health update is allowed only by a specific type of user, a separate method is created
-  //TODO: make sure that only authorized users can call this method
   rpc UpdateCowHealth (CowData) returns (CowData);
 }
 
+// The messages (equivalents of the DTOs)
+//message Empty {} // Simple empty message for requests with no parameters
 
 message CowList {
   repeated CowData cows = 1; // 'repeated' means a list
