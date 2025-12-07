@@ -5,9 +5,10 @@ import java.util.List;
 
 public interface ICowService {
   CowDataDTO addCow(CowCreationDTO cow);
+  CowDataDTO getCowById(long cowToFindId);
+  CowDataDTO getCowByRegNo(String regNo);
   List<CowDataDTO> getAllCows();
   CowDataDTO updateCow(CowDataDTO changesToCow);
-  CowDataDTO updateCowHealth(CowDataDTO changesToCow);
+  void updateManyCowsHealth(List<Long> cowsIds, boolean healthUpdate, long userId);
   void deleteCow(long id);
-  CowDataDTO getCowById(long cowToFindId);
 }

@@ -1,6 +1,7 @@
 package sep3.service.impl;
 
 import org.springframework.stereotype.Service;
+import sep3.entity.DepartmentType;
 import sep3.mapping.TransferRecordMapper;
 import sep3.repository.CowRepository;
 import sep3.repository.DepartmentRepository;
@@ -56,6 +57,11 @@ public class TransferRecordServiceImpl implements ITransferRecordService
 
         Department toDept = departmentRepository.findById(dto.getToDepartmentId())
                 .orElseThrow(() -> new RuntimeException("To Department not found: " + dto.getToDepartmentId()));
+    //if a cow is in quarantine, it can only be released if it is healthy
+        if(fromDept.getType() == DepartmentType.QUARANTINE && !cow.isHealthy())
+        {
+          throw new IllegalArgumentException("Cow is not healthy and cannot be released from quarantine.");
+        }
 
         User requestedBy = userRepository.findById(dto.getRequestedByUserId())
                 .orElseThrow(() -> new RuntimeException("User not found: " + dto.getRequestedByUserId()));

@@ -11,7 +11,7 @@ import sep3.entity.Cow;
 import org.springframework.stereotype.Service;
 import sep3.entity.Department;
 import sep3.entity.DepartmentType;
-import sep3.entity.user.User;
+import sep3.entity.user.*;
 import sep3.service.interfaces.ICowService;
 
 import java.util.List;
@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
   }
 
   //CREATE/ADD
+  @Override
   public CowDataDTO addCow(CowCreationDTO cow)
   {
     //making sure new cows are added to a quarrantine department
@@ -47,6 +48,14 @@ import java.util.stream.Collectors;
   }
 
   //READ/GET
+  @Override
+  public CowDataDTO getCowById(long cowToFindId)
+  {
+    Cow foundCow = cowRepository.findById(cowToFindId)
+        .orElseThrow(() -> new RuntimeException("Cow not found: " + cowToFindId));
+    return CowMapper.convertCowToDto(foundCow);
+  }
+  @Override
   public List<CowDataDTO> getAllCows()
   {
     // 1. Fetch all entities from the PostgreSQL database
@@ -58,9 +67,17 @@ import java.util.stream.Collectors;
         .map(CowMapper::convertCowToDto) // Use the private helper method
         .collect(Collectors.toList());
   }
+  @Override
+  public CowDataDTO getCowByRegNo (String regNo)
+  {
+    Cow foundCow = cowRepository.findByRegNo(regNo)
+        .orElseThrow(() -> new RuntimeException("Cow not found with regNo: " + regNo));
+    return CowMapper.convertCowToDto(foundCow);
+  }
+
 
   //UPDATE
-
+  @Override
   public CowDataDTO updateCow(CowDataDTO changesToCow)
   {
     Cow cowToUpdate = cowRepository.findById(changesToCow.getId()).orElseThrow(() -> new RuntimeException("Cow not found: " + changesToCow.getId()));
@@ -85,32 +102,35 @@ import java.util.stream.Collectors;
 
   }
 
-  //update cow health specifically (t2 must permit this to vet only)
+
+  //update one or many cows' health status
   @Override
-  public CowDataDTO updateCowHealth(CowDataDTO cow)
+  public void updateManyCowsHealth(List<Long> cowsIds, boolean healthUpdate, long userId)
   {
-    //check if the health status is declared
-    if (cow.isHealthy() == null)
+    User updatingUser = userRepository.findById(userId)
+        .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+    if (!(updatingUser instanceof Vet) && healthUpdate)
     {
-      throw new RuntimeException("Health status must be declared.");
+      throw new RuntimeException(
+          "Only a veterinarian can confirm a cow as healthy.");
     }
-    Cow cowToUpdate = cowRepository.findById(cow.getId())
-        .orElseThrow(() -> new RuntimeException("Cow not found: " + cow.getId()));
-    cowToUpdate.setHealthy(cow.isHealthy());
-    Cow savedCow = cowRepository.save(cowToUpdate);
-    return CowMapper.convertCowToDto(savedCow);
+    //if marking the cows as not healthy, to send to quarantine, any user can do it
+    List<Cow> cows = cowRepository.findAllById(cowsIds);
+    if (cows.size() != cowsIds.size())
+    {
+      throw new RuntimeException("One or more cows not found.");
+    }
+    cows.forEach(cow -> cow.setHealthy(healthUpdate));
+    cowRepository.saveAll(cows);
   }
 
   //DELETE
   public void deleteCow(long id)
   {
+    if (!cowRepository.existsById(id))
+    {
+      throw new RuntimeException("Cow not found: " + id);
+    }
     cowRepository.deleteById(id);
-  }
-
-  public CowDataDTO getCowById(long cowToFindId)
-  {
-    Cow foundCow = cowRepository.findById(cowToFindId)
-        .orElseThrow(() -> new RuntimeException("Cow not found: " + cowToFindId));
-    return CowMapper.convertCowToDto(foundCow);
   }
 }

@@ -28,7 +28,7 @@ public class CowServiceGrpcImpl extends CowServiceGrpc.CowServiceImplBase
   {
     // Convert the gRPC Request message into the Spring DTO
     CowCreationDTO creationDto = GrpcMapper.convertCowProtoCreationToDto(request);
-        //TODO make sure birthdate is required from the client side
+    //TODO make sure birthdate is required from the client side
 
     // Call the Core Business Service
     CowDataDTO createdDto = coreService.addCow(creationDto);
@@ -45,7 +45,7 @@ public class CowServiceGrpcImpl extends CowServiceGrpc.CowServiceImplBase
   @Override public void getAllCows(Empty request,
       StreamObserver<CowList> responseObserver)
   {
-     List<CowDataDTO> dtos = coreService.getAllCows();
+    List<CowDataDTO> dtos = coreService.getAllCows();
 
     // Map the DTOs (CowDataDTO) to the gRPC messages (CowData)
     CowList.Builder cowListBuilder = CowList.newBuilder();
@@ -73,6 +73,15 @@ public class CowServiceGrpcImpl extends CowServiceGrpc.CowServiceImplBase
     responseObserver.onCompleted();
   }
 
+  @Override
+  public void getCowByRegNo(SentString regNo, StreamObserver<CowData> responseObserver)
+  {
+    CowDataDTO foundCow = coreService.getCowByRegNo(regNo.getValue());
+    CowData responseData = GrpcMapper.convertCowDtoToProto(foundCow);
+    responseObserver.onNext(responseData);
+    responseObserver.onCompleted();
+  }
+
   //UPDATE
 
   @Override
@@ -90,20 +99,27 @@ public class CowServiceGrpcImpl extends CowServiceGrpc.CowServiceImplBase
     responseObserver.onCompleted();
   }
 
-  public void updateCowHealth(CowData request, StreamObserver<CowData> responseObserver)
+  @Override
+  public void updateCowsHealth(CowsHealthChangeRequest request, StreamObserver<CowList> responseObserver)
   {
-    // Convert partial gRPC request -> DTO with nulls
-    CowDataDTO changesToCow = GrpcMapper.convertCowProtoToDto(request);
+    // Extract data from the request
+    List<Long> cowsIds = request.getCowIdsList();
+    boolean healthUpdate = request.getNewHealthStatus();
+    long userId = request.getRequestedByUserId();
 
-    // Call Service (which is designed for this DTO)
-    CowDataDTO updatedDto = coreService.updateCowHealth(changesToCow);
+    // Call the service to update health status for multiple cows
+    coreService.updateManyCowsHealth(cowsIds, healthUpdate, userId);
 
-    // Convert full result DTO -> gRPC response
-    CowData responseData = GrpcMapper.convertCowDtoToProto(updatedDto);
-
-    responseObserver.onNext(responseData);
+    CowList.Builder cowListBuilder = CowList.newBuilder();
+    for (Long id : cowsIds) {
+      CowDataDTO dto = coreService.getCowById(id);
+      cowListBuilder.addCows(GrpcMapper.convertCowDtoToProto(dto));
+    }
+    // Send the response and complete the call
+    responseObserver.onNext(cowListBuilder.build());
     responseObserver.onCompleted();
   }
+
 
   //DELETE
 
