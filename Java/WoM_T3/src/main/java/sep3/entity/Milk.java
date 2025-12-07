@@ -2,8 +2,7 @@ package sep3.entity;
 
 import jakarta.persistence.*;
 import sep3.entity.user.User;
-
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 public class Milk
@@ -12,7 +11,7 @@ public class Milk
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private LocalDateTime dateTime;
+    private LocalDate date;
     private double volumeL;
 
     @Enumerated(EnumType.STRING)
@@ -21,8 +20,6 @@ public class Milk
     private boolean approvedForStorage;
 
     @ManyToOne
-    @JoinColumn(name = "cow_id")
-    // This creates a foreign key 'cow_id' in the milk table automatically.
     private Cow cow;
 
     @ManyToOne
@@ -31,12 +28,12 @@ public class Milk
     @ManyToOne
     private User registeredBy;
 
-    protected Milk() {}
+    public Milk() {}
 
-    public Milk(LocalDateTime dateTime, double volumeL, MilkTestResult result,
+    public Milk(LocalDate date, double volumeL, MilkTestResult result,
                 boolean approvedForStorage, Cow cow, Container container, User registeredBy)
     {
-        this.dateTime = dateTime;
+        this.date = date;
         this.volumeL = volumeL;
         this.milkTestResult = result;
         this.approvedForStorage = approvedForStorage;
@@ -53,12 +50,12 @@ public class Milk
         this.id = id;
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public double getVolumeL() {
