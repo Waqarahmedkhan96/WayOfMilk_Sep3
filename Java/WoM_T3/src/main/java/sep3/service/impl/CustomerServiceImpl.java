@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerServiceImpl implements ICustomerService {
 
-    private final sep3.dao.CustomerRepository customerRepository;
+    private final sep3.repository.CustomerRepository customerRepository;
     private final UserRepository userRepository;
 
-    public CustomerServiceImpl(sep3.dao.CustomerRepository customerRepository,
+    public CustomerServiceImpl(sep3.repository.CustomerRepository customerRepository,
                                UserRepository userRepository) {
         this.customerRepository = customerRepository;
         this.userRepository = userRepository;
