@@ -6,4 +6,29 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+   <ItemGroup>
+    <!-- runtime packages -->
+    <PackageReference Include="Grpc.Net.Client" Version="2.65.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.27.0" />
+
+    <!-- compiler/code gen only -->
+    <PackageReference Include="Grpc.Tools" Version="2.65.0" PrivateAssets="All" />
+  </ItemGroup>
+
+   <ItemGroup>
+
+    <!-- Base types (Empty, SentId, etc.) -->
+    <Protobuf Include="..\..\..\Java\wom-grpc-contract\src\main\proto\repeatingMessageTypes.proto"
+    GrpcServices="None"/>
+
+    <!-- Container service -->
+    <Protobuf Include="..\..\..\Java\wom-grpc-contract\src\main\proto\container_service.proto"
+    GrpcServices="Client"/>
+
+      <!-- Milk service -->
+    <Protobuf Include="..\..\..\Java\wom-grpc-contract\src\main\proto\milk_service.proto"
+    GrpcServices="Client"/>
+
+    <!-- rest services -->
+  </ItemGroup>
 </Project>

@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+option java_package = "sep3.wayofmilk.grpc";
+option java_multiple_files = true;
+option csharp_namespace = "Sep3.WayOfMilk.Grpc";
+
+import "repeatingMessageTypes.proto";
+
+enum MilkTestResultEnum {
+  MILK_TEST_UNKNOWN = 0;
+  MILK_TEST_PASS = 1;
+  MILK_TEST_FAIL = 2;
+}
+
+message MilkMessage {
+  int64 id = 1;
+  int64 cowId = 2;
+  int64 containerId = 3;
+  // DTO MilkDto currently has no registeredByUserId, so we leave this unused in responses:
+  int64 registeredByUserId = 4;
+  string date = 5;          // ISO-8601 "yyyy-MM-dd"
+  double volumeL = 6;       // matches DTO field name
+  MilkTestResultEnum testResult = 7;
+}
+
+message CreateMilkRequest {
+  int64 cowId = 1;
+  int64 containerId = 2;
+  int64 registeredByUserId = 3;
+  string date = 4;          // optional; server will default to today
+  double volumeL = 5;
+  MilkTestResultEnum testResult = 6;
+}
+
+message UpdateMilkRequest {
+  int64 id = 1;
+  int64 containerId = 2;
+  string date = 3;
+  double volumeL = 4;
+  MilkTestResultEnum testResult = 5;
+}
+
+message MilkByContainerQuery {
+  int64 containerId = 1;
+}
+
+message MilkListReply {
+  repeated MilkMessage milk = 1;
+}
+
+service MilkService {
+  rpc CreateMilk (CreateMilkRequest) returns (MilkMessage);
+  rpc UpdateMilk (UpdateMilkRequest) returns (MilkMessage);
+  rpc DeleteMilk (SentId) returns (Empty);
+  rpc GetMilk (SentId) returns (MilkMessage);
+  rpc GetAllMilk (Empty) returns (MilkListReply);
+  rpc GetMilkByContainer (MilkByContainerQuery) returns (MilkListReply);
+}

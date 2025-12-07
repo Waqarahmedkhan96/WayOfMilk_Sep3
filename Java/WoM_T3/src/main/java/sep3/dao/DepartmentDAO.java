@@ -1,13 +1,15 @@
 package sep3.dao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import sep3.entity.Department;
 import sep3.entity.DepartmentType;
 
 import java.util.Optional;
 
-public interface DepartmentDAO extends JpaRepository<Department, Long>
-{
+@Repository
+public interface DepartmentDAO extends JpaRepository<Department, Long> {
 
-  public Optional<Department> findByType(DepartmentType type);
+    // Find by enum type (RESTING, MILKING, QUARANTINE)
+    Optional<Department> findByType(DepartmentType type);
 }

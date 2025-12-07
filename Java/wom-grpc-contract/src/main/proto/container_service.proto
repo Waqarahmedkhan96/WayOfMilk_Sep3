@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option java_package = "sep3.wayofmilk.grpc";
+option java_multiple_files = true;
+option csharp_namespace = "Sep3.WayOfMilk.Grpc";
+
+import "repeatingMessageTypes.proto";
+
+message ContainerMessage {
+  int64 id = 1;
+  double capacityL = 2;
+}
+
+message CreateContainerRequest {
+  double capacityL = 1;
+}
+
+message UpdateContainerRequest {
+  int64 id = 1;
+  double capacityL = 2;
+}
+
+message ContainerListReply {
+  repeated ContainerMessage containers = 1;
+}
+
+service ContainerService {
+  rpc CreateContainer (CreateContainerRequest) returns (ContainerMessage);
+  rpc UpdateContainer (UpdateContainerRequest) returns (ContainerMessage);
+  rpc DeleteContainer (SentId) returns (Empty);
+  rpc GetContainer (SentId) returns (ContainerMessage);
+  rpc GetAllContainers (Empty) returns (ContainerListReply);
+}
