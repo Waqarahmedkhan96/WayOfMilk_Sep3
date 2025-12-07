@@ -267,7 +267,6 @@ public class GrpcMapper {
     public static CustomerDataDTO convertCustomerProtoToDto(CustomerData proto) {
         CustomerDataDTO dto = new CustomerDataDTO();
 
-        // id is always present in our design
         dto.setId(proto.getId());
 
         if (!proto.getCompanyName().isBlank()) {
@@ -293,10 +292,11 @@ public class GrpcMapper {
         dto.setPhoneNo(proto.getPhoneNo());
         dto.setEmail(proto.getEmail());
         dto.setCompanyCVR(proto.getCompanyCVR());
+        dto.setRegisteredByUserId(proto.getRegisteredByUserId()); // NEW
         return dto;
     }
 
-    // =================== SALE MAPPERS ===================
+// =================== SALE MAPPERS ===================
 
     // DTO -> Proto (for sending sale info back to T2)
     public static SaleData convertSaleDtoToProto(SaleDataDTO dto) {
@@ -335,9 +335,6 @@ public class GrpcMapper {
         SaleDataDTO dto = new SaleDataDTO();
 
         dto.setId(proto.getId());
-
-        // If 0 means "not set" in your design, you can wrap these in checks;
-        // for now we simply set them.
         dto.setCustomerId(proto.getCustomerId());
         dto.setContainerId(proto.getContainerId());
         dto.setQuantityL(proto.getQuantityL());
@@ -360,7 +357,7 @@ public class GrpcMapper {
             dateTime = java.time.LocalDateTime.parse(proto.getDateTime());
         }
 
-        return new SaleCreationDTO(
+        SaleCreationDTO dto = new SaleCreationDTO(
                 proto.getCustomerId(),
                 proto.getContainerId(),
                 proto.getQuantityL(),
@@ -368,6 +365,9 @@ public class GrpcMapper {
                 proto.getCreatedByUserId(),
                 dateTime
         );
+        dto.setRecallCase(proto.getRecallCase()); // NEW
+        return dto;
     }
+
 
 }

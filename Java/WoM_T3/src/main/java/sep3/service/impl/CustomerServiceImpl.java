@@ -1,33 +1,33 @@
-package sep3.RequestHandlers.CustomerService;
+package sep3.service.impl;
 
 import org.springframework.stereotype.Service;
-import sep3.Mapping.CustomerMapper;
-import sep3.dao.CustomerDAO;
-import sep3.dao.UserDAO;
+import sep3.mapping.CustomerMapper;
+import sep3.repository.UserRepository;
 import sep3.dto.customerDTO.CustomerCreationDTO;
 import sep3.dto.customerDTO.CustomerDataDTO;
 import sep3.entity.Customer;
 import sep3.entity.user.User;
+import sep3.service.interfaces.ICustomerService;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class CustomerDataService implements ICustomerDataService {
+public class CustomerServiceImpl implements ICustomerService {
 
-    private final CustomerDAO customerDAO;
-    private final UserDAO userDAO;     // <--- IMPORTANT
+    private final sep3.dao.CustomerRepository customerRepository;
+    private final UserRepository userRepository;
 
-    public CustomerDataService(CustomerDAO customerDAO, UserDAO userDAO) {
-        this.customerDAO = customerDAO;
-        this.userDAO = userDAO;       // <--- IMPORTANT
+    public CustomerServiceImpl(sep3.dao.CustomerRepository customerRepository,
+                               UserRepository userRepository) {
+        this.customerRepository = customerRepository;
+        this.userRepository = userRepository;
     }
 
     // ========== CREATE ==========
     @Override
     public CustomerDataDTO addCustomer(CustomerCreationDTO dto)
     {
-        // Validate
         if (dto.getCompanyName() == null || dto.getPhoneNo() == null ||
                 dto.getEmail() == null || dto.getCompanyCVR() == null ||
                 dto.getRegisteredByUserId() == null)
@@ -35,12 +35,10 @@ public class CustomerDataService implements ICustomerDataService {
             throw new IllegalArgumentException("All customer fields must be provided.");
         }
 
-        // Look up the user who registered this customer
-        User registeredBy = userDAO.findById(dto.getRegisteredByUserId())
+        User registeredBy = userRepository.findById(dto.getRegisteredByUserId())
                 .orElseThrow(() ->
                         new RuntimeException("User not found: " + dto.getRegisteredByUserId()));
 
-        // Create Customer using your PUBLIC constructor
         Customer customer = new Customer(
                 dto.getCompanyName(),
                 dto.getPhoneNo(),
@@ -49,9 +47,8 @@ public class CustomerDataService implements ICustomerDataService {
                 registeredBy
         );
 
-        Customer saved = customerDAO.save(customer);
+        Customer saved = customerRepository.save(customer);
 
-        // 🔁 use existing mapper method name
         return CustomerMapper.convertCustomerToDto(saved);
     }
 
@@ -59,7 +56,7 @@ public class CustomerDataService implements ICustomerDataService {
     @Override
     public CustomerDataDTO getCustomerById(long id)
     {
-        Customer customer = customerDAO.findById(id)
+        Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found: " + id));
 
         return CustomerMapper.convertCustomerToDto(customer);
@@ -68,7 +65,7 @@ public class CustomerDataService implements ICustomerDataService {
     @Override
     public List<CustomerDataDTO> getAllCustomers()
     {
-        return customerDAO.findAll()
+        return customerRepository.findAll()
                 .stream()
                 .map(CustomerMapper::convertCustomerToDto)
                 .collect(Collectors.toList());
@@ -83,12 +80,12 @@ public class CustomerDataService implements ICustomerDataService {
             throw new IllegalArgumentException("Customer ID must be provided for update.");
         }
 
-        Customer customer = customerDAO.findById(dto.getId())
+        Customer customer = customerRepository.findById(dto.getId())
                 .orElseThrow(() -> new RuntimeException("Customer not found: " + dto.getId()));
 
         CustomerMapper.updateCustomerFromDto(customer, dto);
 
-        Customer updated = customerDAO.save(customer);
+        Customer updated = customerRepository.save(customer);
         return CustomerMapper.convertCustomerToDto(updated);
     }
 
@@ -96,10 +93,10 @@ public class CustomerDataService implements ICustomerDataService {
     @Override
     public void deleteCustomer(long id)
     {
-        if (!customerDAO.existsById(id))
+        if (!customerRepository.existsById(id))
         {
             throw new RuntimeException("Customer not found: " + id);
         }
-        customerDAO.deleteById(id);
+        customerRepository.deleteById(id);
     }
 }

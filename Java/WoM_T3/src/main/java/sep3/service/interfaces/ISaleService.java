@@ -1,11 +1,11 @@
-package sep3.RequestHandlers.SaleService;
+package sep3.service.interfaces;
 
 import sep3.dto.saleDTO.SaleCreationDTO;
 import sep3.dto.saleDTO.SaleDataDTO;
 
 import java.util.List;
 
-public interface ISaleDataService
+public interface ISaleService
 {
     // CREATE
     SaleDataDTO addSale(SaleCreationDTO sale);

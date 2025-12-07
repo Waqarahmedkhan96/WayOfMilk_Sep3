@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+option java_package = "sep3.wayofmilk.grpc";
+option java_multiple_files = true;
+
+import "repeatingMessageTypes.proto";
+
+// ========= SERVICE =========
+service SaleService {
+  rpc GetSaleById (SaleIdRequest) returns (SaleData);
+  rpc GetAllSales (Empty) returns (SaleList);
+  rpc CreateSale (SaleCreationRequest) returns (SaleData);
+}
+
+// ========= COMMON =========
+message SaleIdRequest {
+  int64 id = 1;
+}
+
+message SaleList {
+  repeated SaleData sales = 1;
+}
+
+// ========= DATA =========
+message SaleCreationRequest {
+  int64 customerId        = 1;
+  int64 containerId       = 2;
+  double quantityL        = 3;
+  double price            = 4;
+  string dateTime         = 5; // "YYYY-MM-DDTHH:MM:SS"
+  int64 createdByUserId   = 6;
+  bool recallCase         = 7; // NEW
+}
+
+message SaleData {
+  int64 id                = 1;
+  int64 customerId        = 2;
+  int64 containerId       = 3;
+  double quantityL        = 4;
+  double price            = 5;
+  string dateTime         = 6;
+  bool recallCase         = 7;
+  int64 createdByUserId   = 8;
+}
