@@ -1,11 +1,11 @@
-package sep3.RequestHandlers.CustomerService;
+package sep3.service.interfaces;
 
 import sep3.dto.customerDTO.CustomerCreationDTO;
 import sep3.dto.customerDTO.CustomerDataDTO;
 
 import java.util.List;
 
-public interface ICustomerDataService
+public interface ICustomerService
 {
     // CREATE
     CustomerDataDTO addCustomer(CustomerCreationDTO customer);

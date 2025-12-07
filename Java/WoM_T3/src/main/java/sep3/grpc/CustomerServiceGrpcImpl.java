@@ -2,8 +2,8 @@ package sep3.grpc;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
-import sep3.Mapping.GrpcMapper;
-import sep3.RequestHandlers.CustomerService.ICustomerDataService;
+import sep3.mapping.GrpcMapper;
+import sep3.service.interfaces.ICustomerService;
 import sep3.dto.customerDTO.CustomerCreationDTO;
 import sep3.dto.customerDTO.CustomerDataDTO;
 import sep3.wayofmilk.grpc.CustomerCreationRequest;
@@ -16,11 +16,12 @@ import sep3.wayofmilk.grpc.Empty;
 import java.util.List;
 
 @GrpcService
-public class CustomerServiceImpl extends CustomerServiceGrpc.CustomerServiceImplBase {
+public class CustomerServiceGrpcImpl extends CustomerServiceGrpc.CustomerServiceImplBase
+{
 
-    private final ICustomerDataService coreService;
+    private final ICustomerService coreService;
 
-    public CustomerServiceImpl(ICustomerDataService coreService) {
+    public CustomerServiceGrpcImpl(ICustomerService coreService) {
         this.coreService = coreService;
     }
 
@@ -29,14 +30,11 @@ public class CustomerServiceImpl extends CustomerServiceGrpc.CustomerServiceImpl
     public void createCustomer(CustomerCreationRequest request,
                                StreamObserver<CustomerData> responseObserver) {
 
-        // Proto -> DTO
         CustomerCreationDTO creationDTO =
                 GrpcMapper.convertCustomerProtoCreationToDto(request);
 
-        // Business logic
         CustomerDataDTO createdCustomer = coreService.addCustomer(creationDTO);
 
-        // DTO -> Proto
         CustomerData response = GrpcMapper.convertCustomerDtoToProto(createdCustomer);
 
         responseObserver.onNext(response);

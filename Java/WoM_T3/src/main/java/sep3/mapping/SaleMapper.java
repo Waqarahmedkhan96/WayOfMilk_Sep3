@@ -1,4 +1,4 @@
-package sep3.Mapping;
+package sep3.mapping;
 
 import sep3.dto.saleDTO.SaleDataDTO;
 import sep3.entity.Sale;

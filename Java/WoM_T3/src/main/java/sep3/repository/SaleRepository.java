@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface SaleDAO extends JpaRepository<Sale, Long> {
+public interface SaleRepository extends JpaRepository<Sale, Long> {
 
     // All sales created by a specific user (e.g. for reports)
     List<Sale> findAllByCreatedBy(User createdBy);

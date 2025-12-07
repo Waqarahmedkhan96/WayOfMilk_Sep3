@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CustomerDAO extends JpaRepository<Customer, Long> {
+public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     // For checking uniqueness of company CVR during registration / creation
     boolean existsByCompanyCVR(String companyCVR);

@@ -2,8 +2,8 @@ package sep3.grpc;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
-import sep3.Mapping.GrpcMapper;
-import sep3.RequestHandlers.SaleService.ISaleDataService;
+import sep3.mapping.GrpcMapper;
+import sep3.service.interfaces.ISaleService;
 import sep3.dto.saleDTO.SaleCreationDTO;
 import sep3.dto.saleDTO.SaleDataDTO;
 import sep3.wayofmilk.grpc.Empty;
@@ -12,16 +12,15 @@ import sep3.wayofmilk.grpc.SaleData;
 import sep3.wayofmilk.grpc.SaleIdRequest;
 import sep3.wayofmilk.grpc.SaleList;
 import sep3.wayofmilk.grpc.SaleServiceGrpc;
-//for reversal
 
 import java.util.List;
 
 @GrpcService
-public class SaleServiceImpl extends SaleServiceGrpc.SaleServiceImplBase {
+public class SaleServiceGrpcImpl extends SaleServiceGrpc.SaleServiceImplBase {
 
-    private final ISaleDataService coreService;
+    private final ISaleService coreService;
 
-    public SaleServiceImpl(ISaleDataService coreService) {
+    public SaleServiceGrpcImpl(ISaleService coreService) {
         this.coreService = coreService;
     }
 
@@ -30,14 +29,11 @@ public class SaleServiceImpl extends SaleServiceGrpc.SaleServiceImplBase {
     public void createSale(SaleCreationRequest request,
                            StreamObserver<SaleData> responseObserver) {
 
-        // Proto -> DTO
         SaleCreationDTO creationDTO =
                 GrpcMapper.convertSaleProtoCreationToDto(request);
 
-        // Business logic
         SaleDataDTO createdSale = coreService.addSale(creationDTO);
 
-        // DTO -> Proto
         SaleData response = GrpcMapper.convertSaleDtoToProto(createdSale);
 
         responseObserver.onNext(response);

@@ -23,21 +23,22 @@ message SaleList {
 
 // ========= DATA =========
 message SaleCreationRequest {
-  int64 customerId   = 1;
-  int64 containerId  = 2;
-  double quantityL   = 3;
-  double price       = 4;
-  string dateTime    = 5; // "YYYY-MM-DDTHH:MM:SS"
-  int64 createdByUserId = 6;
+  int64 customerId        = 1;
+  int64 containerId       = 2;
+  double quantityL        = 3;
+  double price            = 4;
+  string dateTime         = 5; // "YYYY-MM-DDTHH:MM:SS"
+  int64 createdByUserId   = 6;
+  bool recallCase         = 7; // NEW
 }
 
 message SaleData {
-  int64 id           = 1;
-  int64 customerId   = 2;
-  int64 containerId  = 3;
-  double quantityL   = 4;
-  double price       = 5;
-  string dateTime    = 6;
-  bool recallCase    = 7;
-  int64 createdByUserId = 8;
+  int64 id                = 1;
+  int64 customerId        = 2;
+  int64 containerId       = 3;
+  double quantityL        = 4;
+  double price            = 5;
+  string dateTime         = 6;
+  bool recallCase         = 7;
+  int64 createdByUserId   = 8;
 }

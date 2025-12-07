@@ -1,39 +1,38 @@
-package sep3.RequestHandlers.SaleService;
+package sep3.service.impl;
 
 import org.springframework.stereotype.Service;
-import sep3.Mapping.SaleMapper;
-import sep3.dao.CustomerDAO;
-import sep3.dao.SaleDAO;
-import sep3.dao.ContainerDAO;
-import sep3.dao.UserDAO;
+import sep3.mapping.SaleMapper;
+import sep3.repository.ContainerRepository;
+import sep3.repository.UserRepository;
 import sep3.dto.saleDTO.SaleCreationDTO;
 import sep3.dto.saleDTO.SaleDataDTO;
 import sep3.entity.Customer;
 import sep3.entity.Container;
 import sep3.entity.Sale;
 import sep3.entity.user.User;
+import sep3.service.interfaces.ISaleService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class SaleDataService implements ISaleDataService
+public class SaleServiceImpl implements ISaleService
 {
-    private final SaleDAO saleDAO;
-    private final CustomerDAO customerDAO;
-    private final ContainerDAO containerDAO;
-    private final UserDAO userDAO;
+    private final sep3.dao.SaleRepository saleRepository;
+    private final sep3.dao.CustomerRepository customerRepository;
+    private final ContainerRepository containerRepository;
+    private final UserRepository userRepository;
 
-    public SaleDataService(SaleDAO saleDAO,
-                           CustomerDAO customerDAO,
-                           ContainerDAO containerDAO,
-                           UserDAO userDAO)
+    public SaleServiceImpl(sep3.dao.SaleRepository saleRepository,
+                           sep3.dao.CustomerRepository customerRepository,
+                           ContainerRepository containerRepository,
+                           UserRepository userRepository)
     {
-        this.saleDAO = saleDAO;
-        this.customerDAO = customerDAO;
-        this.containerDAO = containerDAO;
-        this.userDAO = userDAO;
+        this.saleRepository = saleRepository;
+        this.customerRepository = customerRepository;
+        this.containerRepository = containerRepository;
+        this.userRepository = userRepository;
     }
 
     // ========== CREATE ==========
@@ -45,18 +44,17 @@ public class SaleDataService implements ISaleDataService
                 dto.getQuantityL() == null ||
                 dto.getPrice() == null ||
                 dto.getCreatedByUserId() == null)
-
         {
             throw new IllegalArgumentException("customerId, containerId, quantityL, price and createdByUserId are required.");
         }
 
-        Customer customer = customerDAO.findById(dto.getCustomerId())
+        Customer customer = customerRepository.findById(dto.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found: " + dto.getCustomerId()));
 
-        Container container = containerDAO.findById(dto.getContainerId())
+        Container container = containerRepository.findById(dto.getContainerId())
                 .orElseThrow(() -> new RuntimeException("Container not found: " + dto.getContainerId()));
 
-        User createdBy = userDAO.findById(dto.getCreatedByUserId())
+        User createdBy = userRepository.findById(dto.getCreatedByUserId())
                 .orElseThrow(() -> new RuntimeException("User not found: " + dto.getCreatedByUserId()));
 
         LocalDateTime dateTime = dto.getDateTime() != null
@@ -74,7 +72,7 @@ public class SaleDataService implements ISaleDataService
         sale.setRecallCase(recallCase);
         sale.setCreatedBy(createdBy);
 
-        Sale saved = saleDAO.save(sale);
+        Sale saved = saleRepository.save(sale);
 
         return SaleMapper.convertSaleToDto(saved);
     }
@@ -83,7 +81,7 @@ public class SaleDataService implements ISaleDataService
     @Override
     public SaleDataDTO getSaleById(long id)
     {
-        Sale sale = saleDAO.findById(id)
+        Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sale not found: " + id));
 
         return SaleMapper.convertSaleToDto(sale);
@@ -92,7 +90,7 @@ public class SaleDataService implements ISaleDataService
     @Override
     public List<SaleDataDTO> getAllSales()
     {
-        return saleDAO.findAll()
+        return saleRepository.findAll()
                 .stream()
                 .map(SaleMapper::convertSaleToDto)
                 .collect(Collectors.toList());
@@ -107,10 +105,9 @@ public class SaleDataService implements ISaleDataService
             throw new IllegalArgumentException("Sale ID must be provided for update.");
         }
 
-        Sale sale = saleDAO.findById(dto.getId())
+        Sale sale = saleRepository.findById(dto.getId())
                 .orElseThrow(() -> new RuntimeException("Sale not found: " + dto.getId()));
 
-        // Just basic updatable fields (we usually don't change relations here)
         if (dto.getQuantityL() != null) {
             sale.setQuantityL(dto.getQuantityL());
         }
@@ -124,7 +121,7 @@ public class SaleDataService implements ISaleDataService
             sale.setRecallCase(dto.getRecallCase());
         }
 
-        Sale updated = saleDAO.save(sale);
+        Sale updated = saleRepository.save(sale);
         return SaleMapper.convertSaleToDto(updated);
     }
 
@@ -132,10 +129,10 @@ public class SaleDataService implements ISaleDataService
     @Override
     public void deleteSale(long id)
     {
-        if (!saleDAO.existsById(id))
+        if (!saleRepository.existsById(id))
         {
             throw new RuntimeException("Sale not found: " + id);
         }
-        saleDAO.deleteById(id);
+        saleRepository.deleteById(id);
     }
 }
