@@ -1,17 +1,22 @@
 package sep3.Mapping;
 
 import sep3.entity.Department;
-import sep3.dto.DepartmentDataDTO;
+import sep3.dto.departmentDTO.DepartmentDataDTO;
 
+public class DepartmentMapper
+{
+    private DepartmentMapper() { }
 
-public class DepartmentMapper {
+    public static DepartmentDataDTO convertDepartmentToDto(Department department)
+    {
+        if (department == null)
+        {
+            return null;
+        }
 
-  private DepartmentMapper() {}
-
-  public static DepartmentDataDTO convertDepartmentToDto(Department department) {
-    return new DepartmentDataDTO(
-        department.getId(),
-        department.getType()
-    );
-  }
+        return new DepartmentDataDTO(
+                department.getId(),
+                department.getType()
+        );
+    }
 }

@@ -24,4 +24,6 @@ public interface IUserDataService
 
   // EXTRA - CREDENTIAL VERIFICATION (Login Support)
    UserDataDTO validateUser(UserLoginDTO loginDTO);
+  boolean changePassword(String oldPassword, String newPassword, long userId);
+  void resetPassword(long userId);
 }
