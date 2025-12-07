@@ -19,13 +19,13 @@ import java.util.stream.Collectors;
 @Service
 public class SaleServiceImpl implements ISaleService
 {
-    private final sep3.dao.SaleRepository saleRepository;
-    private final sep3.dao.CustomerRepository customerRepository;
+    private final sep3.repository.SaleRepository saleRepository;
+    private final sep3.repository.CustomerRepository customerRepository;
     private final ContainerRepository containerRepository;
     private final UserRepository userRepository;
 
-    public SaleServiceImpl(sep3.dao.SaleRepository saleRepository,
-                           sep3.dao.CustomerRepository customerRepository,
+    public SaleServiceImpl(sep3.repository.SaleRepository saleRepository,
+                           sep3.repository.CustomerRepository customerRepository,
                            ContainerRepository containerRepository,
                            UserRepository userRepository)
     {

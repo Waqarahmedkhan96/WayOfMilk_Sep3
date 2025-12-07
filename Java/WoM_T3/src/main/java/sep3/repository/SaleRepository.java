@@ -1,4 +1,4 @@
-package sep3.dao;
+package sep3.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
