@@ -17,16 +17,12 @@ service CowService {
   rpc AddCow (CowCreationRequest) returns (CowData);
   rpc UpdateCow (CowData) returns (CowData);
   rpc GetCowById (CowIdRequest) returns (CowData);
+  rpc GetCowByRegNo (SentString) returns (CowData);
   rpc DeleteCow (CowIdRequest) returns (Empty);
-  //TODO: consider whether transfer requests should be handled here or in a separate proto/service
-  rpc TransferCow (CowTransferRequest) returns (CowData);
-  //since health update is allowed only by a specific type of user, a separate method is created
-  rpc UpdateCowHealth (CowData) returns (CowData);
+  rpc UpdateCowsHealth (CowsHealthChangeRequest) returns (CowList);
 }
 
-// The messages (equivalents of the DTOs)
-//message Empty {} // Simple empty message for requests with no parameters
-
+// Message definitions
 message CowList {
   repeated CowData cows = 1; // 'repeated' means a list
 }
@@ -43,6 +39,7 @@ message CowData {
   //necessary for null checks in Long, Boolean and LocalDate fields especially during updates
   optional string regNo = 2;
   // Using string for dates, and handling conversion (LocalDate <-> string) in the service layer
+  // date format: "YYYY-MM-DD"
   optional string birthDate = 3;
   optional bool isHealthy = 4;
   optional int64 departmentId = 5; //TODO: consider whether it should be a translated string instead of an id
@@ -52,8 +49,9 @@ message CowIdRequest {
   int64 id = 1;
 }
 
-message CowTransferRequest {
-  int64 cowId = 1;
-  int64 newDepartmentId = 2;
-  optional bool isHealthy = 3;
+
+message CowsHealthChangeRequest {
+  repeated int64 cowIds = 1;
+  optional bool newHealthStatus = 2;
+  int64 requestedByUserId = 3;
 }

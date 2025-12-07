@@ -1,4 +1,4 @@
-package sep3.service;
+package sep3.service.impl;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sep3.repository.CowRepository;
 import sep3.repository.UserRepository;
-import sep3.service.impl.CowServiceImpl;
 import sep3.repository.DepartmentRepository;
 import sep3.dto.cowDTO.CowCreationDTO;
 import sep3.dto.cowDTO.CowDataDTO;
@@ -136,8 +135,16 @@ class CowServiceImplTest {
 
   @Test
   void testDeleteCow() {
-    // 1. Arrange (Delete usually returns void, so we just call it)
-    long cowId = 10L;
+    // 1. Arrange
+    Department dept = new Department(DepartmentType.QUARANTINE);
+    User user = new Owner("Owie", "owie@email.com", "25648454", "Street 123", "password");
+
+    Cow cow1 = new Cow("Reg1", LocalDate.now(), dept, user);
+    cow1.setId(1L);
+    long cowId = 1L;
+
+    // stub repository existence check so service won't throw
+    when(mockCowRepository.existsById(cowId)).thenReturn(true);
 
     // 2. Act
     cowDataService.deleteCow(cowId);

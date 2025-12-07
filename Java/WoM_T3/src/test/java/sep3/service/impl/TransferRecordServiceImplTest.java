@@ -1,4 +1,4 @@
-package sep3.service;
+package sep3.service.impl;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import sep3.repository.UserRepository;
-import sep3.service.impl.TransferRecordServiceImpl;
 import sep3.repository.CowRepository;
 import sep3.repository.DepartmentRepository;
 import sep3.repository.TransferRepository;

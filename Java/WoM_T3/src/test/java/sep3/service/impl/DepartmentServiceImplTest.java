@@ -1,4 +1,4 @@
-package sep3.service;
+package sep3.service.impl;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sep3.service.impl.DepartmentServiceImpl;
 import sep3.repository.DepartmentRepository;
 import sep3.dto.departmentDTO.DepartmentCreationDTO;
 import sep3.dto.departmentDTO.DepartmentDataDTO;
