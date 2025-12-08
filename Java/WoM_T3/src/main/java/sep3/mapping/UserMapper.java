@@ -4,74 +4,71 @@ import sep3.dto.userDTO.UserCreationDTO;
 import sep3.dto.userDTO.UserDataDTO;
 import sep3.entity.user.*;
 
-public class UserMapper {
+public class UserMapper
+{
 
   // DTO -> Entity (For Registration)
-  public static User toEntity(UserCreationDTO dto) {
+  public static User toEntity(UserCreationDTO dto)
+  {
     // Normalize the role string (handle "vet", "VET", "Vet")
     String roleString = dto.getRole() != null ? dto.getRole().toUpperCase() : "";
 
     UserRole roleEnum;
-    try {
+    try
+    {
       roleEnum = UserRole.valueOf(roleString);
-    } catch (IllegalArgumentException e) {
+    }
+    catch (IllegalArgumentException e)
+    {
       // enforcing a role (error if no role is provided)
       throw new RuntimeException("Invalid or missing User Role: " + dto.getRole());
     }
 
-    switch (roleEnum) {
+    switch (roleEnum)
+    {
       case VET:
-        return new Vet(
-            dto.getName(),
-            dto.getEmail(),
-            dto.getPhone(),
-            dto.getAddress(),
-            dto.getPassword(),
-            dto.getLicenseNumber()
-        );
+        return new Vet(dto.getName(), dto.getEmail(), dto.getPhone(),
+            dto.getAddress(), dto.getPassword(), dto.getLicenseNumber());
 
       case OWNER:
-        return new Owner(
-            dto.getName(),
-            dto.getEmail(),
-            dto.getPhone(),
-            dto.getAddress(),
-            dto.getPassword()
-        );
+        return new Owner(dto.getName(), dto.getEmail(), dto.getPhone(),
+            dto.getAddress(), dto.getPassword());
 
       case WORKER:
-        return new Worker(
-            dto.getName(),
-            dto.getEmail(),
-            dto.getPhone(),
-            dto.getAddress(),
-            dto.getPassword()
-        );
+        return new Worker(dto.getName(), dto.getEmail(), dto.getPhone(),
+            dto.getAddress(), dto.getPassword());
 
       default:
         throw new RuntimeException("Role logic not implemented for: " + roleEnum);
     }
+
   }
 
   //DTO -> Entity for updating
   public static User updateEntity(UserDataDTO dto, User userToUpdate)
   {
-    if(dto.getName() != null && !dto.getName().isBlank()) {
+    if (dto.getName() != null && !dto.getName().isBlank())
+    {
       userToUpdate.setName(dto.getName());
     }
-    if(dto.getEmail() != null && !dto.getEmail().isBlank()) {
+    if (dto.getEmail() != null && !dto.getEmail().isBlank())
+    {
       userToUpdate.setEmail(dto.getEmail());
     }
-    if(dto.getPhone() != null && !dto.getPhone().isBlank()) {
+    if (dto.getPhone() != null && !dto.getPhone().isBlank())
+    {
       userToUpdate.setPhone(dto.getPhone());
     }
-    if(dto.getAddress() != null && !dto.getAddress().isBlank()) {
+    if (dto.getAddress() != null && !dto.getAddress().isBlank())
+    {
       userToUpdate.setAddress(dto.getAddress());
     }
 
     // Polymorphism check for Vet License
-    if (dto.getLicenseNumber() != null && !dto.getLicenseNumber().isBlank()) {
-      if (userToUpdate instanceof Vet) {
+    if (dto.getLicenseNumber() != null && !dto.getLicenseNumber().isBlank())
+    {
+      if (userToUpdate instanceof Vet)
+      {
         ((Vet) userToUpdate).setLicenseNumber(dto.getLicenseNumber());
       }
     }
@@ -80,22 +77,19 @@ public class UserMapper {
   }
 
   // Entity -> DTO (For Viewing Users)
-  public static UserDataDTO toDTO(User user) {
+  public static UserDataDTO toDTO(User user)
+  {
     String licenseNumber = null;
 
     // check if user is a vet
-    if (user instanceof Vet) {
+    if (user instanceof Vet)
+    {
       licenseNumber = ((Vet) user).getLicenseNumber();
     }
 
-    return new UserDataDTO(
-        user.getName(),
-        user.getEmail(),
-        user.getAddress(),
-        user.getPhone(),
-        user.getId(),
-        user.getRole().toString(),
-        licenseNumber // Will be null for Owners and Workers
+    return new UserDataDTO(user.getName(), user.getEmail(), user.getAddress(),
+        user.getPhone(), user.getId(), user.getRole().toString(), licenseNumber
+        // Will be null for Owners and Workers
     );
   }
 
