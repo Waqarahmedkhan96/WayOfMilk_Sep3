@@ -15,7 +15,7 @@ option csharp_namespace = "Sep3.WayOfMilk.Grpc";
 service CowService {
   rpc GetAllCows (Empty) returns (CowList);
   rpc AddCow (CowCreationRequest) returns (CowData);
-  rpc UpdateCow (CowData) returns (CowData);
+  rpc UpdateCow (CowUpdateRequest) returns (CowData);
   rpc GetCowById (CowIdRequest) returns (CowData);
   rpc GetCowByRegNo (SentString) returns (CowData);
   rpc DeleteCow (CowIdRequest) returns (Empty);
@@ -30,7 +30,12 @@ message CowCreationRequest {
   string regNo = 1;
   string birthDate = 2; // Using string for dates, and handling conversion (LocalDate <-> string) in the service layer
   int64 registeredByUserId = 3;
+  int64 quarantineDepartmentId = 4;
+}
 
+message CowUpdateRequest{
+  CowData cowData = 1;
+  int64 requestedBy = 2;
 }
 
 message CowData {

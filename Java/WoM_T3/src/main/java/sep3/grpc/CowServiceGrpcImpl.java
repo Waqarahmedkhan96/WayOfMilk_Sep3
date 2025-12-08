@@ -85,12 +85,12 @@ public class CowServiceGrpcImpl extends CowServiceGrpc.CowServiceImplBase
   //UPDATE
 
   @Override
-  public void updateCow(CowData request, StreamObserver<CowData> responseObserver) {
+  public void updateCow(CowUpdateRequest request, StreamObserver<CowData> responseObserver) {
     // Convert partial gRPC request -> DTO with nulls
-    CowDataDTO changesToCow = GrpcMapper.convertCowProtoToDto(request);
+    CowDataDTO changesToCow = GrpcMapper.convertCowProtoToDto(request.getCowData());
 
     // Call Service (which is designed for this DTO)
-    CowDataDTO updatedDto = coreService.updateCow(changesToCow);
+    CowDataDTO updatedDto = coreService.updateCow(changesToCow, request.getRequestedBy());
 
     // Convert full result DTO -> gRPC response
     CowData responseData = GrpcMapper.convertCowDtoToProto(updatedDto);

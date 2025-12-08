@@ -36,6 +36,10 @@ public class CustomerServiceImpl implements ICustomerService {
         {
             throw new IllegalArgumentException("All customer fields must be provided.");
         }
+        //check if customer already exists by cvr
+        if(customerDAO.existsByCompanyCVR(dto.getCompanyCVR())) {
+            throw new IllegalArgumentException("Customer already exists.");
+        }
 
 
         // Create Customer using your PUBLIC constructor
@@ -43,8 +47,7 @@ public class CustomerServiceImpl implements ICustomerService {
                 dto.getCompanyName(),
                 dto.getPhoneNo(),
                 dto.getEmail(),
-                dto.getCompanyCVR(),
-                registeredBy
+                dto.getCompanyCVR()
         );
 
         Customer saved = customerDAO.save(customer);
@@ -70,6 +73,21 @@ public class CustomerServiceImpl implements ICustomerService {
                 .stream()
                 .map(CustomerMapper::convertCustomerToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public CustomerDataDTO getCustomerByCVR(String cvr) {
+        CustomerDataDTO found = customerDAO.findByCompanyCVR(cvr)
+                .map(CustomerMapper::convertCustomerToDto)
+                .orElseThrow(() -> new RuntimeException("Customer not found with CVR: " + cvr));
+        return found;
+    }
+
+    @Override
+    public List<CustomerDataDTO> getCustomersByName(String name)
+    {
+        List<CustomerDataDTO> finds = CustomerMapper.convertCustomerListToDto(customerDAO.findByCompanyNameContainingIgnoreCase(name));
+        return finds;
     }
 
     // ========== UPDATE (partial) ==========

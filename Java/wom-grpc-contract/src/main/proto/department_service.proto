@@ -38,4 +38,5 @@ service DepartmentService {
   rpc AddDepartment (DepartmentCreationRequest) returns (DepartmentData);
   rpc GetDepartmentById (DepartmentIdRequest) returns (DepartmentData);
   rpc GetDepartmentByType (DepartmentTypeRequest) returns (DepartmentData);
+  rpc DeleteDepartment (SentId) returns (Empty);
 }

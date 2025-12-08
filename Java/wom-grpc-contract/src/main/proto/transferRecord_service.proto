@@ -28,7 +28,8 @@ message TransferRecordCreationRequest {
   int64 toDepartmentId = 3;
   int64 requestedByUserId = 4;
 
-  string movedAt = 5; // optional (blank = set at creation)
+  //date with time format: yyyy-mm-ddThh:mm:ss
+  string movedAt = 5; // make sure it's required from t2
 }
 
 message TransferRecordIdRequest {

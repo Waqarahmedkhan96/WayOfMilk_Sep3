@@ -5,6 +5,9 @@ import sep3.dto.cowDTO.CowDataDTO;
 import sep3.entity.Cow;
 import sep3.entity.Department;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class CowMapper
 {
   //static methods to map between entities and DTOs for request handlers
@@ -23,9 +26,53 @@ public class CowMapper
         cow.isHealthy(), deptId
     );
   }
+/*
+  public static Cow convertDtoToEntity (CowDataDTO dto)
+  {
+    //initialised by null fields, but this might need revisiting
+    //since it risks rewriting stuff as null in the database
+    Cow entity = new Cow(null, null, null, null);
 
-  //not sure if needed, but better have than not have
-  //update methods might use it, come to think of it
+      if (dto.getRegNo() != null && !dto.getRegNo().isEmpty())
+    {
+      entity.setRegNo(dto.getRegNo());
+    }
+    // Check for null (which parsing an empty string "" from proto would produce)
+    if (dto.getBirthDate() != null)
+    {
+      entity.setBirthDate(dto.getBirthDate());
+    }
+
+    // since this is now a Long, not long, a null check can be made
+    if (dto.getDepartmentId() != null)
+    {
+      entity.setDepartment(department);
+    }
+
+    // boolean is no longer a primitive so null checks can be made
+    if (dto.isHealthy() != null)
+    {
+      entity.setHealthy(dto.isHealthy());
+    }
+
+    return entity;
+  }
+
+   */
+
+  public static List<CowDataDTO> convertCowListToDTO(List<Cow> cows)
+  {
+    return cows.stream().map(CowMapper::convertCowToDto).collect(Collectors.toList());
+  }
+/*
+  public static List<Cow> convertDtoListToEntity(List<CowDataDTO> cows)
+  {
+      return cows.stream().map(CowMapper::convertDtoToEntity(cows)).collect(Collectors.toList());
+  }
+
+ */
+
+  //for update methods
   //because proto could be missing some fields on some occasions (ex on transfers)
   public static void updateCowFromDto(Cow entityToUpdate, CowDataDTO dto, Department department)
   {
@@ -48,9 +95,12 @@ public class CowMapper
     }
 
     // boolean is no longer a primitive so null checks can be made
-    if (dto.isHealthy() != null)
-    {
-      entityToUpdate.setHealthy(dto.isHealthy());
-    }
+      //this will be set only after user check, handled in service
+      /*
+        if (dto.isHealthy() != null)
+        {
+          entityToUpdate.setHealthy(dto.isHealthy());
+        }
+       */
   }
 }

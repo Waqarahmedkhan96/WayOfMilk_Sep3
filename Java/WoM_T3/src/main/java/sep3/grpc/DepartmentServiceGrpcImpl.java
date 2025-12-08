@@ -102,4 +102,17 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
             responseObserver.onError(e);
         }
     }
+
+    public void deleteDepartment(DepartmentIdRequest request, StreamObserver<Empty> responseObserver)
+    {
+        try
+        {
+            coreService.deleteDepartment(request.getId());
+
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(e);
+        }
+    }
 }

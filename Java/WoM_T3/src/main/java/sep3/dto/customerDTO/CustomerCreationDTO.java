@@ -12,8 +12,7 @@ public class CustomerCreationDTO
     public CustomerCreationDTO(String companyName,
                                String phoneNo,
                                String email,
-                               String companyCVR,
-                               Long registeredByUserId)
+                               String companyCVR)
     {
         this.companyName = companyName;
         this.phoneNo = phoneNo;
@@ -33,7 +32,4 @@ public class CustomerCreationDTO
 
     public String getCompanyCVR() { return companyCVR; }
     public void setCompanyCVR(String companyCVR) { this.companyCVR = companyCVR; }
-
-    public Long getRegisteredByUserId() { return registeredByUserId; }
-    public void setRegisteredByUserId(Long registeredByUserId) { this.registeredByUserId = registeredByUserId; }
 }

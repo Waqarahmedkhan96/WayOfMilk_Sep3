@@ -6,12 +6,7 @@ import sep3.mapping.GrpcMapper;
 import sep3.service.interfaces.ICustomerService;
 import sep3.dto.customerDTO.CustomerCreationDTO;
 import sep3.dto.customerDTO.CustomerDataDTO;
-import sep3.wayofmilk.grpc.CustomerCreationRequest;
-import sep3.wayofmilk.grpc.CustomerData;
-import sep3.wayofmilk.grpc.CustomerIdRequest;
-import sep3.wayofmilk.grpc.CustomerList;
-import sep3.wayofmilk.grpc.CustomerServiceGrpc;
-import sep3.wayofmilk.grpc.Empty;
+import sep3.wayofmilk.grpc.*;
 
 import java.util.List;
 
@@ -28,6 +23,7 @@ public class CustomerServiceGrpcImpl extends CustomerServiceGrpc.CustomerService
     @Override
     public void createCustomer(CustomerCreationRequest request,
                                StreamObserver<CustomerData> responseObserver) {
+
 
         // Proto -> DTO
         CustomerCreationDTO creationDTO =
@@ -57,6 +53,22 @@ public class CustomerServiceGrpcImpl extends CustomerServiceGrpc.CustomerService
         responseObserver.onCompleted();
     }
 
+    //READ: get by CVR
+    @Override
+    public void getCustomerByCVR (SentString cvr, StreamObserver<CustomerData> responseObserver)
+    {
+        if (cvr.getValue().isEmpty()) {
+            throw new IllegalArgumentException("Please add a CVR value to search for.");
+        }
+        String cvrString = cvr.getValue();
+        CustomerDataDTO dto = coreService.getCustomerByCVR(cvrString);
+        CustomerData response = GrpcMapper.convertCustomerDtoToProto(dto);
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+
     // READ: Get all
     @Override
     public void getAllCustomers(Empty request,
@@ -71,5 +83,29 @@ public class CustomerServiceGrpcImpl extends CustomerServiceGrpc.CustomerService
 
         responseObserver.onNext(listBuilder.build());
         responseObserver.onCompleted();
+    }
+
+    //READ: get by name
+    @Override
+    public void getCustomerByName(SentString name, StreamObserver<CustomerList> responseObserver)
+    {
+        List<CustomerDataDTO> foundCustomers = coreService.getCustomersByName(name.getValue());
+        CustomerList.Builder listBuilder = CustomerList.newBuilder();
+        for (CustomerDataDTO dto : foundCustomers) {
+            listBuilder.addCustomers(GrpcMapper.convertCustomerDtoToProto(dto));
+        }
+
+        responseObserver.onNext(listBuilder.build());
+        responseObserver.onCompleted();
+    }
+
+    //DELETE
+    @Override
+    public void deleteCustomer(SentId id, StreamObserver<Empty> streamObserver)
+    {
+        coreService.deleteCustomer(id.getId());
+
+        streamObserver.onNext(Empty.getDefaultInstance());
+        streamObserver.onCompleted();
     }
 }
