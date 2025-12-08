@@ -177,7 +177,7 @@ public class GrpcMapper {
     {
         return DepartmentData.newBuilder()
                 .setId(dto.getId())
-                .setType(dto.getType().name())
+                .setType(dto.getType().toString())
                 .build();
     }
 
@@ -194,13 +194,16 @@ public class GrpcMapper {
         return new DepartmentCreationDTO(type);
     }
 
-    public static DepartmentType convertDepartmentTypeStringToEnum(String typeString)
-    {
-        if (typeString == null)
-        {
-            throw new IllegalArgumentException("Department type cannot be null.");
+    public static DepartmentType convertDepartmentTypeStringToEnum(String type) {
+        if (type == null || type.isBlank()) {
+            throw new IllegalArgumentException("Department type cannot be null or blank");
         }
-        return DepartmentType.valueOf(typeString.toUpperCase());
+
+        try {
+            return DepartmentType.valueOf(type.toUpperCase());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid department type: " + type);
+        }
     }
 
     // Transfer Record mapping
