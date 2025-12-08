@@ -2,6 +2,7 @@ package sep3.grpc;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
+import sep3.entity.DepartmentType;
 import sep3.mapping.GrpcMapper;
 import sep3.service.interfaces.IDepartmentService;
 import sep3.dto.departmentDTO.DepartmentCreationDTO;
@@ -84,35 +85,26 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
     }
 
     @Override
-    public void getDepartmentByType(DepartmentTypeRequest request,
-                                    StreamObserver<DepartmentData> responseObserver)
+    public void getDepartmentsByType(DepartmentTypeRequest request,
+                                     StreamObserver<DepartmentList> responseObserver)
     {
-        try
-        {
-            DepartmentDataDTO dto =
-                    coreService.getDepartmentByType(
-                            GrpcMapper.convertDepartmentTypeStringToEnum(request.getType()));
+        try {
+            // proto ENUM → entity enum
+            DepartmentType type = DepartmentType.valueOf(request.getType().name());
 
-            DepartmentData response = GrpcMapper.convertDepartmentDtoToProto(dto);
-            responseObserver.onNext(response);
+            List<DepartmentDataDTO> dtos = coreService.getDepartmentsByType(type);
+
+            DepartmentList.Builder builder = DepartmentList.newBuilder();
+            for (DepartmentDataDTO dto : dtos) {
+                builder.addDepartments(GrpcMapper.convertDepartmentDtoToProto(dto));
+            }
+
+            responseObserver.onNext(builder.build());
             responseObserver.onCompleted();
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             responseObserver.onError(e);
         }
     }
 
-    public void deleteDepartment(DepartmentIdRequest request, StreamObserver<Empty> responseObserver)
-    {
-        try
-        {
-            coreService.deleteDepartment(request.getId());
-
-            responseObserver.onNext(Empty.getDefaultInstance());
-            responseObserver.onCompleted();
-        } catch (Exception e) {
-            responseObserver.onError(e);
-        }
-    }
 }

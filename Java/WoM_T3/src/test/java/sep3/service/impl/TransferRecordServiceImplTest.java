@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sep3.repository.UserRepository;
 import sep3.repository.CowRepository;
 import sep3.repository.DepartmentRepository;
-import sep3.repository.TransferRepository;
+import sep3.repository.TransferRecordRepository;
 
 import sep3.dto.transferRecordDTO.TransferRecordCreationDTO;
 import sep3.dto.transferRecordDTO.TransferRecordDataDTO;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class TransferRecordServiceImplTest {
 
-    @Mock private TransferRepository mockTransferDAO;
+    @Mock private TransferRecordRepository mockTransferDAO;
     @Mock private CowRepository mockCowRepository;
     @Mock private DepartmentRepository mockDepartmentRepository;
     @Mock private UserRepository mockUserRepository;

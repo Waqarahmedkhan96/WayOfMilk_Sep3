@@ -27,6 +27,14 @@
     <!-- Milk service -->
     <Protobuf Include="..\..\..\Java\wom-grpc-contract\src\main\proto\milk_service.proto"
               GrpcServices="Client" />
+
+    <!-- Department service -->
+    <Protobuf Include="..\..\..\Java\wom-grpc-contract\src\main\proto\department_service.proto"
+              GrpcServices="Client" />
+
+    <!-- TransferRecord service -->
+    <Protobuf Include="..\..\..\Java\wom-grpc-contract\src\main\proto\transferRecord_service.proto"
+              GrpcServices="Client" />
   </ItemGroup>
 
     <!-- -->

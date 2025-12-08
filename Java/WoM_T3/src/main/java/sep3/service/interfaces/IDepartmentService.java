@@ -11,7 +11,7 @@ public interface IDepartmentService
     DepartmentDataDTO addDepartment(DepartmentCreationDTO department);
     List<DepartmentDataDTO> getAllDepartments();
     DepartmentDataDTO getDepartmentById(long departmentId);
-    DepartmentDataDTO getDepartmentByType(DepartmentType departmentType);
+    List<DepartmentDataDTO> getDepartmentsByType(DepartmentType type);
     DepartmentDataDTO updateDepartment(DepartmentDataDTO department);
     void deleteDepartment(long departmentId);
 }
