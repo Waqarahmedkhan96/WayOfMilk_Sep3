@@ -15,8 +15,6 @@ public class Customer
     private String email;
     private String companyCVR;
 
-    @ManyToOne
-    private User registeredBy;
 
     protected Customer() {}
 
@@ -26,7 +24,6 @@ public class Customer
         this.phoneNo = phoneNo;
         this.email = email;
         this.companyCVR = companyCVR;
-        this.registeredBy = registeredBy;
     }
 
     public long getId() {
@@ -69,11 +66,4 @@ public class Customer
         this.companyCVR = companyCVR;
     }
 
-    public User getRegisteredBy() {
-        return registeredBy;
-    }
-
-    public void setRegisteredBy(User registeredBy) {
-        this.registeredBy = registeredBy;
-    }
 }

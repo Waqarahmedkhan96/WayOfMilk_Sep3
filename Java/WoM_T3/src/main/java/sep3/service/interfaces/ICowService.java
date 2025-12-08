@@ -8,7 +8,7 @@ public interface ICowService {
   CowDataDTO getCowById(long cowToFindId);
   CowDataDTO getCowByRegNo(String regNo);
   List<CowDataDTO> getAllCows();
-  CowDataDTO updateCow(CowDataDTO changesToCow);
+  CowDataDTO updateCow(CowDataDTO changesToCow, long userId);
   void updateManyCowsHealth(List<Long> cowsIds, boolean healthUpdate, long userId);
   void deleteCow(long id);
 }

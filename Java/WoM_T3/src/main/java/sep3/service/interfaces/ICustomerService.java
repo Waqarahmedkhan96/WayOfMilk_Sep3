@@ -13,6 +13,8 @@ public interface ICustomerService
     // READ
     CustomerDataDTO getCustomerById(long id);
     List<CustomerDataDTO> getAllCustomers();
+    CustomerDataDTO getCustomerByCVR(String cvr);
+    List<CustomerDataDTO> getCustomersByName(String name);
 
     // UPDATE (optional, for future use)
     CustomerDataDTO updateCustomer(CustomerDataDTO customer);

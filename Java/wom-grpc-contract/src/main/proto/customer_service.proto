@@ -9,7 +9,10 @@ import "repeatingMessageTypes.proto";
 service CustomerService {
   rpc GetCustomerById (CustomerIdRequest) returns (CustomerData);
   rpc GetAllCustomers (Empty) returns (CustomerList);
+  rpc GetCustomerByCVR (SentString) returns (CustomerData);
+  rpc GetCustomerByName (SentString) returns (CustomerList);
   rpc CreateCustomer (CustomerCreationRequest) returns (CustomerData);
+  rpc DeleteCustomer (SentId) returns (Empty);
 }
 
 // ========= COMMON =========

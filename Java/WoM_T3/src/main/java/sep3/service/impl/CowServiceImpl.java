@@ -39,7 +39,11 @@ import java.util.stream.Collectors;
   public CowDataDTO addCow(CowCreationDTO cow)
   {
     //making sure new cows are added to a quarrantine department
-    Department quarantine = departmentRepository.findByType(DepartmentType.QUARANTINE).orElseThrow(() -> new RuntimeException("Quarantine department not found"));
+    Department quarantine = departmentRepository.findById(cow.getDepartmentId()).orElseThrow(() -> new RuntimeException("Department not found"));
+    if (!quarantine.getType().equals(DepartmentType.QUARANTINE))
+    {
+        throw new RuntimeException("Cows can only be added to a quarantine department.");
+    }
     User addedBy = userRepository.findById(cow.getRegisteredByUserId()).orElseThrow(() -> new RuntimeException("User not found: " + cow.getRegisteredByUserId()));
     Cow addedCow = cowRepository.save(new Cow(cow.getRegNo(), cow.getBirthDate(), quarantine, addedBy));
     return CowMapper.convertCowToDto(addedCow);
@@ -63,9 +67,10 @@ import java.util.stream.Collectors;
 
     // 2. Map the list of Cow Entities (database objects) to
     //    CowDataDTO DTOs (data transfer objects).
-    return cows.stream()
-        .map(CowMapper::convertCowToDto) // Use the private helper method
-        .collect(Collectors.toList());
+      List<CowDataDTO> returnedDTOs = CowMapper.convertCowListToDTO(cows);
+
+  //return converted list
+    return returnedDTOs;
   }
   @Override
   public CowDataDTO getCowByRegNo (String regNo)
@@ -78,23 +83,32 @@ import java.util.stream.Collectors;
 
   //UPDATE
   @Override
-  public CowDataDTO updateCow(CowDataDTO changesToCow)
+  public CowDataDTO updateCow(CowDataDTO changesToCow, long userId)
   {
     Cow cowToUpdate = cowRepository.findById(changesToCow.getId()).orElseThrow(() -> new RuntimeException("Cow not found: " + changesToCow.getId()));
     //with throw because findbyid returns an optional, so we need to handle the case where the cow isn't found
     //create the department object to be attached to the cow
     // FIX START: Only fetch department if the DTO actually has a new Department ID
     Department department = null;
+    //find the user trying to perform the update
+    User requester = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found: " + userId));
     if (changesToCow.getDepartmentId() != null) {
       department = departmentRepository.findById(changesToCow.getDepartmentId())
           .orElseThrow(() -> new RuntimeException("Department not found"));
     }
 
     //making sure everything is mapped safe to update
+      //this will not update the health yet!
     CowMapper.updateCowFromDto(cowToUpdate, changesToCow, department);
+  //check if the user has the right to update the health status of the cow and update it if so
+  if (requester instanceof Vet) {
+      cowToUpdate.setHealthy(changesToCow.isHealthy());
+  }
+
 
     //now we can safely update the cow
     Cow savedCow = cowRepository.save(cowToUpdate);
+
     //since this cow will already have an ID, JPA will automatically look for the corresponding cow
     // and perform the UPDATE operation instead of creating a new one
     //ahh, convenience
@@ -120,6 +134,7 @@ import java.util.stream.Collectors;
     {
       throw new RuntimeException("One or more cows not found.");
     }
+    //this just confirms the save
     cows.forEach(cow -> cow.setHealthy(healthUpdate));
     cowRepository.saveAll(cows);
   }

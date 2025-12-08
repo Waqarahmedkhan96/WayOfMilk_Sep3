@@ -49,10 +49,10 @@ public class Cow
 
     public Cow(String regNo, LocalDate birthDate, boolean isHealthy, User registeredBy)
     {
-        this.regNo = regNo;
-        this.birthDate = birthDate;
-        this.isHealthy = isHealthy;
-        this.registeredBy = registeredBy;
+    this.regNo = regNo;
+    this.birthDate = birthDate;
+    this.isHealthy = isHealthy;
+    this.registeredBy = registeredBy;
     }
 
 

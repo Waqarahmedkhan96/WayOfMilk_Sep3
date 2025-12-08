@@ -105,7 +105,7 @@ public class GrpcMapper {
       return new CowCreationDTO(
           proto.getRegNo(),
           LocalDate.parse(proto.getBirthDate()), // Expects YYYY-MM-DD
-          proto.getRegisteredByUserId()
+          proto.getRegisteredByUserId(), proto.getQuarantineDepartmentId()
       );
     } catch (DateTimeParseException e) {
       throw new IllegalArgumentException("Date must be in YYYY-MM-DD format");
