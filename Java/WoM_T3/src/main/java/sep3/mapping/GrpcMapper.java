@@ -295,7 +295,6 @@ public class GrpcMapper {
         dto.setPhoneNo(proto.getPhoneNo());
         dto.setEmail(proto.getEmail());
         dto.setCompanyCVR(proto.getCompanyCVR());
-        dto.setRegisteredByUserId(proto.getRegisteredByUserId()); // NEW
         return dto;
     }
 

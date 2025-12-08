@@ -1,8 +1,11 @@
 package sep3.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import sep3.mapping.SaleMapper;
 import sep3.repository.ContainerRepository;
+import sep3.repository.CustomerRepository;
+import sep3.repository.SaleRepository;
 import sep3.repository.UserRepository;
 import sep3.dto.saleDTO.SaleCreationDTO;
 import sep3.dto.saleDTO.SaleDataDTO;
@@ -19,20 +22,20 @@ import java.util.stream.Collectors;
 @Service
 public class SaleServiceImpl implements ISaleService
 {
-    private final sep3.repository.SaleRepository saleRepository;
-    private final sep3.repository.CustomerRepository customerRepository;
-    private final ContainerRepository containerRepository;
-    private final UserRepository userRepository;
+    private final SaleRepository saleDAO;
+    private final CustomerRepository customerDAO;
+    private final ContainerRepository containerDAO;
+    private final UserRepository userDAO;
 
-    public SaleServiceImpl(sep3.repository.SaleRepository saleRepository,
-                           sep3.repository.CustomerRepository customerRepository,
-                           ContainerRepository containerRepository,
-                           UserRepository userRepository)
+    public SaleServiceImpl(SaleRepository saleDAO,
+                           CustomerRepository customerDAO,
+                           ContainerRepository containerDAO,
+                           UserRepository userDAO)
     {
-        this.saleRepository = saleRepository;
-        this.customerRepository = customerRepository;
-        this.containerRepository = containerRepository;
-        this.userRepository = userRepository;
+        this.saleDAO = saleDAO;
+        this.customerDAO = customerDAO;
+        this.containerDAO = containerDAO;
+        this.userDAO = userDAO;
     }
 
     // ========== CREATE ==========
@@ -45,19 +48,23 @@ public class SaleServiceImpl implements ISaleService
                 dto.getPrice() == null ||
                 dto.getCreatedByUserId() == null)
         {
-            throw new IllegalArgumentException("customerId, containerId, quantityL, price and createdByUserId are required.");
+            throw new IllegalArgumentException(
+                    "customerId, containerId, quantityL, price and createdByUserId are required.");
         }
 
-        Customer customer = customerRepository.findById(dto.getCustomerId())
-                .orElseThrow(() -> new RuntimeException("Customer not found: " + dto.getCustomerId()));
+        Customer customer = customerDAO.findById(dto.getCustomerId())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Customer not found with id: " + dto.getCustomerId()));
 
-        Container container = containerRepository.findById(dto.getContainerId())
-                .orElseThrow(() -> new RuntimeException("Container not found: " + dto.getContainerId()));
+        Container container = containerDAO.findById(dto.getContainerId())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Container not found with id: " + dto.getContainerId()));
 
-        User createdBy = userRepository.findById(dto.getCreatedByUserId())
-                .orElseThrow(() -> new RuntimeException("User not found: " + dto.getCreatedByUserId()));
+        User createdBy = userDAO.findById(dto.getCreatedByUserId())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("User not found with id: " + dto.getCreatedByUserId()));
 
-        LocalDateTime dateTime = dto.getDateTime() != null
+        LocalDateTime dateTime = (dto.getDateTime() != null)
                 ? dto.getDateTime()
                 : LocalDateTime.now();
 
@@ -72,7 +79,7 @@ public class SaleServiceImpl implements ISaleService
         sale.setRecallCase(recallCase);
         sale.setCreatedBy(createdBy);
 
-        Sale saved = saleRepository.save(sale);
+        Sale saved = saleDAO.save(sale);
 
         return SaleMapper.convertSaleToDto(saved);
     }
@@ -81,8 +88,9 @@ public class SaleServiceImpl implements ISaleService
     @Override
     public SaleDataDTO getSaleById(long id)
     {
-        Sale sale = saleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Sale not found: " + id));
+        Sale sale = saleDAO.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Sale not found with id: " + id));
 
         return SaleMapper.convertSaleToDto(sale);
     }
@@ -90,7 +98,7 @@ public class SaleServiceImpl implements ISaleService
     @Override
     public List<SaleDataDTO> getAllSales()
     {
-        return saleRepository.findAll()
+        return saleDAO.findAll()
                 .stream()
                 .map(SaleMapper::convertSaleToDto)
                 .collect(Collectors.toList());
@@ -105,9 +113,11 @@ public class SaleServiceImpl implements ISaleService
             throw new IllegalArgumentException("Sale ID must be provided for update.");
         }
 
-        Sale sale = saleRepository.findById(dto.getId())
-                .orElseThrow(() -> new RuntimeException("Sale not found: " + dto.getId()));
+        Sale sale = saleDAO.findById(dto.getId())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Sale not found with id: " + dto.getId()));
 
+        // Just basic updatable fields (we usually don't change relations here)
         if (dto.getQuantityL() != null) {
             sale.setQuantityL(dto.getQuantityL());
         }
@@ -121,7 +131,7 @@ public class SaleServiceImpl implements ISaleService
             sale.setRecallCase(dto.getRecallCase());
         }
 
-        Sale updated = saleRepository.save(sale);
+        Sale updated = saleDAO.save(sale);
         return SaleMapper.convertSaleToDto(updated);
     }
 
@@ -129,10 +139,10 @@ public class SaleServiceImpl implements ISaleService
     @Override
     public void deleteSale(long id)
     {
-        if (!saleRepository.existsById(id))
+        if (!saleDAO.existsById(id))
         {
-            throw new RuntimeException("Sale not found: " + id);
+            throw new EntityNotFoundException("Sale not found with id: " + id);
         }
-        saleRepository.deleteById(id);
+        saleDAO.deleteById(id);
     }
 }

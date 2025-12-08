@@ -20,8 +20,7 @@ public class Customer
 
     protected Customer() {}
 
-    public Customer(String companyName, String phoneNo, String email, String companyCVR,
-                    User registeredBy)
+    public Customer(String companyName, String phoneNo, String email, String companyCVR)
     {
         this.companyName = companyName;
         this.phoneNo = phoneNo;

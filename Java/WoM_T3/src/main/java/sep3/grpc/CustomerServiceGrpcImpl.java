@@ -16,8 +16,7 @@ import sep3.wayofmilk.grpc.Empty;
 import java.util.List;
 
 @GrpcService
-public class CustomerServiceGrpcImpl extends CustomerServiceGrpc.CustomerServiceImplBase
-{
+public class CustomerServiceGrpcImpl extends CustomerServiceGrpc.CustomerServiceImplBase {
 
     private final ICustomerService coreService;
 
@@ -30,11 +29,14 @@ public class CustomerServiceGrpcImpl extends CustomerServiceGrpc.CustomerService
     public void createCustomer(CustomerCreationRequest request,
                                StreamObserver<CustomerData> responseObserver) {
 
+        // Proto -> DTO
         CustomerCreationDTO creationDTO =
                 GrpcMapper.convertCustomerProtoCreationToDto(request);
 
+        // Business logic
         CustomerDataDTO createdCustomer = coreService.addCustomer(creationDTO);
 
+        // DTO -> Proto
         CustomerData response = GrpcMapper.convertCustomerDtoToProto(createdCustomer);
 
         responseObserver.onNext(response);

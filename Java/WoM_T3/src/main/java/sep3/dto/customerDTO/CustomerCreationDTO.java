@@ -6,7 +6,6 @@ public class CustomerCreationDTO
     private String phoneNo;
     private String email;
     private String companyCVR;
-    private Long registeredByUserId;   // this is new
 
     public CustomerCreationDTO() {}
 
@@ -20,7 +19,7 @@ public class CustomerCreationDTO
         this.phoneNo = phoneNo;
         this.email = email;
         this.companyCVR = companyCVR;
-        this.registeredByUserId = registeredByUserId;
+
     }
 
     public String getCompanyName() { return companyName; }

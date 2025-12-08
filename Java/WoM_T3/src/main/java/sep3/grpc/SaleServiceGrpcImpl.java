@@ -6,12 +6,7 @@ import sep3.mapping.GrpcMapper;
 import sep3.service.interfaces.ISaleService;
 import sep3.dto.saleDTO.SaleCreationDTO;
 import sep3.dto.saleDTO.SaleDataDTO;
-import sep3.wayofmilk.grpc.Empty;
-import sep3.wayofmilk.grpc.SaleCreationRequest;
-import sep3.wayofmilk.grpc.SaleData;
-import sep3.wayofmilk.grpc.SaleIdRequest;
-import sep3.wayofmilk.grpc.SaleList;
-import sep3.wayofmilk.grpc.SaleServiceGrpc;
+import sep3.wayofmilk.grpc.*;
 
 import java.util.List;
 
@@ -29,11 +24,14 @@ public class SaleServiceGrpcImpl extends SaleServiceGrpc.SaleServiceImplBase {
     public void createSale(SaleCreationRequest request,
                            StreamObserver<SaleData> responseObserver) {
 
+        // Proto -> DTO
         SaleCreationDTO creationDTO =
                 GrpcMapper.convertSaleProtoCreationToDto(request);
 
+        // Business logic
         SaleDataDTO createdSale = coreService.addSale(creationDTO);
 
+        // DTO -> Proto
         SaleData response = GrpcMapper.convertSaleDtoToProto(createdSale);
 
         responseObserver.onNext(response);
@@ -68,5 +66,19 @@ public class SaleServiceGrpcImpl extends SaleServiceGrpc.SaleServiceImplBase {
 
         responseObserver.onNext(listBuilder.build());
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void deleteSale(SentId request, StreamObserver<Empty> responseObserver)
+    {
+        try
+        {
+            coreService.deleteSale(request.getId());
+
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(e);
+        }
     }
 }

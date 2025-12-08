@@ -3,6 +3,9 @@ package sep3.mapping;
 import sep3.dto.customerDTO.CustomerDataDTO;
 import sep3.entity.Customer;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class CustomerMapper {
 
     private CustomerMapper() {
@@ -45,4 +48,14 @@ public class CustomerMapper {
             customer.setCompanyCVR(dto.getCompanyCVR());
         }
     }
+
+    public static List<CustomerDataDTO> convertCustomerListToDto(List<Customer> customerList) {
+        return customerList.stream().map(CustomerMapper::convertCustomerToDto).toList();
+    }
+
+    /*
+    public static List<Customer> convertDtoListToEntity(List<CustomerDataDTO> customerList) {
+        return customerList.stream().map(CustomerMapper::convertCustomerToDto).collect(Collectors.toList());
+    }
+     */
 }
