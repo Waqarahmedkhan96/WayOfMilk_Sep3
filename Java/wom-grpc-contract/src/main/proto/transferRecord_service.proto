@@ -56,4 +56,7 @@ service TransferRecordService {
   rpc GetTransferRecordsForCow(TransferRecordsForCowRequest) returns (TransferRecordList);
   rpc GetTransferRecordById(TransferRecordIdRequest) returns (TransferRecordData);
   rpc ApproveTransfer(ApproveTransferRequest) returns (TransferRecordData);
+  rpc UpdateTransferRecord (TransferRecordData) returns (TransferRecordData);
+  rpc DeleteTransferRecord (TransferRecordIdRequest) returns (Empty);
+
 }

@@ -49,7 +49,7 @@ class CowServiceImplTest {
 
     // Define Mock Behavior
     when(mockDepartmentRepository.findByType(DepartmentType.QUARANTINE))
-        .thenReturn(Optional.of(mockQuarantine));
+        .thenReturn(List.of(mockQuarantine));
 
     when(mockUserRepository.findById(userId))
         .thenReturn(Optional.of(mockUser));

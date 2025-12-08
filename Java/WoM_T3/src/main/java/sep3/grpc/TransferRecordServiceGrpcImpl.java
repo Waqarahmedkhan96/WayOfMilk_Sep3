@@ -30,13 +30,13 @@ public class TransferRecordServiceGrpcImpl
         try
         {
             TransferRecordCreationDTO creationDto =
-                    GrpcMapper.convertTransferProtoCreationToDto(request);
+                    GrpcMapper.convertTransferRecordProtoCreationToDto(request);
 
             TransferRecordDataDTO createdDto =
                     coreService.addTransferRecord(creationDto);
 
             TransferRecordData response =
-                    GrpcMapper.convertTransferDtoToProto(createdDto);
+                    GrpcMapper.convertTransferRecordDtoToProto(createdDto);
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
@@ -57,7 +57,7 @@ public class TransferRecordServiceGrpcImpl
 
         for (TransferRecordDataDTO dto : dtos)
         {
-            listBuilder.addRecords(GrpcMapper.convertTransferDtoToProto(dto));
+            listBuilder.addRecords(GrpcMapper.convertTransferRecordDtoToProto(dto));
         }
 
         responseObserver.onNext(listBuilder.build());
@@ -75,7 +75,7 @@ public class TransferRecordServiceGrpcImpl
 
         for (TransferRecordDataDTO dto : dtos)
         {
-            listBuilder.addRecords(GrpcMapper.convertTransferDtoToProto(dto));
+            listBuilder.addRecords(GrpcMapper.convertTransferRecordDtoToProto(dto));
         }
 
         responseObserver.onNext(listBuilder.build());
@@ -89,9 +89,39 @@ public class TransferRecordServiceGrpcImpl
         TransferRecordDataDTO dto =
                 coreService.getTransferRecordById(request.getId());
 
-        responseObserver.onNext(GrpcMapper.convertTransferDtoToProto(dto));
+        responseObserver.onNext(GrpcMapper.convertTransferRecordDtoToProto(dto));
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void updateTransferRecord(TransferRecordData request,
+                                     StreamObserver<TransferRecordData> responseObserver)
+    {
+        try {
+            var dto = GrpcMapper.convertTransferProtoToDto(request);
+            var updated = coreService.updateTransferRecord(dto);
+
+            responseObserver.onNext(GrpcMapper.convertTransferDtoToProto(updated));
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(e);
+        }
+    }
+
+
+    @Override
+    public void deleteTransferRecord(TransferRecordIdRequest request,
+                                     StreamObserver<Empty> responseObserver)
+    {
+        try {
+            coreService.deleteTransferRecord(request.getId());
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(e);
+        }
+    }
+
 
     @Override
     public void approveTransfer(ApproveTransferRequest request,
@@ -100,7 +130,7 @@ public class TransferRecordServiceGrpcImpl
         TransferRecordDataDTO dto =
                 coreService.approveTransfer(request.getTransferId(), request.getVetUserId());
 
-        responseObserver.onNext(GrpcMapper.convertTransferDtoToProto(dto));
+        responseObserver.onNext(GrpcMapper.convertTransferRecordDtoToProto(dto));
         responseObserver.onCompleted();
     }
 }

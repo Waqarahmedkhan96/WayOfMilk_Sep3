@@ -39,7 +39,8 @@ import java.util.stream.Collectors;
   public CowDataDTO addCow(CowCreationDTO cow)
   {
     //making sure new cows are added to a quarrantine department
-    Department quarantine = departmentRepository.findByType(DepartmentType.QUARANTINE).orElseThrow(() -> new RuntimeException("Quarantine department not found"));
+    Department quarantine = departmentRepository.findByType(DepartmentType.QUARANTINE).stream().findFirst().orElseThrow(() -> new RuntimeException("Quarantine department not found"));
+
     User addedBy = userRepository.findById(cow.getRegisteredByUserId()).orElseThrow(() -> new RuntimeException("User not found: " + cow.getRegisteredByUserId()));
     Cow addedCow = cowRepository.save(new Cow(cow.getRegNo(), cow.getBirthDate(), quarantine, addedBy));
     return CowMapper.convertCowToDto(addedCow);

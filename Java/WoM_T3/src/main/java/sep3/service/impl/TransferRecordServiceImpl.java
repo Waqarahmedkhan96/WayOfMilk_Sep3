@@ -5,7 +5,7 @@ import sep3.entity.DepartmentType;
 import sep3.mapping.TransferRecordMapper;
 import sep3.repository.CowRepository;
 import sep3.repository.DepartmentRepository;
-import sep3.repository.TransferRepository;
+import sep3.repository.TransferRecordRepository;
 import sep3.repository.UserRepository;
 import sep3.dto.transferRecordDTO.TransferRecordCreationDTO;
 import sep3.dto.transferRecordDTO.TransferRecordDataDTO;
@@ -22,17 +22,17 @@ import java.util.stream.Collectors;
 @Service
 public class TransferRecordServiceImpl implements ITransferRecordService
 {
-    private final TransferRepository transferRepository;
+    private final TransferRecordRepository transferRecordRepository;
     private final CowRepository cowRepository;
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
 
-    public TransferRecordServiceImpl(TransferRepository transferRepository,
+    public TransferRecordServiceImpl(TransferRecordRepository transferRecordRepository,
                                      CowRepository cowRepository,
                                      DepartmentRepository departmentRepository,
                                      UserRepository userRepository)
     {
-        this.transferRepository = transferRepository;
+        this.transferRecordRepository = transferRecordRepository;
         this.cowRepository = cowRepository;
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;
@@ -79,7 +79,7 @@ public class TransferRecordServiceImpl implements ITransferRecordService
                 cow
         );
 
-        TransferRecord saved = transferRepository.save(entity);
+        TransferRecord saved = transferRecordRepository.save(entity);
 
         // update cow's department
         cow.setDepartment(toDept);
@@ -91,7 +91,7 @@ public class TransferRecordServiceImpl implements ITransferRecordService
     @Override
     public List<TransferRecordDataDTO> getAllTransferRecords()
     {
-        return transferRepository.findAll()
+        return transferRecordRepository.findAll()
                 .stream()
                 .map(TransferRecordMapper::convertTransferRecordToDto)
                 .collect(Collectors.toList());
@@ -100,7 +100,7 @@ public class TransferRecordServiceImpl implements ITransferRecordService
     @Override
     public List<TransferRecordDataDTO> getTransferRecordsForCow(long cowId)
     {
-        return transferRepository.findByCowId(cowId)
+        return transferRecordRepository.findByCowId(cowId)
                 .stream()
                 .map(TransferRecordMapper::convertTransferRecordToDto)
                 .collect(Collectors.toList());
@@ -109,16 +109,57 @@ public class TransferRecordServiceImpl implements ITransferRecordService
     @Override
     public TransferRecordDataDTO getTransferRecordById(long id)
     {
-        TransferRecord entity = transferRepository.findById(id)
+        TransferRecord entity = transferRecordRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("TransferRecord not found: " + id));
 
         return TransferRecordMapper.convertTransferRecordToDto(entity);
     }
 
     @Override
+    public TransferRecordDataDTO updateTransferRecord(TransferRecordDataDTO dto)
+    {
+        TransferRecord entity = transferRecordRepository.findById(dto.getId())
+                .orElseThrow(() -> new RuntimeException("TransferRecord not found: " + dto.getId()));
+
+        if (dto.getMovedAt() != null)
+            entity.setMovedAt(dto.getMovedAt());
+
+        if (dto.getFromDepartmentId() != null)
+        {
+            Department from = departmentRepository.findById(dto.getFromDepartmentId())
+                    .orElseThrow(() -> new RuntimeException("Department not found"));
+            entity.setFromDept(from);
+        }
+
+        if (dto.getToDepartmentId() != null)
+        {
+            Department to = departmentRepository.findById(dto.getToDepartmentId())
+                    .orElseThrow(() -> new RuntimeException("Department not found"));
+            entity.setToDept(to);
+            entity.setDepartment(to);
+        }
+
+        if (dto.getApprovedByVetUserId() != null)
+        {
+            User vet = userRepository.findById(dto.getApprovedByVetUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            entity.setApprovedByVet(vet);
+        }
+
+        TransferRecord saved = transferRecordRepository.save(entity);
+        return TransferRecordMapper.convertTransferRecordToDto(saved);
+    }
+
+    @Override
+    public void deleteTransferRecord(long id)
+    {
+        transferRecordRepository.deleteById(id);
+    }
+
+    @Override
     public TransferRecordDataDTO approveTransfer(long transferId, long vetUserId)
     {
-        TransferRecord entity = transferRepository.findById(transferId)
+        TransferRecord entity = transferRecordRepository.findById(transferId)
                 .orElseThrow(() -> new RuntimeException("TransferRecord not found: " + transferId));
 
         User vet = userRepository.findById(vetUserId)
@@ -132,7 +173,7 @@ public class TransferRecordServiceImpl implements ITransferRecordService
             entity.setMovedAt(LocalDateTime.now());
         }
 
-        TransferRecord saved = transferRepository.save(entity);
+        TransferRecord saved = transferRecordRepository.save(entity);
         return TransferRecordMapper.convertTransferRecordToDto(saved);
     }
 }

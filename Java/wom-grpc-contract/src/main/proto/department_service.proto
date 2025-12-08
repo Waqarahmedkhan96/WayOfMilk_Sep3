@@ -23,8 +23,15 @@ message DepartmentIdRequest {
   int64 id = 1;
 }
 
+enum DepartmentTypeEnum {
+  UNKNOWN = 0;
+  MILKING = 1;
+  RESTING = 2;
+  QUARANTINE = 3;
+}
+
 message DepartmentTypeRequest {
-  string type = 1; // MILKING/RESTING/QUARANTINE
+  DepartmentTypeEnum type = 1;  // MILKING/RESTING/QUARANTINE
 }
 
 message DepartmentList {
@@ -37,5 +44,8 @@ service DepartmentService {
   rpc GetAllDepartments (Empty) returns (DepartmentList);
   rpc AddDepartment (DepartmentCreationRequest) returns (DepartmentData);
   rpc GetDepartmentById (DepartmentIdRequest) returns (DepartmentData);
-  rpc GetDepartmentByType (DepartmentTypeRequest) returns (DepartmentData);
+  rpc GetDepartmentsByType (DepartmentTypeRequest) returns (DepartmentList);
+  rpc UpdateDepartment (DepartmentData) returns (DepartmentData);
+  rpc DeleteDepartment (DepartmentIdRequest) returns (Empty);
+
 }
