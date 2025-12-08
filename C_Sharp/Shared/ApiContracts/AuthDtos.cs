@@ -8,6 +8,7 @@ public class LoginRequestDto
 }
 
 // Login response from WebApi to UI
+
 public class LoginResponseDto
 {
     public long Id { get; set; }
@@ -30,4 +31,16 @@ public class ResetPasswordDto
 {
     public long UserId { get; set; }
     public required string NewPassword { get; set; }
+}
+
+//UserData from t3 grpc
+public class AuthenticatedUserDto
+{
+    public long UserId { get; set; }
+    public string Name { get; set; }
+    public string email { get; set; }
+    public string address { get; set }
+    publicString phone { get; set; }
+    public UserRole Role { get; set; }
+    public string licenseNumber { get; set; }
 }

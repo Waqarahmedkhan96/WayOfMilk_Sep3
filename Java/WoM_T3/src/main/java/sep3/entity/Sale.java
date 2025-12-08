@@ -13,11 +13,13 @@ public class Sale
     private long id;
 
     @ManyToOne
+    @JoinColumn(name = "sold_by")
     private User createdBy;
 
     private LocalDateTime dateTime;
 
     @ManyToOne
+    @JoinColumn(name = "container_id")
     private Container container;
 
     private double quantityL;
