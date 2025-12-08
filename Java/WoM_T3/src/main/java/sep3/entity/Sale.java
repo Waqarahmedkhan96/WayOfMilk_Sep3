@@ -8,38 +8,38 @@ import java.time.LocalDateTime;
 @Entity
 public class Sale
 {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-  @ManyToOne
-  private User createdBy;
+    @ManyToOne
+    private User createdBy;
 
-  private LocalDateTime dateTime;
+    private LocalDateTime dateTime;
 
-  @ManyToOne
-  private Container container;
+    @ManyToOne
+    private Container container;
 
-  private double quantityL;
-  private double price;
-  private boolean recallCase;
+    private double quantityL;
+    private double price;
+    private boolean recallCase;
 
-  @ManyToOne
-  private Customer customer;
+    @ManyToOne
+    private Customer customer;
 
-  public Sale() {}
+    public Sale() {}
 
-  public Sale(User createdBy, LocalDateTime dateTime, Container container,
-              double quantityL, double price, boolean recallCase, Customer customer)
-  {
-    this.createdBy = createdBy;
-    this.dateTime = dateTime;
-    this.container = container;
-    this.quantityL = quantityL;
-    this.price = price;
-    this.recallCase = recallCase;
-    this.customer = customer;
-  }
+    public Sale(User createdBy, LocalDateTime dateTime, Container container,
+                double quantityL, double price, boolean recallCase, Customer customer)
+    {
+        this.createdBy = createdBy;
+        this.dateTime = dateTime;
+        this.container = container;
+        this.quantityL = quantityL;
+        this.price = price;
+        this.recallCase = recallCase;
+        this.customer = customer;
+    }
 
     public long getId() {
         return id;

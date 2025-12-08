@@ -1,13 +1,18 @@
 package sep3.service.impl;
 
+import io.grpc.stub.StreamObserver;
+import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.stereotype.Service;
 import sep3.mapping.CustomerMapper;
+import sep3.mapping.GrpcMapper;
+import sep3.repository.CustomerRepository;
 import sep3.repository.UserRepository;
 import sep3.dto.customerDTO.CustomerCreationDTO;
 import sep3.dto.customerDTO.CustomerDataDTO;
 import sep3.entity.Customer;
 import sep3.entity.user.User;
 import sep3.service.interfaces.ICustomerService;
+import sep3.wayofmilk.grpc.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,30 +20,25 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerServiceImpl implements ICustomerService {
 
-    private final sep3.repository.CustomerRepository customerRepository;
-    private final UserRepository userRepository;
+    private final CustomerRepository customerDAO;
 
-    public CustomerServiceImpl(sep3.repository.CustomerRepository customerRepository,
-                               UserRepository userRepository) {
-        this.customerRepository = customerRepository;
-        this.userRepository = userRepository;
+    public CustomerServiceImpl(CustomerRepository customerDAO) {
+        this.customerDAO = customerDAO;
     }
 
     // ========== CREATE ==========
     @Override
     public CustomerDataDTO addCustomer(CustomerCreationDTO dto)
     {
+        // Validate
         if (dto.getCompanyName() == null || dto.getPhoneNo() == null ||
-                dto.getEmail() == null || dto.getCompanyCVR() == null ||
-                dto.getRegisteredByUserId() == null)
+                dto.getEmail() == null || dto.getCompanyCVR() == null)
         {
             throw new IllegalArgumentException("All customer fields must be provided.");
         }
 
-        User registeredBy = userRepository.findById(dto.getRegisteredByUserId())
-                .orElseThrow(() ->
-                        new RuntimeException("User not found: " + dto.getRegisteredByUserId()));
 
+        // Create Customer using your PUBLIC constructor
         Customer customer = new Customer(
                 dto.getCompanyName(),
                 dto.getPhoneNo(),
@@ -47,8 +47,9 @@ public class CustomerServiceImpl implements ICustomerService {
                 registeredBy
         );
 
-        Customer saved = customerRepository.save(customer);
+        Customer saved = customerDAO.save(customer);
 
+        //use existing mapper method name
         return CustomerMapper.convertCustomerToDto(saved);
     }
 
@@ -56,7 +57,7 @@ public class CustomerServiceImpl implements ICustomerService {
     @Override
     public CustomerDataDTO getCustomerById(long id)
     {
-        Customer customer = customerRepository.findById(id)
+        Customer customer = customerDAO.findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found: " + id));
 
         return CustomerMapper.convertCustomerToDto(customer);
@@ -65,7 +66,7 @@ public class CustomerServiceImpl implements ICustomerService {
     @Override
     public List<CustomerDataDTO> getAllCustomers()
     {
-        return customerRepository.findAll()
+        return customerDAO.findAll()
                 .stream()
                 .map(CustomerMapper::convertCustomerToDto)
                 .collect(Collectors.toList());
@@ -80,12 +81,12 @@ public class CustomerServiceImpl implements ICustomerService {
             throw new IllegalArgumentException("Customer ID must be provided for update.");
         }
 
-        Customer customer = customerRepository.findById(dto.getId())
+        Customer customer = customerDAO.findById(dto.getId())
                 .orElseThrow(() -> new RuntimeException("Customer not found: " + dto.getId()));
 
         CustomerMapper.updateCustomerFromDto(customer, dto);
 
-        Customer updated = customerRepository.save(customer);
+        Customer updated = customerDAO.save(customer);
         return CustomerMapper.convertCustomerToDto(updated);
     }
 
@@ -93,10 +94,10 @@ public class CustomerServiceImpl implements ICustomerService {
     @Override
     public void deleteCustomer(long id)
     {
-        if (!customerRepository.existsById(id))
+        if (!customerDAO.existsById(id))
         {
             throw new RuntimeException("Customer not found: " + id);
         }
-        customerRepository.deleteById(id);
+        customerDAO.deleteById(id);
     }
 }

@@ -10,6 +10,7 @@ service SaleService {
   rpc GetSaleById (SaleIdRequest) returns (SaleData);
   rpc GetAllSales (Empty) returns (SaleList);
   rpc CreateSale (SaleCreationRequest) returns (SaleData);
+  rpc DeleteSale (SentId) returns (Empty);
 }
 
 // ========= COMMON =========
@@ -29,7 +30,7 @@ message SaleCreationRequest {
   double price            = 4;
   string dateTime         = 5; // "YYYY-MM-DDTHH:MM:SS"
   int64 createdByUserId   = 6;
-  bool recallCase         = 7; // NEW
+  bool recallCase         = 7;
 }
 
 message SaleData {
