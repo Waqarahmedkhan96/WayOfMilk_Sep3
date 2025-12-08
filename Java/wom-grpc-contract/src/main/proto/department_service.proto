@@ -11,14 +11,12 @@ option csharp_namespace = "Sep3.WayOfMilk.Grpc";
 // Matches DepartmentDataDTO
 message DepartmentData {
   int64 id = 1;
-  string name = 2;
-  string type = 3; // MILKING / RESTING / QUARANTINE
+  string type = 2; // MILKING / RESTING / QUARANTINE
 }
 
 // Matches DepartmentCreationDTO
 message DepartmentCreationRequest {
-  string name = 1;
-  string type = 2; // enum as string because we parse in mapper/service
+  string type = 1; // enum as string because we parse in mapper/service
 }
 
 message DepartmentIdRequest {
