@@ -35,6 +35,18 @@
     <!-- TransferRecord service -->
     <Protobuf Include="..\..\..\Java\wom-grpc-contract\src\main\proto\transferRecord_service.proto"
               GrpcServices="Client" />
+      <!--Cow service-->
+    <Protobuf Include="..\..\..\Java\wom-grpc-contract\src\main\proto\cow_service.proto"
+              GrpcServices="Client" />
+      <!--User service-->
+    <Protobuf Include="..\..\..\Java\wom-grpc-contract\src\main\proto\user_service.proto"
+              GrpcServices="Client" />
+      <!--Sale service-->
+    <Protobuf Include="..\..\..\Java\wom-grpc-contract\src\main\proto\sale_service.proto"
+              GrpcServices="Client" />
+      <!--Customer service-->
+    <Protobuf Include="..\..\..\Java\wom-grpc-contract\src\main\proto\customer_service.proto"
+              GrpcServices="Client" />
   </ItemGroup>
 
     <!-- -->
