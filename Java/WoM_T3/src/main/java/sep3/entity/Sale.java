@@ -12,27 +12,36 @@ public class Sale
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    // User 1..* Sale
     @ManyToOne
-    @JoinColumn(name = "sold_by")
+    @JoinColumn(name = "created_by_id")   // FK -> users.id
     private User createdBy;
 
     private LocalDateTime dateTime;
 
+    // Container 1..* Sale
     @ManyToOne
-    @JoinColumn(name = "container_id")
+    @JoinColumn(name = "container_id")    // FK -> container.id
     private Container container;
 
     private double quantityL;
     private double price;
     private boolean recallCase;
 
+    // Customer 1..* Sale
     @ManyToOne
+    @JoinColumn(name = "customer_id")     // FK -> customer.id
     private Customer customer;
 
     public Sale() {}
 
-    public Sale(User createdBy, LocalDateTime dateTime, Container container,
-                double quantityL, double price, boolean recallCase, Customer customer)
+    public Sale(User createdBy,
+                LocalDateTime dateTime,
+                Container container,
+                double quantityL,
+                double price,
+                boolean recallCase,
+                Customer customer)
     {
         this.createdBy = createdBy;
         this.dateTime = dateTime;
@@ -42,6 +51,8 @@ public class Sale
         this.recallCase = recallCase;
         this.customer = customer;
     }
+
+    // ---------- getters / setters ----------
 
     public long getId() {
         return id;

@@ -1,6 +1,9 @@
 package sep3.entity.user;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import sep3.entity.Customer;
 
 @Entity
 //"user" is a reserved keyword in PostgreSQL.
@@ -18,8 +21,12 @@ public abstract class User
   private String email;
   private String phone;
   private String address;
+    // 1 User .. * Customers (customers registered by this user)
+    @OneToMany(mappedBy = "registeredBy", cascade = CascadeType.ALL)
+    private List<Customer> customers = new ArrayList<>();
 
-  //private String hashedPassword;
+
+    //private String hashedPassword;
   //database will only retain the hashed version of the password
   //now handling the hashing via bcrypt configuration from the service layer
   private String password;
@@ -45,6 +52,7 @@ public abstract class User
     this.password = password;
     //this.hashedPassword = hashPassword(rawPassword);
     this.role = role;
+    this.customers = new ArrayList<>();
   }
 
   //constructor for authentication only
@@ -117,12 +125,20 @@ public abstract class User
     this.password = password;
   }
 
-  public UserRole getRole()
-  {
-    return role;
+  // User List methods:
+  public List<Customer> getCustomers() {
+      return customers;
   }
 
-  //HELPERS for password hashing
+  public void addCustomer(Customer customer) {
+      customers.add(customer);
+  }
+
+    public Object getRole() {
+      return role;
+    }
+
+    //HELPERS for password hashing
   //no longer needed
   //
   //  private String hashPassword(String password)
