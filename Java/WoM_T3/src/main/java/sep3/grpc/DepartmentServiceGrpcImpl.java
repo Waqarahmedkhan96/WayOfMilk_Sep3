@@ -145,4 +145,5 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
             responseObserver.onError(e);
         }
     }
+
 }
