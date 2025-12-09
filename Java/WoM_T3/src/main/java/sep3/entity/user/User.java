@@ -134,9 +134,14 @@ public abstract class User
       customers.add(customer);
   }
 
-    public Object getRole() {
+    public UserRole getRole() {
       return role;
     }
+
+  public void setRole(UserRole role)
+  {
+    this.role = role;
+  }
 
     //HELPERS for password hashing
   //no longer needed
