@@ -15,7 +15,6 @@ public class Sale
     // User 1..* Sale
     @ManyToOne
     @JoinColumn(name = "created_by_id")   // FK -> users.id
-    @JoinColumn(name = "sold_by")
     private User createdBy;
 
     private LocalDateTime dateTime;

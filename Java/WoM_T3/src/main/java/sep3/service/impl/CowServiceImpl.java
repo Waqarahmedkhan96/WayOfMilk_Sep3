@@ -101,9 +101,17 @@ import java.util.stream.Collectors;
       //this will not update the health yet!
     CowMapper.updateCowFromDto(cowToUpdate, changesToCow, department);
   //check if the user has the right to update the health status of the cow and update it if so
-  if (requester instanceof Vet) {
-      cowToUpdate.setHealthy(changesToCow.isHealthy());
-  }
+    boolean newHealthy = changesToCow.isHealthy();
+    if (newHealthy) {
+      if (requester instanceof Vet) {
+        cowToUpdate.setHealthy(true);
+      } else {
+        throw new RuntimeException("Only a veterinarian can mark a cow as healthy.");
+      }
+    } else {
+      // anyone (including vets) can mark a cow as not healthy
+      cowToUpdate.setHealthy(false);
+    }
 
 
     //now we can safely update the cow
