@@ -8,13 +8,11 @@ import java.util.List;
 public interface ITransferRecordService
 {
     TransferRecordDataDTO addTransferRecord(TransferRecordCreationDTO transfer);
-
     List<TransferRecordDataDTO> getAllTransferRecords();
-
     List<TransferRecordDataDTO> getTransferRecordsForCow(long cowId);
-
     TransferRecordDataDTO getTransferRecordById(long id);
-
-    // e.g. approval by vet
     TransferRecordDataDTO approveTransfer(long transferId, long vetUserId);
+
+    TransferRecordDataDTO updateTransferRecord(TransferRecordDataDTO dto);
+    void deleteTransferRecord(long id);
 }

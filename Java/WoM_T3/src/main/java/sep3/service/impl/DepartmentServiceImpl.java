@@ -54,36 +54,30 @@ public class DepartmentServiceImpl implements IDepartmentService
     }
 
     @Override
-    public DepartmentDataDTO getDepartmentByType(DepartmentType type)
+    public List<DepartmentDataDTO> getDepartmentsByType(DepartmentType type)
     {
-        Department department = departmentRepository.findByType(type)
-                .orElseThrow(() -> new IllegalArgumentException("Department not found type: " + type));
-
-        return DepartmentMapper.convertDepartmentToDto(department);
+        return departmentRepository.findByType(type).stream()
+                .map(DepartmentMapper::convertDepartmentToDto)
+                .toList();
     }
+
+
 
     @Override
     public DepartmentDataDTO updateDepartment(DepartmentDataDTO request)
     {
         if (request.getId() == null)
-        {
-            throw new IllegalArgumentException("Department ID must be provided for update.");
-        }
+            throw new IllegalArgumentException("ID required");
 
-        long id = request.getId();
-
-        Department departmentToUpdate = departmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Department not found: " + id));
+        Department dept = departmentRepository.findById(request.getId())
+                .orElseThrow(() -> new RuntimeException("Department not found: " + request.getId()));
 
         if (request.getType() != null)
-        {
-            departmentToUpdate.setType(request.getType());
-        }
+            dept.setType(request.getType());
 
-        Department updated = departmentRepository.save(departmentToUpdate);
-        return DepartmentMapper.convertDepartmentToDto(updated);
+        Department saved = departmentRepository.save(dept);
+        return DepartmentMapper.convertDepartmentToDto(saved);
     }
-
 
     @Override
     public void deleteDepartment(long departmentId)

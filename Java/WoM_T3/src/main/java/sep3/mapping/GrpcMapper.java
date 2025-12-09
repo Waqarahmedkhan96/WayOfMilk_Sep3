@@ -207,7 +207,7 @@ public class GrpcMapper {
     }
 
     // Transfer Record mapping
-    public static TransferRecordData convertTransferDtoToProto(TransferRecordDataDTO dto)
+    public static TransferRecordData convertTransferRecordDtoToProto(TransferRecordDataDTO dto)
     {
         TransferRecordData.Builder builder = TransferRecordData.newBuilder();
 
@@ -226,7 +226,12 @@ public class GrpcMapper {
         return builder.build();
     }
 
-    public static TransferRecordCreationDTO convertTransferProtoCreationToDto(
+    public static TransferRecordData convertTransferDtoToProto(TransferRecordDataDTO dto)
+    {
+        return convertTransferRecordDtoToProto(dto);
+    }
+
+    public static TransferRecordCreationDTO convertTransferRecordProtoCreationToDto(
             TransferRecordCreationRequest proto)
     {
         LocalDateTime movedAt =
@@ -240,6 +245,40 @@ public class GrpcMapper {
                 movedAt
         );
     }
+
+    public static TransferRecordCreationDTO convertTransferProtoCreationToDto(
+            TransferRecordCreationRequest proto)
+    {
+        return convertTransferRecordProtoCreationToDto(proto);
+    }
+
+
+    public static TransferRecordDataDTO convertTransferRecordProtoToDto(TransferRecordData proto)
+    {
+        TransferRecordDataDTO dto = new TransferRecordDataDTO();
+
+        dto.setId(proto.getId());
+
+        if (proto.getMovedAt() != null && !proto.getMovedAt().isBlank())
+            dto.setMovedAt(LocalDateTime.parse(proto.getMovedAt()));
+
+        dto.setFromDepartmentId(proto.getFromDepartmentId());
+        dto.setToDepartmentId(proto.getToDepartmentId());
+        dto.setDepartmentId(proto.getDepartmentId());
+
+        dto.setRequestedByUserId(proto.getRequestedByUserId());
+        dto.setApprovedByVetUserId(proto.getApprovedByVetUserId());
+
+        dto.setCowId(proto.getCowId());
+
+        return dto;
+    }
+
+    public static TransferRecordDataDTO convertTransferProtoToDto(TransferRecordData proto)
+    {
+        return convertTransferRecordProtoToDto(proto);
+    }
+
 
     // =================== CUSTOMER MAPPERS ===================
 
