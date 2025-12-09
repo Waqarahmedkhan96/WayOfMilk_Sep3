@@ -1,4 +1,5 @@
 package sep3.mapping;
+import sep3.dto.MilkDtos.*;
 import sep3.dto.cowDTO.*;
 import sep3.dto.departmentDTO.DepartmentCreationDTO;
 import sep3.dto.departmentDTO.DepartmentDataDTO;
@@ -11,27 +12,17 @@ import sep3.dto.saleDTO.SaleCreationDTO;
 import sep3.dto.saleDTO.SaleDataDTO;
 
 import sep3.entity.DepartmentType;
-import sep3.wayofmilk.grpc.CowCreationRequest; // Import your generated classes
-import sep3.wayofmilk.grpc.CowData; // Import your generated classes
-import sep3.wayofmilk.grpc.UserCreationRequest;
-import sep3.wayofmilk.grpc.UserData;
-import sep3.wayofmilk.grpc.DepartmentCreationRequest;
-import sep3.wayofmilk.grpc.DepartmentData;
-import sep3.wayofmilk.grpc.TransferRecordCreationRequest;
-import sep3.wayofmilk.grpc.TransferRecordData;
-import sep3.wayofmilk.grpc.AuthenticationRequest;
-import sep3.wayofmilk.grpc.CustomerCreationRequest;
-import sep3.wayofmilk.grpc.CustomerData;
-import sep3.wayofmilk.grpc.SaleCreationRequest;
-import sep3.wayofmilk.grpc.SaleData;
-
+import sep3.entity.MilkTestResult;
+import sep3.wayofmilk.grpc.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
-public class GrpcMapper {
+public final class GrpcMapper
+{
 
+  //no constructor because it's a utility class with static methods only (also why final)
   //COW mappers
 
   //OUT
@@ -66,30 +57,38 @@ public class GrpcMapper {
   }
 
   //  Converts the gRPC CowData message (with 'optional' fields)
-   // into internal CowDataDTO (with nulls).
-   // This is for handling an incoming partial UPDATE request.
+  // into internal CowDataDTO (with nulls).
+  // This is for handling an incoming partial UPDATE request.
 
-  public static CowDataDTO convertCowProtoToDto(CowData proto) {
+  public static CowDataDTO convertCowProtoToDto(CowData proto)
+  {
     CowDataDTO dto = new CowDataDTO();
 
     // ID is always present
     dto.setId(proto.getId());
 
     // Use has...() to check if a value was ACTUALLY sent
-    if (proto.hasRegNo()) {
+    if (proto.hasRegNo())
+    {
       dto.setRegNo(proto.getRegNo());
     }
-    if (proto.hasBirthDate()) {
-      if (proto.getBirthDate().isEmpty()) {
+    if (proto.hasBirthDate())
+    {
+      if (proto.getBirthDate().isEmpty())
+      {
         dto.setBirthDate(null);
-      } else {
+      }
+      else
+      {
         dto.setBirthDate(LocalDate.parse(proto.getBirthDate()));
       }
     }
-    if (proto.hasIsHealthy()) {
+    if (proto.hasIsHealthy())
+    {
       dto.setHealthy(proto.getIsHealthy());
     }
-    if (proto.hasDepartmentId()) {
+    if (proto.hasDepartmentId())
+    {
       dto.setDepartmentId(proto.getDepartmentId());
     }
 
@@ -97,17 +96,19 @@ public class GrpcMapper {
   }
 
   // Converts an incoming gRPC CowCreationRequest
-   // into internal CowCreationDTO
+  // into internal CowCreationDTO
 
-  public static CowCreationDTO convertCowProtoCreationToDto(CowCreationRequest proto) {
+  public static CowCreationDTO convertCowProtoCreationToDto(CowCreationRequest proto)
+  {
     // Assumes fields are required for creation
-    try {
-      return new CowCreationDTO(
-          proto.getRegNo(),
+    try
+    {
+      return new CowCreationDTO(proto.getRegNo(),
           LocalDate.parse(proto.getBirthDate()), // Expects YYYY-MM-DD
-          proto.getRegisteredByUserId(), proto.getQuarantineDepartmentId()
-      );
-    } catch (DateTimeParseException e) {
+          proto.getRegisteredByUserId(), proto.getQuarantineDepartmentId());
+    }
+    catch (DateTimeParseException e)
+    {
       throw new IllegalArgumentException("Date must be in YYYY-MM-DD format");
     }
   }
@@ -129,42 +130,57 @@ public class GrpcMapper {
   }
 
   // 2. User Data (DTO -> Proto) - For sending user info back to T2/Client
-  public static UserData convertUserDtoToProto(UserDataDTO dto) {
+  public static UserData convertUserDtoToProto(UserDataDTO dto)
+  {
     UserData.Builder builder = UserData.newBuilder();
 
     // ID is primitive long
     builder.setId(dto.getId());
 
     // Null checks for Strings to prevent NullPointerExceptions
-    if (dto.getName() != null) builder.setName(dto.getName());
-    if (dto.getEmail() != null) builder.setEmail(dto.getEmail());
-    if (dto.getAddress() != null) builder.setAddress(dto.getAddress());
-    if (dto.getPhone() != null) builder.setPhone(dto.getPhone());
-    if (dto.getRole() != null) builder.setRole(dto.getRole());
-    if (dto.getLicenseNumber() != null) builder.setLicenseNumber(dto.getLicenseNumber());
+    if (dto.getName() != null)
+      builder.setName(dto.getName());
+    if (dto.getEmail() != null)
+      builder.setEmail(dto.getEmail());
+    if (dto.getAddress() != null)
+      builder.setAddress(dto.getAddress());
+    if (dto.getPhone() != null)
+      builder.setPhone(dto.getPhone());
+    if (dto.getRole() != null)
+      builder.setRole(dto.getRole());
+    if (dto.getLicenseNumber() != null)
+      builder.setLicenseNumber(dto.getLicenseNumber());
 
     return builder.build();
   }
 
   // 3. User Data (Proto -> DTO) - For receiving updates from T2
-  public static UserDataDTO convertUserProtoToDto(UserData proto) {
+  public static UserDataDTO convertUserProtoToDto(UserData proto)
+  {
     UserDataDTO dto = new UserDataDTO();
 
     dto.setId(proto.getId());
 
     // Only set fields that were actually sent (Optional check)
-    if (proto.hasName()) dto.setName(proto.getName());
-    if (proto.hasEmail()) dto.setEmail(proto.getEmail());
-    if (proto.hasAddress()) dto.setAddress(proto.getAddress());
-    if (proto.hasPhone()) dto.setPhone(proto.getPhone());
-    if (proto.hasRole()) dto.setRole(proto.getRole());
-    if (proto.hasLicenseNumber()) dto.setLicenseNumber(proto.getLicenseNumber());
+    if (proto.hasName())
+      dto.setName(proto.getName());
+    if (proto.hasEmail())
+      dto.setEmail(proto.getEmail());
+    if (proto.hasAddress())
+      dto.setAddress(proto.getAddress());
+    if (proto.hasPhone())
+      dto.setPhone(proto.getPhone());
+    if (proto.hasRole())
+      dto.setRole(proto.getRole());
+    if (proto.hasLicenseNumber())
+      dto.setLicenseNumber(proto.getLicenseNumber());
 
     return dto;
   }
 
   // 4. Login Request (Proto -> DTO)
-  public static UserLoginDTO convertLoginProtoToDto(AuthenticationRequest proto) {
+  public static UserLoginDTO convertLoginProtoToDto(AuthenticationRequest proto)
+  {
     UserLoginDTO dto = new UserLoginDTO();
     dto.setEmail(proto.getEmail());
     dto.setPassword(proto.getPassword());
@@ -173,242 +189,331 @@ public class GrpcMapper {
 
   // Department mappers
 
-    public static DepartmentData convertDepartmentDtoToProto(DepartmentDataDTO dto)
+  public static DepartmentData convertDepartmentDtoToProto(DepartmentDataDTO dto)
+  {
+    return DepartmentData.newBuilder().setId(dto.getId()).setType(dto.getType().toString()).build();
+  }
+
+  public static DepartmentDataDTO convertDepartmentProtoToDto(DepartmentData proto)
+  {
+    DepartmentType type = convertDepartmentTypeStringToEnum(proto.getType());
+    return new DepartmentDataDTO(proto.getId(), type);
+  }
+
+  public static DepartmentCreationDTO convertDepartmentProtoCreationToDto(
+      DepartmentCreationRequest proto)
+  {
+    DepartmentType type = convertDepartmentTypeStringToEnum(proto.getType());
+    return new DepartmentCreationDTO(type);
+  }
+
+  public static DepartmentType convertDepartmentTypeStringToEnum(String type)
+  {
+    if (type == null || type.isBlank())
     {
-        return DepartmentData.newBuilder()
-                .setId(dto.getId())
-                .setType(dto.getType().toString())
-                .build();
+      throw new IllegalArgumentException(
+          "Department type cannot be null or blank");
     }
 
-    public static DepartmentDataDTO convertDepartmentProtoToDto(DepartmentData proto)
+    try
     {
-        DepartmentType type = convertDepartmentTypeStringToEnum(proto.getType());
-        return new DepartmentDataDTO(proto.getId(), type);
+      return DepartmentType.valueOf(type.toUpperCase());
     }
-
-    public static DepartmentCreationDTO convertDepartmentProtoCreationToDto(
-            DepartmentCreationRequest proto)
+    catch (Exception e)
     {
-        DepartmentType type = convertDepartmentTypeStringToEnum(proto.getType());
-        return new DepartmentCreationDTO(type);
+      throw new IllegalArgumentException("Invalid department type: " + type);
     }
+  }
 
-    public static DepartmentType convertDepartmentTypeStringToEnum(String type) {
-        if (type == null || type.isBlank()) {
-            throw new IllegalArgumentException("Department type cannot be null or blank");
-        }
+  // Transfer Record mapping
+  public static TransferRecordData convertTransferRecordDtoToProto(
+      TransferRecordDataDTO dto)
+  {
+    TransferRecordData.Builder builder = TransferRecordData.newBuilder();
 
-        try {
-            return DepartmentType.valueOf(type.toUpperCase());
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid department type: " + type);
-        }
-    }
+    if (dto.getId() != null)
+      builder.setId(dto.getId());
+    if (dto.getMovedAt() != null)
+      builder.setMovedAt(dto.getMovedAt().toString());
 
-    // Transfer Record mapping
-    public static TransferRecordData convertTransferRecordDtoToProto(TransferRecordDataDTO dto)
+    if (dto.getFromDepartmentId() != null)
+      builder.setFromDepartmentId(dto.getFromDepartmentId());
+    if (dto.getToDepartmentId() != null)
+      builder.setToDepartmentId(dto.getToDepartmentId());
+    if (dto.getDepartmentId() != null)
+      builder.setDepartmentId(dto.getDepartmentId());
+
+    if (dto.getRequestedByUserId() != null)
+      builder.setRequestedByUserId(dto.getRequestedByUserId());
+    if (dto.getApprovedByVetUserId() != null)
+      builder.setApprovedByVetUserId(dto.getApprovedByVetUserId());
+
+    if (dto.getCowId() != null)
+      builder.setCowId(dto.getCowId());
+
+    return builder.build();
+  }
+
+  public static TransferRecordData convertTransferDtoToProto(
+      TransferRecordDataDTO dto)
+  {
+    return convertTransferRecordDtoToProto(dto);
+  }
+
+  public static TransferRecordCreationDTO convertTransferRecordProtoCreationToDto(
+      TransferRecordCreationRequest proto)
+  {
+    LocalDateTime movedAt = proto.getMovedAt().isBlank() ? null : LocalDateTime.parse(proto.getMovedAt());
+
+    return new TransferRecordCreationDTO(proto.getCowId(), proto.getFromDepartmentId(),
+        proto.getToDepartmentId(), proto.getRequestedByUserId(), movedAt);
+  }
+
+  public static TransferRecordCreationDTO convertTransferProtoCreationToDto(
+      TransferRecordCreationRequest proto)
+  {
+    return convertTransferRecordProtoCreationToDto(proto);
+  }
+
+  public static TransferRecordDataDTO convertTransferRecordProtoToDto(
+      TransferRecordData proto)
+  {
+    TransferRecordDataDTO dto = new TransferRecordDataDTO();
+
+    dto.setId(proto.getId());
+
+    if (proto.getMovedAt() != null && !proto.getMovedAt().isBlank())
+      dto.setMovedAt(LocalDateTime.parse(proto.getMovedAt()));
+
+    dto.setFromDepartmentId(proto.getFromDepartmentId());
+    dto.setToDepartmentId(proto.getToDepartmentId());
+    dto.setDepartmentId(proto.getDepartmentId());
+
+    dto.setRequestedByUserId(proto.getRequestedByUserId());
+    dto.setApprovedByVetUserId(proto.getApprovedByVetUserId());
+
+    dto.setCowId(proto.getCowId());
+
+    return dto;
+  }
+
+  public static TransferRecordDataDTO convertTransferProtoToDto(
+      TransferRecordData proto)
+  {
+    return convertTransferRecordProtoToDto(proto);
+  }
+
+  // =================== CUSTOMER MAPPERS ===================
+
+  // DTO -> Proto (for sending CustomerData back to T2)
+  public static CustomerData convertCustomerDtoToProto(CustomerDataDTO dto)
+  {
+    CustomerData.Builder builder = CustomerData.newBuilder();
+
+    if (dto.getId() != null)
     {
-        TransferRecordData.Builder builder = TransferRecordData.newBuilder();
-
-        if (dto.getId() != null) builder.setId(dto.getId());
-        if (dto.getMovedAt() != null) builder.setMovedAt(dto.getMovedAt().toString());
-
-        if (dto.getFromDepartmentId() != null) builder.setFromDepartmentId(dto.getFromDepartmentId());
-        if (dto.getToDepartmentId() != null) builder.setToDepartmentId(dto.getToDepartmentId());
-        if (dto.getDepartmentId() != null) builder.setDepartmentId(dto.getDepartmentId());
-
-        if (dto.getRequestedByUserId() != null) builder.setRequestedByUserId(dto.getRequestedByUserId());
-        if (dto.getApprovedByVetUserId() != null) builder.setApprovedByVetUserId(dto.getApprovedByVetUserId());
-
-        if (dto.getCowId() != null) builder.setCowId(dto.getCowId());
-
-        return builder.build();
+      builder.setId(dto.getId());
     }
-
-    public static TransferRecordData convertTransferDtoToProto(TransferRecordDataDTO dto)
+    if (dto.getCompanyName() != null)
     {
-        return convertTransferRecordDtoToProto(dto);
+      builder.setCompanyName(dto.getCompanyName());
     }
-
-    public static TransferRecordCreationDTO convertTransferRecordProtoCreationToDto(
-            TransferRecordCreationRequest proto)
+    if (dto.getPhoneNo() != null)
     {
-        LocalDateTime movedAt =
-                proto.getMovedAt().isBlank() ? null : LocalDateTime.parse(proto.getMovedAt());
-
-        return new TransferRecordCreationDTO(
-                proto.getCowId(),
-                proto.getFromDepartmentId(),
-                proto.getToDepartmentId(),
-                proto.getRequestedByUserId(),
-                movedAt
-        );
+      builder.setPhoneNo(dto.getPhoneNo());
     }
-
-    public static TransferRecordCreationDTO convertTransferProtoCreationToDto(
-            TransferRecordCreationRequest proto)
+    if (dto.getEmail() != null)
     {
-        return convertTransferRecordProtoCreationToDto(proto);
+      builder.setEmail(dto.getEmail());
     }
-
-
-    public static TransferRecordDataDTO convertTransferRecordProtoToDto(TransferRecordData proto)
+    if (dto.getCompanyCVR() != null)
     {
-        TransferRecordDataDTO dto = new TransferRecordDataDTO();
-
-        dto.setId(proto.getId());
-
-        if (proto.getMovedAt() != null && !proto.getMovedAt().isBlank())
-            dto.setMovedAt(LocalDateTime.parse(proto.getMovedAt()));
-
-        dto.setFromDepartmentId(proto.getFromDepartmentId());
-        dto.setToDepartmentId(proto.getToDepartmentId());
-        dto.setDepartmentId(proto.getDepartmentId());
-
-        dto.setRequestedByUserId(proto.getRequestedByUserId());
-        dto.setApprovedByVetUserId(proto.getApprovedByVetUserId());
-
-        dto.setCowId(proto.getCowId());
-
-        return dto;
+      builder.setCompanyCVR(dto.getCompanyCVR());
     }
 
-    public static TransferRecordDataDTO convertTransferProtoToDto(TransferRecordData proto)
+    return builder.build();
+  }
+
+  // Proto -> DTO (for incoming updates, if ever used)
+  public static CustomerDataDTO convertCustomerProtoToDto(CustomerData proto)
+  {
+    CustomerDataDTO dto = new CustomerDataDTO();
+
+    dto.setId(proto.getId());
+
+    if (!proto.getCompanyName().isBlank())
     {
-        return convertTransferRecordProtoToDto(proto);
+      dto.setCompanyName(proto.getCompanyName());
+    }
+    if (!proto.getPhoneNo().isBlank())
+    {
+      dto.setPhoneNo(proto.getPhoneNo());
+    }
+    if (!proto.getEmail().isBlank())
+    {
+      dto.setEmail(proto.getEmail());
+    }
+    if (!proto.getCompanyCVR().isBlank())
+    {
+      dto.setCompanyCVR(proto.getCompanyCVR());
     }
 
+    return dto;
+  }
 
-    // =================== CUSTOMER MAPPERS ===================
+  // Creation: Proto -> DTO
+  public static CustomerCreationDTO convertCustomerProtoCreationToDto(
+      CustomerCreationRequest proto)
+  {
+    CustomerCreationDTO dto = new CustomerCreationDTO();
+    dto.setCompanyName(proto.getCompanyName());
+    dto.setPhoneNo(proto.getPhoneNo());
+    dto.setEmail(proto.getEmail());
+    dto.setCompanyCVR(proto.getCompanyCVR());
+    return dto;
+  }
 
-    // DTO -> Proto (for sending CustomerData back to T2)
-    public static CustomerData convertCustomerDtoToProto(CustomerDataDTO dto) {
-        CustomerData.Builder builder = CustomerData.newBuilder();
+  // =================== SALE MAPPERS ===================
 
-        if (dto.getId() != null) {
-            builder.setId(dto.getId());
-        }
-        if (dto.getCompanyName() != null) {
-            builder.setCompanyName(dto.getCompanyName());
-        }
-        if (dto.getPhoneNo() != null) {
-            builder.setPhoneNo(dto.getPhoneNo());
-        }
-        if (dto.getEmail() != null) {
-            builder.setEmail(dto.getEmail());
-        }
-        if (dto.getCompanyCVR() != null) {
-            builder.setCompanyCVR(dto.getCompanyCVR());
-        }
+  // DTO -> Proto (for sending sale info back to T2)
+  public static SaleData convertSaleDtoToProto(SaleDataDTO dto)
+  {
+    SaleData.Builder builder = SaleData.newBuilder();
 
-        return builder.build();
+    if (dto.getId() != null)
+    {
+      builder.setId(dto.getId());
+    }
+    if (dto.getCustomerId() != null)
+    {
+      builder.setCustomerId(dto.getCustomerId());
+    }
+    if (dto.getContainerId() != null)
+    {
+      builder.setContainerId(dto.getContainerId());
+    }
+    if (dto.getQuantityL() != null)
+    {
+      builder.setQuantityL(dto.getQuantityL());
+    }
+    if (dto.getPrice() != null)
+    {
+      builder.setPrice(dto.getPrice());
+    }
+    if (dto.getDateTime() != null)
+    {
+      builder.setDateTime(dto.getDateTime().toString());
+    }
+    if (dto.getRecallCase() != null)
+    {
+      builder.setRecallCase(dto.getRecallCase());
+    }
+    if (dto.getCreatedByUserId() != null)
+    {
+      builder.setCreatedByUserId(dto.getCreatedByUserId());
     }
 
-    // Proto -> DTO (for incoming updates, if ever used)
-    public static CustomerDataDTO convertCustomerProtoToDto(CustomerData proto) {
-        CustomerDataDTO dto = new CustomerDataDTO();
+    return builder.build();
+  }
 
-        dto.setId(proto.getId());
+  // Proto -> DTO (for incoming updates, if needed)
+  public static SaleDataDTO convertSaleProtoToDto(SaleData proto)
+  {
+    SaleDataDTO dto = new SaleDataDTO();
 
-        if (!proto.getCompanyName().isBlank()) {
-            dto.setCompanyName(proto.getCompanyName());
-        }
-        if (!proto.getPhoneNo().isBlank()) {
-            dto.setPhoneNo(proto.getPhoneNo());
-        }
-        if (!proto.getEmail().isBlank()) {
-            dto.setEmail(proto.getEmail());
-        }
-        if (!proto.getCompanyCVR().isBlank()) {
-            dto.setCompanyCVR(proto.getCompanyCVR());
-        }
+    dto.setId(proto.getId());
+    dto.setCustomerId(proto.getCustomerId());
+    dto.setContainerId(proto.getContainerId());
+    dto.setQuantityL(proto.getQuantityL());
+    dto.setPrice(proto.getPrice());
 
-        return dto;
+    if (!proto.getDateTime().isBlank())
+    {
+      dto.setDateTime(java.time.LocalDateTime.parse(proto.getDateTime()));
     }
 
-    // Creation: Proto -> DTO
-    public static CustomerCreationDTO convertCustomerProtoCreationToDto(CustomerCreationRequest proto) {
-        CustomerCreationDTO dto = new CustomerCreationDTO();
-        dto.setCompanyName(proto.getCompanyName());
-        dto.setPhoneNo(proto.getPhoneNo());
-        dto.setEmail(proto.getEmail());
-        dto.setCompanyCVR(proto.getCompanyCVR());
-        return dto;
+    dto.setRecallCase(proto.getRecallCase());
+    dto.setCreatedByUserId(proto.getCreatedByUserId());
+
+    return dto;
+  }
+
+  // Creation: Proto -> DTO
+  public static SaleCreationDTO convertSaleProtoCreationToDto(
+      SaleCreationRequest proto)
+  {
+    java.time.LocalDateTime dateTime = null;
+    if (!proto.getDateTime().isBlank())
+    {
+      dateTime = java.time.LocalDateTime.parse(proto.getDateTime());
     }
 
-// =================== SALE MAPPERS ===================
+    SaleCreationDTO dto = new SaleCreationDTO(proto.getCustomerId(), proto.getContainerId(),
+        proto.getQuantityL(), proto.getPrice(), proto.getCreatedByUserId(),
+        dateTime);
+    dto.setRecallCase(proto.getRecallCase()); // NEW
+    return dto;
+  }
 
-    // DTO -> Proto (for sending sale info back to T2)
-    public static SaleData convertSaleDtoToProto(SaleDataDTO dto) {
-        SaleData.Builder builder = SaleData.newBuilder();
+  //Milk mappers
 
-        if (dto.getId() != null) {
-            builder.setId(dto.getId());
-        }
-        if (dto.getCustomerId() != null) {
-            builder.setCustomerId(dto.getCustomerId());
-        }
-        if (dto.getContainerId() != null) {
-            builder.setContainerId(dto.getContainerId());
-        }
-        if (dto.getQuantityL() != null) {
-            builder.setQuantityL(dto.getQuantityL());
-        }
-        if (dto.getPrice() != null) {
-            builder.setPrice(dto.getPrice());
-        }
-        if (dto.getDateTime() != null) {
-            builder.setDateTime(dto.getDateTime().toString());
-        }
-        if (dto.getRecallCase() != null) {
-            builder.setRecallCase(dto.getRecallCase());
-        }
-        if (dto.getCreatedByUserId() != null) {
-            builder.setCreatedByUserId(dto.getCreatedByUserId());
-        }
+  public static MilkDto convertMilkProtoToDto(MilkMessage proto)
+  {
 
-        return builder.build();
+    MilkDto dto = new MilkDto();
+    dto.setId(proto.getId());
+    dto.setVolumeL(proto.getVolumeL());
+    dto.setDate(LocalDate.parse(proto.getDate()));
+    dto.setContainerId(proto.getContainerId());
+    dto.setCowId(proto.getCowId());
+    //no registeredBy field in this dto, although the proto has it
+    dto.setTestResult(convertProtoMilkTestResult(proto.getTestResult()));
+    return dto;
+  }
+
+  public static MilkMessage convertMilkDtoToProto(MilkDto dto)
+  {
+    MilkMessage.Builder builder = MilkMessage.newBuilder();
+    builder.setId(dto.getId());
+    builder.setVolumeL(dto.getVolumeL());
+    builder.setDate(dto.getDate().toString());
+    builder.setContainerId(dto.getContainerId());
+    builder.setCowId(dto.getCowId());
+    builder.setTestResult(convertDtoMilkTestResult(dto.getTestResult()));
+
+    //no registeredBy field in this dto, so remember to set it up manually in the grpc implementation
+    return builder.build();
+  }
+
+  //helper method to parse one enum to the other
+
+  public static MilkTestResult convertProtoMilkTestResult(MilkTestResultEnum proto)
+  {
+    if (proto == null)
+      return null;
+    try
+    {
+      // map by enum name; falls back to null if no matching value exists
+      return MilkTestResult.valueOf(proto.name());
     }
-
-    // Proto -> DTO (for incoming updates, if needed)
-    public static SaleDataDTO convertSaleProtoToDto(SaleData proto) {
-        SaleDataDTO dto = new SaleDataDTO();
-
-        dto.setId(proto.getId());
-        dto.setCustomerId(proto.getCustomerId());
-        dto.setContainerId(proto.getContainerId());
-        dto.setQuantityL(proto.getQuantityL());
-        dto.setPrice(proto.getPrice());
-
-        if (!proto.getDateTime().isBlank()) {
-            dto.setDateTime(java.time.LocalDateTime.parse(proto.getDateTime()));
-        }
-
-        dto.setRecallCase(proto.getRecallCase());
-        dto.setCreatedByUserId(proto.getCreatedByUserId());
-
-        return dto;
+    catch (IllegalArgumentException e)
+    {
+      return null;
     }
+  }
 
-    // Creation: Proto -> DTO
-    public static SaleCreationDTO convertSaleProtoCreationToDto(SaleCreationRequest proto) {
-        java.time.LocalDateTime dateTime = null;
-        if (!proto.getDateTime().isBlank()) {
-            dateTime = java.time.LocalDateTime.parse(proto.getDateTime());
-        }
-
-        SaleCreationDTO dto = new SaleCreationDTO(
-                proto.getCustomerId(),
-                proto.getContainerId(),
-                proto.getQuantityL(),
-                proto.getPrice(),
-                proto.getCreatedByUserId(),
-                dateTime
-        );
-        dto.setRecallCase(proto.getRecallCase()); // NEW
-        return dto;
+  public static MilkTestResultEnum convertDtoMilkTestResult(MilkTestResult dto)
+  {
+    if (dto == null)
+      return null;
+    try
+    {
+      return MilkTestResultEnum.valueOf(dto.toString());
     }
-
+    catch (IllegalArgumentException e)
+    {
+      return null;
+    }
+  }
 
 }

@@ -1,5 +1,8 @@
 package sep3.service.impl;
 
+import sep3.dto.MilkDtos;
+import sep3.entity.Milk;
+import sep3.mapping.MilkMapper;
 import sep3.repository.CowRepository;
 import sep3.repository.DepartmentRepository;
 import sep3.repository.UserRepository;
@@ -79,6 +82,25 @@ import java.util.stream.Collectors;
         .orElseThrow(() -> new RuntimeException("Cow not found with regNo: " + regNo));
     return CowMapper.convertCowToDto(foundCow);
   }
+  //for maybe later use
+  @Override
+  public List<CowDataDTO> getCowsByDepartmentId(long departmentId)
+  {
+    List<Cow> cowsInDepartment = cowRepository.findByDepartmentId(departmentId);
+    return CowMapper.convertCowListToDTO(cowsInDepartment);
+  }
+
+  //this one likely belongs in milkservice, but I'm leaving it here for now
+  @Override
+  public List<MilkDtos.MilkDto> getCowMilk(long cowId)
+  {
+    List<Milk> milkFromCow = cowRepository.findById(cowId)
+        .orElseThrow(() -> new RuntimeException("Cow not found: " + cowId))
+        .getMilk();
+    return MilkMapper.toListDto(milkFromCow).getMilkRecords();
+  }
+
+
 
 
   //UPDATE

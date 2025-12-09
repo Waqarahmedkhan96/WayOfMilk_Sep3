@@ -1,5 +1,6 @@
 package sep3.grpc;
 import net.devh.boot.grpc.server.service.GrpcService;
+import sep3.dto.MilkDtos;
 import sep3.dto.cowDTO.CowCreationDTO;
 import sep3.dto.cowDTO.CowDataDTO;
 import sep3.mapping.GrpcMapper;
@@ -79,6 +80,33 @@ public class CowServiceGrpcImpl extends CowServiceGrpc.CowServiceImplBase
     CowDataDTO foundCow = coreService.getCowByRegNo(regNo.getValue());
     CowData responseData = GrpcMapper.convertCowDtoToProto(foundCow);
     responseObserver.onNext(responseData);
+    responseObserver.onCompleted();
+  }
+@Override
+  public void getCowsByDepartmentId(SentId departmentId, StreamObserver<CowList> responseObserver)
+  {
+    List<CowDataDTO> foundCows = coreService.getCowsByDepartmentId(departmentId.getId());
+    CowList.Builder cowListBuilder = CowList.newBuilder();
+    for (CowDataDTO dto : foundCows)
+    {
+      cowListBuilder.addCows(GrpcMapper.convertCowDtoToProto(dto));
+    }
+    responseObserver.onNext(cowListBuilder.build());
+    responseObserver.onCompleted();
+  }
+
+  @Override public void getMilksByCowId(CowIdRequest request,
+      StreamObserver<MilkListReply> responseObserver)
+  {
+    List<MilkDtos.MilkDto> milkList = coreService.getCowMilk(request.getId());
+    MilkListReply.Builder milkListBuilder = MilkListReply.newBuilder();
+    for (MilkDtos.MilkDto dto : milkList)
+    {
+      milkListBuilder.addMilk(GrpcMapper.convertMilkDtoToProto(dto));
+      //currently unsure how to add the resisteredBy field to the milk proto without editing the dto
+      //fix later if time allows
+    }
+    responseObserver.onNext(milkListBuilder.build());
     responseObserver.onCompleted();
   }
 
