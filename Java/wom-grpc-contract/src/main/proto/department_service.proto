@@ -23,15 +23,10 @@ message DepartmentIdRequest {
   int64 id = 1;
 }
 
-enum DepartmentTypeEnum {
-  UNKNOWN = 0;
-  MILKING = 1;
-  RESTING = 2;
-  QUARANTINE = 3;
-}
+
 
 message DepartmentTypeRequest {
-  DepartmentTypeEnum type = 1;  // MILKING/RESTING/QUARANTINE
+  string type = 1;  // MILKING/RESTING/QUARANTINE
 }
 
 message DepartmentList {

@@ -90,7 +90,7 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
     {
         try {
             // proto ENUM → entity enum
-            DepartmentType type = DepartmentType.valueOf(request.getType().name());
+            DepartmentType type = DepartmentType.valueOf(request.getType().toUpperCase());
 
             List<DepartmentDataDTO> dtos = coreService.getDepartmentsByType(type);
 
@@ -107,4 +107,42 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
         }
     }
 
+    @Override
+    public void updateDepartment(DepartmentData request,
+                                 StreamObserver<DepartmentData> responseObserver)
+    {
+        try
+        {
+            DepartmentDataDTO dtoToUpdate =
+                    GrpcMapper.convertDepartmentProtoToDto(request);
+
+            DepartmentDataDTO updatedDto = coreService.updateDepartment(dtoToUpdate);
+
+            DepartmentData responseData =
+                    GrpcMapper.convertDepartmentDtoToProto(updatedDto);
+
+            responseObserver.onNext(responseData);
+            responseObserver.onCompleted();
+        }
+        catch (Exception e)
+        {
+            responseObserver.onError(e);
+        }
+    }
+
+    @Override
+    public void deleteDepartment(DepartmentIdRequest request,
+                                 StreamObserver<Empty> responseObserver)
+    {
+        try
+        {
+            coreService.deleteDepartment(request.getId());
+            responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onCompleted();
+        }
+        catch (Exception e)
+        {
+            responseObserver.onError(e);
+        }
+    }
 }
