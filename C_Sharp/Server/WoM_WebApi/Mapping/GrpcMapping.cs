@@ -1,14 +1,14 @@
 using ApiContracts;
-using Sep3.WayOfMilk.Grpc;
+using WoM_Grpc;
 
-namespace CowFarm_WebApi.Mapping;
+namespace WoM_WebApi.Mapping;
 
 public static class GrpcMapping
 {
     // -------- UserRole mapping --------
 
     // API -> gRPC
-    public static Sep3.WayOfMilk.Grpc.UserRole ToGrpcUserRole(ApiContracts.UserRole role)
+    public static UserRole ToGrpcUserRole(ApiContracts.UserRole role)
         => role switch
         {
             ApiContracts.UserRole.Owner  => CowFarm_Grpc.UserRole.Owner,

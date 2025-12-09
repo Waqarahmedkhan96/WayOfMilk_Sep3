@@ -39,8 +39,8 @@ public class AuthenticatedUserDto
     public long UserId { get; set; }
     public string Name { get; set; }
     public string email { get; set; }
-    public string address { get; set }
-    publicString phone { get; set; }
+    public string address { get; set; }
+    public string phone { get; set; }
     public UserRole Role { get; set; }
     public string licenseNumber { get; set; }
 }
