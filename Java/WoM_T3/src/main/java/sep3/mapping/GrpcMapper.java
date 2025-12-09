@@ -171,32 +171,57 @@ public class GrpcMapper {
     return dto;
   }
 
-  // Department mappers
+    // Department mappers
 
-    public static DepartmentData convertDepartmentDtoToProto(DepartmentDataDTO dto)
-    {
-        return DepartmentData.newBuilder()
-                .setId(dto.getId())
-                .setType(dto.getType().toString())
-                .build();
+
+    public static DepartmentData convertDepartmentDtoToProto(DepartmentDataDTO dto) {
+
+        DepartmentData.Builder b = DepartmentData.newBuilder();
+
+        if (dto.getId() != null) {
+            b.setId(dto.getId());
+        }
+
+        if (dto.getType() != null) {
+            // enum -> STRING dla proto
+            b.setType(dto.getType().name());
+        }
+
+        // UWAGA: proto NIE ma cows ani transferów – nic więcej nie mapujemy
+
+        return b.build();
     }
+
 
     public static DepartmentDataDTO convertDepartmentProtoToDto(DepartmentData proto)
     {
+        DepartmentDataDTO dto = new DepartmentDataDTO();
+        dto.setId(proto.getId());
+
+        // tutaj typ jest OPCJONALNY (np. przy update tylko ID)
         DepartmentType type = convertDepartmentTypeStringToEnum(proto.getType());
-        return new DepartmentDataDTO(proto.getId(), type);
+        dto.setType(type);
+
+        return dto;
     }
 
     public static DepartmentCreationDTO convertDepartmentProtoCreationToDto(
             DepartmentCreationRequest proto)
     {
         DepartmentType type = convertDepartmentTypeStringToEnum(proto.getType());
+        if (type == null) {
+            throw new IllegalArgumentException("Department type is required for creation.");
+        }
         return new DepartmentCreationDTO(type);
     }
 
+    /**
+     * Bezpieczna konwersja String -> DepartmentType.
+     * Zwraca null, jeśli string jest pusty – dzięki temu update bez typu nie wywala serwera.
+     */
     public static DepartmentType convertDepartmentTypeStringToEnum(String type) {
         if (type == null || type.isBlank()) {
-            throw new IllegalArgumentException("Department type cannot be null or blank");
+            return null; // 👈 przy update/getById nie rzucamy, tylko zostawiamy null
         }
 
         try {
@@ -205,6 +230,7 @@ public class GrpcMapper {
             throw new IllegalArgumentException("Invalid department type: " + type);
         }
     }
+
 
     // Transfer Record mapping
     public static TransferRecordData convertTransferRecordDtoToProto(TransferRecordDataDTO dto)
@@ -216,7 +242,6 @@ public class GrpcMapper {
 
         if (dto.getFromDepartmentId() != null) builder.setFromDepartmentId(dto.getFromDepartmentId());
         if (dto.getToDepartmentId() != null) builder.setToDepartmentId(dto.getToDepartmentId());
-        if (dto.getDepartmentId() != null) builder.setDepartmentId(dto.getDepartmentId());
 
         if (dto.getRequestedByUserId() != null) builder.setRequestedByUserId(dto.getRequestedByUserId());
         if (dto.getApprovedByVetUserId() != null) builder.setApprovedByVetUserId(dto.getApprovedByVetUserId());
@@ -264,7 +289,6 @@ public class GrpcMapper {
 
         dto.setFromDepartmentId(proto.getFromDepartmentId());
         dto.setToDepartmentId(proto.getToDepartmentId());
-        dto.setDepartmentId(proto.getDepartmentId());
 
         dto.setRequestedByUserId(proto.getRequestedByUserId());
         dto.setApprovedByVetUserId(proto.getApprovedByVetUserId());
