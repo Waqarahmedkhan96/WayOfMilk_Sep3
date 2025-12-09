@@ -1,0 +1,184 @@
+/*
+
+
+
+// =================== COW INFO =================
+
+service CowService {
+  rpc GetAllCows (Empty) returns (CowList);
+  rpc AddCow (CowCreationRequest) returns (CowData);
+  // rpc UpdateCow (CowData) returns (CowData); // for later
+}
+
+message CowList {
+  repeated CowData cows = 1;
+}
+
+message CowCreationRequest {
+  string regNo = 1;
+  string birthDate = 2; // string <-> LocalDate in service
+}
+
+message CowData {
+  int64 id = 1;
+  string regNo = 2;
+  string birthDate = 3;
+  bool isHealthy = 4;
+}
+
+// =================== USER INFO ================
+
+service UserService {
+  rpc GetAllUsers (Empty) returns (UserList);
+  rpc GetUserById (UserIdRequest) returns (UserData);
+}
+
+message UserIdRequest {
+  int64 id = 1;
+}
+
+message UserList {
+  repeated UserData users = 1;
+}
+
+message UserData {
+  int64 id = 1;
+  string username = 2;
+  string fullName = 3;
+  string role = 4;       // e.g. "owner", "vet"
+  int64 departmentId = 5;
+}
+
+// =================== MILK INFO ================
+
+service MilkService {
+  rpc GetMilkById (MilkIdRequest) returns (MilkData);
+  rpc GetAllMilkRecords (Empty) returns (MilkList);
+}
+
+message MilkIdRequest {
+  int64 id = 1;
+}
+
+message MilkList {
+  repeated MilkData milkRecords = 1;
+}
+
+message MilkData {
+  int64 id = 1;
+  int64 cowId = 2;
+  double quantityLiters = 3;
+  double fatPercentage = 4;
+  string collectionDate = 5; // string <-> LocalDate/Time
+}
+
+// =================== CUSTOMER INFO ============
+
+service CustomerService {
+  rpc GetCustomerById (CustomerIdRequest) returns (CustomerData);
+  rpc GetAllCustomers (Empty) returns (CustomerList);
+}
+
+message CustomerIdRequest {
+  int64 id = 1;
+}
+
+message CustomerList {
+  repeated CustomerData customers = 1;
+}
+
+message CustomerData {
+  int64 id = 1;
+  string name = 2;
+  string address = 3;
+  string email = 4;
+}
+
+// =================== TRANSFER INFO ============
+
+service TransferService {
+  rpc GetTransferById (TransferIdRequest) returns (TransferData);
+  rpc GetAllTransfers (Empty) returns (TransferList);
+}
+
+message TransferIdRequest {
+  int64 id = 1;
+}
+
+message TransferList {
+  repeated TransferData transfers = 1;
+}
+
+message TransferData {
+  int64 id = 1;
+  int64 fromDepartmentId = 2;
+  int64 toDepartmentId = 3;
+  string transferDate = 4;
+  string description = 5;
+}
+
+// =================== SALE INFO ================
+
+service SaleService {
+  rpc GetSaleById (SaleIdRequest) returns (SaleData);
+  rpc GetAllSales (Empty) returns (SaleList);
+}
+
+message SaleIdRequest {
+  int64 id = 1;
+}
+
+message SaleList {
+  repeated SaleData sales = 1;
+}
+
+message SaleData {
+  int64 id = 1;
+  int64 customerId = 2;
+  double totalAmount = 3;
+  string saleDate = 4;
+}
+
+// =================== DEPARTMENT (OPTIONAL) ====
+
+service DepartmentService {
+  rpc GetAllDepartments (Empty) returns (DepartmentList);
+  rpc GetDepartmentById (DepartmentIdRequest) returns (DepartmentData);
+}
+
+message DepartmentIdRequest {
+  int64 id = 1;
+}
+
+message DepartmentList {
+  repeated DepartmentData departments = 1;
+}
+
+message DepartmentData {
+  int64 id = 1;
+  string name = 2;
+}
+
+// =================== CONTAINER (EXAMPLE) ======
+
+service ContainerService {
+  rpc GetAllContainers (Empty) returns (ContainerList);
+  rpc GetContainerById (ContainerIdRequest) returns (ContainerData);
+}
+
+message ContainerIdRequest {
+  int64 id = 1;
+}
+
+message ContainerList {
+  repeated ContainerData containers = 1;
+}
+
+message ContainerData {
+  int64 id = 1;
+  double capacityLiters = 2;
+  string status = 3; // e.g. "FULL", "EMPTY", "IN_USE"
+}
+
+
+ */

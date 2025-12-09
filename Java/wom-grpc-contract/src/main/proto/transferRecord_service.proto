@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+import "repeatingMessageTypes.proto";
+
+option java_package = "sep3.wayofmilk.grpc";
+option java_multiple_files = true;
+option csharp_namespace = "Sep3.WayOfMilk.Grpc";
+
+// --- Messages ---
+
+message TransferRecordData {
+  int64 id = 1;
+  string movedAt = 2; // ISO string (e.g., 2025-01-12T15:33:20)
+
+  int64 fromDepartmentId = 3;
+  int64 toDepartmentId = 4;
+  int64 departmentId = 5;
+
+  int64 requestedByUserId = 6;
+  int64 approvedByVetUserId = 7;
+
+  int64 cowId = 8;
+}
+
+message TransferRecordCreationRequest {
+  int64 cowId = 1;
+  int64 fromDepartmentId = 2;
+  int64 toDepartmentId = 3;
+  int64 requestedByUserId = 4;
+
+  //date with time format: yyyy-mm-ddThh:mm:ss
+  string movedAt = 5; // make sure it's required from t2
+}
+
+message TransferRecordIdRequest {
+  int64 id = 1;
+}
+
+message TransferRecordsForCowRequest {
+  int64 cowId = 1;
+}
+
+message ApproveTransferRequest {
+  int64 transferId = 1;
+  int64 vetUserId = 2;
+}
+
+message TransferRecordList {
+  repeated TransferRecordData records = 1;
+}
+
+// --- Service ---
+
+service TransferRecordService {
+  rpc AddTransferRecord(TransferRecordCreationRequest) returns (TransferRecordData);
+  rpc GetAllTransferRecords(Empty) returns (TransferRecordList);
+  rpc GetTransferRecordsForCow(TransferRecordsForCowRequest) returns (TransferRecordList);
+  rpc GetTransferRecordById(TransferRecordIdRequest) returns (TransferRecordData);
+  rpc ApproveTransfer(ApproveTransferRequest) returns (TransferRecordData);
+  rpc UpdateTransferRecord (TransferRecordData) returns (TransferRecordData);
+  rpc DeleteTransferRecord (TransferRecordIdRequest) returns (Empty);
+
+}

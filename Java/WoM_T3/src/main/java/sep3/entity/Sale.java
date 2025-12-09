@@ -8,38 +8,51 @@ import java.time.LocalDateTime;
 @Entity
 public class Sale
 {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-  @ManyToOne
-  private User createdBy;
+    // User 1..* Sale
+    @ManyToOne
+    @JoinColumn(name = "created_by_id")   // FK -> users.id
+    private User createdBy;
 
-  private LocalDateTime dateTime;
+    private LocalDateTime dateTime;
 
-  @ManyToOne
-  private Container container;
+    // Container 1..* Sale
+    @ManyToOne
+    @JoinColumn(name = "container_id")    // FK -> container.id
+    private Container container;
 
-  private double quantityL;
-  private double price;
-  private boolean recallCase;
+    private double quantityL;
+    private double price;
+    private boolean recallCase;
 
-  @ManyToOne
-  private Customer customer;
+    // Customer 1..* Sale
+    @ManyToOne
+    @JoinColumn(name = "customer_id")     // FK -> customer.id
+    private Customer customer;
 
-  protected Sale() {}
+    public Sale() {}
 
-  public Sale(User createdBy, LocalDateTime dateTime, Container container,
-              double quantityL, double price, boolean recallCase, Customer customer)
-  {
-    this.createdBy = createdBy;
-    this.dateTime = dateTime;
-    this.container = container;
-    this.quantityL = quantityL;
-    this.price = price;
-    this.recallCase = recallCase;
-    this.customer = customer;
-  }
+    public Sale(User createdBy,
+                LocalDateTime dateTime,
+                Container container,
+                double quantityL,
+                double price,
+                boolean recallCase,
+                Customer customer)
+    {
+        this.createdBy = createdBy;
+        this.dateTime = dateTime;
+        this.container = container;
+        this.quantityL = quantityL;
+        this.price = price;
+        this.recallCase = recallCase;
+        this.customer = customer;
+    }
+
+    // ---------- getters / setters ----------
 
     public long getId() {
         return id;

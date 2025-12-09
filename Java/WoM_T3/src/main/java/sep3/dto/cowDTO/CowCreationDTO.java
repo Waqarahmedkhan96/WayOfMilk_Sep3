@@ -9,15 +9,17 @@ public class CowCreationDTO
   // We can omit 'isHealthy', as the client won't send it on creation,
   // or the Service layer might enforce the initial 'false' value.
   private long registeredByUserId;
+  private long departmentId; //must be quarantine department initially
 
 
   public CowCreationDTO() {
   }
 
-  public CowCreationDTO(String regNo, LocalDate birthDate, long registeredByUserId) {
+  public CowCreationDTO(String regNo, LocalDate birthDate, long registeredByUserId, long departmentId) {
     this.regNo = regNo;
     this.birthDate = birthDate;
     this.registeredByUserId = registeredByUserId;
+    this.departmentId = departmentId;
   }
 
   // --- Getters and Setters (Mandatory for JSON conversion) ---
@@ -43,5 +45,11 @@ public class CowCreationDTO
 
   public void setRegisteredByUserId(long registeredByUserId) {
     this.registeredByUserId = registeredByUserId;
+  }
+  public long getDepartmentId() {
+    return departmentId;
+  }
+  public void setDepartmentId(long departmentId) {
+    this.departmentId = departmentId;
   }
 }
