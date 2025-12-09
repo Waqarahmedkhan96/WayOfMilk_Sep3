@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using ApiContracts.Cows;
+using ApiContracts;
 
 namespace WoM_BlazorApp.Http;
 
@@ -38,7 +38,7 @@ public class HttpCowService : ICowService
         return JsonSerializer.Deserialize<CowDto>(content, _jsonOptions)!;
     }
 
-    public async Task<CowDto> CreateAsync(CreateCowDto dto)
+    public async Task<CowDto> CreateAsync(CowCreationDto dto)
     {
         HttpResponseMessage httpResponse = await _client.PostAsJsonAsync("cows", dto);
         string response = await httpResponse.Content.ReadAsStringAsync();
@@ -56,7 +56,7 @@ public class HttpCowService : ICowService
             throw new Exception(response);
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(long id)
     {
         HttpResponseMessage httpResponse = await _client.DeleteAsync($"cows/{id}");
         string response = await httpResponse.Content.ReadAsStringAsync();

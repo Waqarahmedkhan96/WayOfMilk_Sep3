@@ -1,7 +1,8 @@
 @page "/cows/create"
 @rendermode InteractiveServer
 
-@using ApiContracts.Cows
+@using ApiContracts
+@using ApiContracts.*
 @using WoM_BlazorApp.Http
 @inject ICowService CowService
 @inject NavigationManager Nav
@@ -27,6 +28,7 @@
 
 @code {
     private DateOnly birthDate = DateOnly.FromDateTime(DateTime.Today);
+    private string regNo;
     private string? error;
 
     private async Task CreateAsync()
@@ -34,8 +36,9 @@
         error = null;
         try
         {
-            var dto = new CreateCowDto
+            var dto = new CowCreationDto
             {
+                RegNo = regNo,
                 BirthDate = birthDate
             };
 

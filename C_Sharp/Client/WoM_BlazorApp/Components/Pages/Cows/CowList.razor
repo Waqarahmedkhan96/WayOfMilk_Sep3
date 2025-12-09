@@ -1,7 +1,8 @@
 @page "/cows"
 @rendermode InteractiveServer
 
-@using ApiContracts.Cows
+
+@using ApiContracts
 @using WoM_BlazorApp.Http
 @inject WoM_BlazorApp.Http.ICowService CowService
 @inject NavigationManager Nav
@@ -29,23 +30,29 @@ else if (cows is null || cows.Count == 0)
 }
 else
 {
-    <table class="table">
+    <table class="table table-striped">
         <thead>
         <tr>
-            <th>Id</th>
-            <th>Birth date</th>
-            <th></th>
+            <th>Reg No</th>
+            <th>Birth Date</th>
+            <th>Health</th>
+            <th>Dept ID</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody>
         @foreach (var cow in cows)
         {
             <tr>
-                <td>@cow.Id</td>
+                <td>@cow.RegNo</td>
                 <td>@cow.BirthDate</td>
                 <td>
-                    <button class="btn btn-sm btn-danger"
-                            @onclick="() => DeleteAsync(cow.Id)">
+                    @if(cow.Healthy) { <span class="text-success">Healthy</span> }
+                    else { <span class="text-danger">Sick</span> }
+                </td>
+                <td>@cow.DepartmentId</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" @onclick="() => DeleteAsync(cow.Id)">
                         Delete
                     </button>
                 </td>
@@ -76,7 +83,7 @@ else
         }
     }
 
-    private async Task DeleteAsync(int id)
+    private async Task DeleteAsync(long id)
     {
         error = null;
         try
