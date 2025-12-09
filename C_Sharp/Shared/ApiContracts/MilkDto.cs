@@ -1,57 +1,63 @@
+using System;
+using System.Collections.Generic;
+
 namespace ApiContracts;
 
-// Create
+// DTO: create milk record
 public class CreateMilkDto
 {
-    public DateOnly? Date { get; set; } // null => Java uses today
+    public DateOnly? Date { get; set; }              // null => use today
     public double VolumeL { get; set; }
+    public MilkTestResult TestResult { get; set; }   // proto enum
     public long CowId { get; set; }
     public long ContainerId { get; set; }
-    public MilkTestResult MilkTestResult { get; set; }
-    public long RegisteredByUserId { get; set; }
+    public long RegisteredByUserId { get; set; }     // proto: registeredByUserId
 }
 
-// Read
+// DTO: single milk record
 public class MilkDto
 {
     public long Id { get; set; }
     public DateOnly Date { get; set; }
     public double VolumeL { get; set; }
-    public MilkTestResult MilkTestResult { get; set; }
+    public MilkTestResult TestResult { get; set; }
     public long CowId { get; set; }
     public long ContainerId { get; set; }
     public long RegisteredByUserId { get; set; }
+    public bool ApprovedForStorage { get; set; }     // proto: approvedForStorage
 }
 
-// Update
+// DTO: update milk record
 public class UpdateMilkDto
 {
-    public DateOnly Date { get; set; }
-    public double VolumeL { get; set; }
-    public MilkTestResult MilkTestResult { get; set; }
-    public long CowId { get; set; }
-    public long ContainerId { get; set; }
+    public long Id { get; set; }
+    public DateOnly? Date { get; set; }
+    public double? VolumeL { get; set; }
+    public MilkTestResult? TestResult { get; set; }
+    public long? ContainerId { get; set; }
 }
 
-// Action: approve (if you still want a UI action)
-public class ApproveMilkDto
+// DTO: approve/deny storage
+public class ApproveMilkStorageDto
 {
-    public MilkTestResult MilkTestResult { get; set; }
+    public long Id { get; set; }                 // milk id
+    public long ApprovedByUserId { get; set; }   // vet/owner id
+    public bool ApprovedForStorage { get; set; } // true/false
 }
 
-// Delete (batch)
+// DTO: delete milk batch
 public class DeleteMilksDto
 {
     public required long[] Ids { get; set; }
 }
 
-// List
+// DTO: list of milk records
 public class MilkListDto
 {
     public List<MilkDto> Milks { get; set; } = new();
 }
 
-// Query
+// DTO: milk filters
 public class MilkQueryParameters
 {
     public long? CowId { get; set; }

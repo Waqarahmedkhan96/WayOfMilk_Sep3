@@ -1,16 +1,19 @@
+using System;
+using System.Collections.Generic;
+
 namespace ApiContracts;
 
-// Create
+// DTO: create customer
 public class CreateCustomerDto
 {
     public required string CompanyName { get; set; }
     public string PhoneNo { get; set; } = "";
     public string Email { get; set; } = "";
     public string CompanyCVR { get; set; } = "";
-    public long RegisteredByUserId { get; set; } // who created
+    public long RegisteredByUserId { get; set; } // WebApi only (not proto)
 }
 
-// Read
+// DTO: single customer
 public class CustomerDto
 {
     public long Id { get; set; }
@@ -18,10 +21,9 @@ public class CustomerDto
     public string PhoneNo { get; set; } = "";
     public string Email { get; set; } = "";
     public string CompanyCVR { get; set; } = "";
-    // NOTE: no RegisteredByUserId here – not in proto
 }
 
-// Update
+// DTO: update customer
 public class UpdateCustomerDto
 {
     public required string CompanyName { get; set; }
@@ -30,19 +32,19 @@ public class UpdateCustomerDto
     public string CompanyCVR { get; set; } = "";
 }
 
-// Delete (batch)
+// DTO: delete customers batch
 public class DeleteCustomersDto
 {
     public required long[] Ids { get; set; }
 }
 
-// List
+// DTO: list of customers
 public class CustomerListDto
 {
     public List<CustomerDto> Customers { get; set; } = new();
 }
 
-// Query (in WebApi, not gRPC)
+// DTO: customer filters
 public class CustomerQueryParameters
 {
     public string? CompanyContains { get; set; }

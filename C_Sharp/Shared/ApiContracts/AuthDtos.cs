@@ -1,24 +1,25 @@
+using System;
+
 namespace ApiContracts;
 
-// Login request from UI to WebApi
+// DTO: login request (UI → WebApi)
 public class LoginRequestDto
 {
     public required string Email { get; set; }
     public required string Password { get; set; }
 }
 
-// Login response from WebApi to UI
-
+// DTO: login response (WebApi → UI)
 public class LoginResponseDto
 {
     public long Id { get; set; }
     public required string Name { get; set; }
     public required string Email { get; set; }
     public UserRole Role { get; set; }
-    public required string Token { get; set; } // NEW: JWT token
+    public required string Token { get; set; } // JWT token string
 }
 
-// User changes own password
+// DTO: change own password
 public class ChangePasswordDto
 {
     public long UserId { get; set; }
@@ -26,21 +27,21 @@ public class ChangePasswordDto
     public required string NewPassword { get; set; }
 }
 
-// Admin resets employee password
+// DTO: admin reset password
 public class ResetPasswordDto
 {
     public long UserId { get; set; }
     public required string NewPassword { get; set; }
 }
 
-//UserData from t3 grpc
+// DTO: user from gRPC AuthService
 public class AuthenticatedUserDto
 {
-    public long UserId { get; set; }
-    public string Name { get; set; }
-    public string email { get; set; }
-    public string address { get; set }
-    publicString phone { get; set; }
+    public long Id { get; set; }
+    public required string Name { get; set; }
+    public required string Email { get; set; }
+    public required string Address { get; set; }
+    public required string Phone { get; set; }
     public UserRole Role { get; set; }
-    public string licenseNumber { get; set; }
+    public string? LicenseNumber { get; set; } // only for vets
 }

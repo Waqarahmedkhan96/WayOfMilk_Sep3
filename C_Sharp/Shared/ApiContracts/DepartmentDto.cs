@@ -1,37 +1,40 @@
+using System;
+using System.Collections.Generic;
+
 namespace ApiContracts;
 
-// Create
+// DTO: create department
 public class CreateDepartmentDto
 {
-    public DepartmentType Type { get; set; }
+    public DepartmentType Type { get; set; } // QUARANTINE/MILKING/RESTING
 }
 
-// Read
+// DTO: single department
 public class DepartmentDto
 {
     public long Id { get; set; }
     public DepartmentType Type { get; set; }
 }
 
-// Update
+// DTO: update department
 public class UpdateDepartmentDto
 {
     public DepartmentType Type { get; set; }
 }
 
-// Delete (batch)
+// DTO: delete departments batch
 public class DeleteDepartmentsDto
 {
     public required long[] Ids { get; set; }
 }
 
-// List
+// DTO: list of departments
 public class DepartmentListDto
 {
     public List<DepartmentDto> Departments { get; set; } = new();
 }
 
-// Query
+// DTO: department filters
 public class DepartmentQueryParameters
 {
     public DepartmentType? Type { get; set; }

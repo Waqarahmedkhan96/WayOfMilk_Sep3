@@ -1,8 +1,18 @@
+using System.Text;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Sep3.WayOfMilk.Grpc;               // gRPC stubs
+using WoM_WebApi.Configuration;         // JwtOptions class
+using WoM_WebApi.GlobalExceptionHandler;
+using WoM_WebApi.Services.Implementation;
+using WoM_WebApi.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ---------- Controllers ----------
-builder.Services.AddControllers(); // add MVC controllers
+builder.Services.AddControllers();
 
 // ---------- Swagger + JWT UI ----------
 builder.Services.AddEndpointsApiExplorer();
@@ -14,7 +24,7 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1"
     });
 
-    // Swagger JWT definition
+    // Swagger: JWT header
     var securityScheme = new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -22,14 +32,22 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter 'Bearer {token}'"
+        Description = "Paste only the JWT token string here (no 'Bearer ' prefix)."
     };
 
     c.AddSecurityDefinition("Bearer", securityScheme);
+
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
-            securityScheme,
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id   = "Bearer"
+                }
+            },
             Array.Empty<string>()
         }
     });
@@ -41,85 +59,68 @@ builder.Services.Configure<JwtOptions>(
 
 // ---------- Authentication (JWT) ----------
 builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
+    })
     .AddJwtBearer(options =>
     {
-        var jwt = builder.Configuration.GetSection("Jwt");
-        var key = jwt["Key"] ?? throw new InvalidOperationException("Jwt:Key missing");
+        var jwtSection = builder.Configuration.GetSection("Jwt");
+        var key        = jwtSection["Key"] ?? throw new InvalidOperationException("Jwt:Key missing");
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+            IssuerSigningKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+
             ValidateIssuer = true,
-            ValidIssuer = jwt["Issuer"],
+            ValidIssuer    = jwtSection["Issuer"],
+
             ValidateAudience = true,
-            ValidAudience = jwt["Audience"],
-            ValidateLifetime = true
+            ValidAudience    = jwtSection["Audience"],
+
+            ValidateLifetime = true,
+
+            // must match what we use in AuthController
+            NameClaimType = ClaimTypes.Name,
+            RoleClaimType = ClaimTypes.Role
         };
     });
 
-// ---------- Authorization (roles) ----------
+// ---------- Authorization policies ----------
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("OwnerOnly", p => p.RequireRole("Owner"));
-    options.AddPolicy("VetOnly", p => p.RequireRole("Vet"));
+    options.AddPolicy("OwnerOnly",     p => p.RequireRole("Owner"));
+    options.AddPolicy("VetOnly",       p => p.RequireRole("Vet"));
     options.AddPolicy("WorkerOrOwner", p => p.RequireRole("Worker", "Owner"));
 });
 
-// ---------- gRPC clients to Java (PLAIN HTTP on localhost) ----------
-// Java gRPC server listens on http://localhost:9090 WITHOUT TLS.
-// This is only used internally between WebApi and Java backend.
-var javaGrpcAddress = new Uri("http://localhost:9090");
+// ---------- gRPC clients to Java (plain HTTP) ----------
+var javaGrpcAddress = new Uri("http://localhost:9090"); // Java gRPC URL
 
-// Default HttpClient handler is enough (no TLS, no custom cert validation).
+builder.Services.AddGrpcClient<UserService.UserServiceClient>(o => o.Address = javaGrpcAddress);
+builder.Services.AddGrpcClient<CowService.CowServiceClient>(o => o.Address = javaGrpcAddress);
+builder.Services.AddGrpcClient<ContainerService.ContainerServiceClient>(o => o.Address = javaGrpcAddress);
+builder.Services.AddGrpcClient<CustomerService.CustomerServiceClient>(o => o.Address = javaGrpcAddress);
+builder.Services.AddGrpcClient<DepartmentService.DepartmentServiceClient>(o => o.Address = javaGrpcAddress);
+builder.Services.AddGrpcClient<MilkService.MilkServiceClient>(o => o.Address = javaGrpcAddress);
+builder.Services.AddGrpcClient<SaleService.SaleServiceClient>(o => o.Address = javaGrpcAddress);
+builder.Services.AddGrpcClient<TransferRecordService.TransferRecordServiceClient>(o => o.Address = javaGrpcAddress);
+// add RecallService later if you have it in proto
 
-// User service
-builder.Services
-    .AddGrpcClient<UserService.UserServiceClient>(o => o.Address = javaGrpcAddress);
-
-// Auth service
-builder.Services
-    .AddGrpcClient<AuthService.AuthServiceClient>(o => o.Address = javaGrpcAddress);
-
-// Cow service
-builder.Services
-    .AddGrpcClient<CowService.CowServiceClient>(o => o.Address = javaGrpcAddress);
-
-// Container service
-builder.Services
-    .AddGrpcClient<ContainerService.ContainerServiceClient>(o => o.Address = javaGrpcAddress);
-
-// Customer service
-builder.Services
-    .AddGrpcClient<CustomerService.CustomerServiceClient>(o => o.Address = javaGrpcAddress);
-
-// Department service
-builder.Services
-    .AddGrpcClient<DepartmentService.DepartmentServiceClient>(o => o.Address = javaGrpcAddress);
-
-// Milk service
-builder.Services
-    .AddGrpcClient<MilkService.MilkServiceClient>(o => o.Address = javaGrpcAddress);
-
-// Sale service
-builder.Services
-    .AddGrpcClient<SaleService.SaleServiceClient>(o => o.Address = javaGrpcAddress);
-
-// TransferRecord service
-builder.Services
-    .AddGrpcClient<TransferRecordService.TransferRecordServiceClient>(o => o.Address = javaGrpcAddress);
-
-// Recall service
-builder.Services
-    .AddGrpcClient<RecallService.RecallServiceClient>(o => o.Address = javaGrpcAddress);
+// ---------- DI: Services ----------
+builder.Services.AddScoped<ITokenService, JwtTokenServiceImpl>();   // JWT helper
+builder.Services.AddScoped<IAuthService, GrpcAuthServiceImpl>();    // login / passwords
+builder.Services.AddScoped<IUserService, GrpcUserServiceImpl>();    // user CRUD
+// later we’ll add ICowService, IMilkService, etc.
 
 // ---------- Global exception middleware ----------
 builder.Services.AddTransient<GlobalExceptionHandlerMiddleware>();
 
 var app = builder.Build();
 
-// use global exception handler
+// global error handler
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -128,11 +129,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();   // WebApi itself still runs over HTTPS for browser & Swagger
-
-app.UseAuthentication(); // JWT auth
-app.UseAuthorization();  // role checks
-
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

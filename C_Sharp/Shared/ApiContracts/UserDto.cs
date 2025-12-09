@@ -1,55 +1,57 @@
-﻿namespace ApiContracts;
+﻿using System;
+using System.Collections.Generic;
 
-// Create
+namespace ApiContracts;
+
+// DTO: create user (UI → WebApi)
 public class CreateUserDto
 {
     public required string Name { get; set; }
     public required string Email { get; set; }
-    public required string PhoneNumber { get; set; }
+    public required string Phone { get; set; }       // proto: phone
     public required string Address { get; set; }
     public required string Password { get; set; }
     public UserRole Role { get; set; } = UserRole.Worker; // default worker
-    public string? VetLicenseNo { get; set; } // only for VET
+    public string? LicenseNumber { get; set; }            // for vets only
 }
 
-// Read
+// DTO: single user (read)
 public class UserDto
 {
     public long Id { get; set; }
     public required string Name { get; set; }
     public required string Email { get; set; }
-    public required string PhoneNumber { get; set; }
+    public required string Phone { get; set; }
     public required string Address { get; set; }
     public UserRole Role { get; set; }
-    public string? VetLicenseNo { get; set; }
+    public string? LicenseNumber { get; set; }
 }
 
-// Update (no password here – password handled in Auth)
-//needs id, however, set up automatically, and everything else is optional
+// DTO: update user (no password)
 public class UpdateUserDto
 {
-    public required long Id { get; set; }
+    public required long Id { get; set; }     // user id
     public string? Name { get; set; }
     public string? Email { get; set; }
-    public string? PhoneNumber { get; set; }
+    public string? Phone { get; set; }
     public string? Address { get; set; }
     public UserRole? Role { get; set; }
-    public string? VetLicenseNo { get; set; }
+    public string? LicenseNumber { get; set; }
 }
 
-// Delete (batch)
+// DTO: delete users batch
 public class DeleteUsersDto
 {
     public required long[] Ids { get; set; }
 }
 
-// List
+// DTO: list of users
 public class UserListDto
 {
     public List<UserDto> Users { get; set; } = new();
 }
 
-// Query
+// DTO: filter + paging
 public class UserQueryParameters
 {
     public string? NameContains { get; set; }
