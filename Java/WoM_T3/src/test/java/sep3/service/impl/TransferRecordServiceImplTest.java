@@ -61,7 +61,7 @@ class TransferRecordServiceImplTest {
         requester.setId(userId);
 
         TransferRecord saved = new TransferRecord(
-                dto.getMovedAt(), fromDept, toDept, toDept, requester, null, cow
+                dto.getMovedAt(), fromDept, toDept, requester, null, cow
         );
         saved.setId(999L);
 
@@ -162,7 +162,7 @@ class TransferRecordServiceImplTest {
         Cow cow = new Cow("A", LocalDate.now(), true, new Owner("Owie", "owie@email.com", "25648454", "Street 123", "password")); cow.setId(99L);
 
         TransferRecord r = new TransferRecord(
-                LocalDateTime.now(), dept, dept, dept,
+                LocalDateTime.now(), dept, dept,
                 new Owner("Owie", "owie@email.com", "25648454", "Street 123", "password"), null, cow
         );
         r.setId(id);

@@ -16,13 +16,12 @@ public class TransferRecord
     private LocalDateTime movedAt;
 
     @ManyToOne
+    @JoinColumn(name = "from_department_id")
     private Department fromDept;
 
     @ManyToOne
+    @JoinColumn(name = "to_department_id")
     private Department toDept;
-
-    @ManyToOne
-    private Department department;
 
     @ManyToOne
     private User requestedBy;
@@ -31,17 +30,17 @@ public class TransferRecord
     private User approvedByVet;
 
     @ManyToOne
+    @JoinColumn(name = "cow_id")
     private Cow cow;
 
     protected TransferRecord() {}
 
     public TransferRecord(LocalDateTime movedAt, Department fromDept, Department toDept,
-                          Department department, User requestedBy, User approvedByVet, Cow cow)
+                          User requestedBy, User approvedByVet, Cow cow)
     {
         this.movedAt = movedAt;
         this.fromDept = fromDept;
         this.toDept = toDept;
-        this.department = department;
         this.requestedBy = requestedBy;
         this.approvedByVet = approvedByVet;
         this.cow = cow;
@@ -93,14 +92,6 @@ public class TransferRecord
 
     public void setApprovedByVet(User approvedByVet) {
         this.approvedByVet = approvedByVet;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
     }
 
     public Cow getCow() {

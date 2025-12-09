@@ -15,7 +15,6 @@ import sep3.entity.user.*;
 import sep3.service.interfaces.ICowService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 // Marks this class as a Spring business service
 @Service public class CowServiceImpl implements ICowService

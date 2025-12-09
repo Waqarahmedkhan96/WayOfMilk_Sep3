@@ -23,17 +23,14 @@ public class DepartmentServiceImpl implements IDepartmentService
     }
 
     @Override
-    public DepartmentDataDTO addDepartment(DepartmentCreationDTO request)
-    {
-        if (request.getType() == null)
-        {
-            throw new IllegalArgumentException("Department type must be provided.");
-        }
+    public DepartmentDataDTO addDepartment(DepartmentCreationDTO dto) {
 
-        Department department = new Department(request.getType());
+        Department department = new Department(dto.getType());
         Department saved = departmentRepository.save(department);
+
         return DepartmentMapper.convertDepartmentToDto(saved);
     }
+
 
     @Override
     public List<DepartmentDataDTO> getAllDepartments()

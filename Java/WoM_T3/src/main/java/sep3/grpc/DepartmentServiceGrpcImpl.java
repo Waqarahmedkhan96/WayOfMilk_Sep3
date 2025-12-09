@@ -23,26 +23,23 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
 
     @Override
     public void addDepartment(DepartmentCreationRequest request,
-                              StreamObserver<DepartmentData> responseObserver)
-    {
-        try
-        {
-            DepartmentCreationDTO creationDto =
-                    GrpcMapper.convertDepartmentProtoCreationToDto(request);
+                              StreamObserver<DepartmentData> responseObserver) {
 
-            DepartmentDataDTO createdDto = coreService.addDepartment(creationDto);
+        try {
+            DepartmentType type = DepartmentType.valueOf(request.getType().toUpperCase());
+            DepartmentCreationDTO dto = new DepartmentCreationDTO(type);
 
-            DepartmentData responseData =
-                    GrpcMapper.convertDepartmentDtoToProto(createdDto);
+            DepartmentDataDTO result = coreService.addDepartment(dto);
+            DepartmentData proto = GrpcMapper.convertDepartmentDtoToProto(result);
 
-            responseObserver.onNext(responseData);
+            responseObserver.onNext(proto);
             responseObserver.onCompleted();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
+            e.printStackTrace();
             responseObserver.onError(e);
         }
     }
+
 
     @Override
     public void getAllDepartments(Empty request,
@@ -65,6 +62,8 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
         {
             responseObserver.onError(e);
         }
+        System.out.println(">> GET ALL DEPARTMENTS CALLED");
+
     }
 
     @Override
@@ -82,6 +81,7 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
         {
             responseObserver.onError(e);
         }
+        System.out.println(">> GET DEPARTMENT BY ID CALLED");
     }
 
     @Override
@@ -105,6 +105,7 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
         catch (Exception e) {
             responseObserver.onError(e);
         }
+        System.out.println(">> GET DEPARTMENTS BY TYPE CALLED");
     }
 
     @Override
@@ -128,6 +129,7 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
         {
             responseObserver.onError(e);
         }
+        System.out.println(">> UPDATE DEPARTMENT CALLED");
     }
 
     @Override
