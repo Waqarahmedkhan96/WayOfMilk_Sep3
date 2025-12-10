@@ -1,7 +1,11 @@
 package sep3.service.impl;
 
 import org.springframework.stereotype.Service;
+import sep3.dto.cowDTO.CowDataDTO;
+import sep3.dto.transferRecordDTO.TransferRecordDataDTO;
+import sep3.mapping.CowMapper;
 import sep3.mapping.DepartmentMapper;
+import sep3.mapping.TransferRecordMapper;
 import sep3.repository.DepartmentRepository;
 import sep3.dto.departmentDTO.DepartmentCreationDTO;
 import sep3.dto.departmentDTO.DepartmentDataDTO;
@@ -9,6 +13,7 @@ import sep3.entity.Department;
 import sep3.entity.DepartmentType;
 import sep3.service.interfaces.IDepartmentService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,4 +86,20 @@ public class DepartmentServiceImpl implements IDepartmentService
     {
         departmentRepository.deleteById(departmentId);
     }
+
+    @Override
+    public List<CowDataDTO> getCowsByDepartment(long deptId) {
+        return departmentRepository.findCowsByDepartmentId(deptId).stream()
+                .map(CowMapper::convertCowToDto)
+                .toList();
+    }
+
+    @Override
+    public List<TransferRecordDataDTO> getTransferRecordsByDepartment(long deptId) {
+        return departmentRepository.findTransferRecordsByDepartmentId(deptId).stream()
+                .map(TransferRecordMapper::convertTransferRecordToDto)
+                .toList();
+    }
+
+
 }
