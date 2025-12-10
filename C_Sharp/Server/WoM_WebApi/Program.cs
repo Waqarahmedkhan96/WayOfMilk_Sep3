@@ -67,7 +67,8 @@ builder.Services
     .AddJwtBearer(options =>
     {
         var jwtSection = builder.Configuration.GetSection("Jwt");
-        var key        = jwtSection["Key"] ?? throw new InvalidOperationException("Jwt:Key missing");
+        var key        = jwtSection["Key"]
+                         ?? throw new InvalidOperationException("Jwt:Key missing");
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -110,10 +111,16 @@ builder.Services.AddGrpcClient<TransferRecordService.TransferRecordServiceClient
 // add RecallService later if you have it in proto
 
 // ---------- DI: Services ----------
-builder.Services.AddScoped<ITokenService, JwtTokenServiceImpl>();   // JWT helper
-builder.Services.AddScoped<IAuthService, GrpcAuthServiceImpl>();    // login / passwords
-builder.Services.AddScoped<IUserService, GrpcUserServiceImpl>();    // user CRUD
-// later we’ll add ICowService, IMilkService, etc.
+builder.Services.AddScoped<ITokenService, JwtTokenServiceImpl>();          // JWT helper
+builder.Services.AddScoped<IAuthService, GrpcAuthServiceImpl>();          // login / passwords
+builder.Services.AddScoped<IUserService, GrpcUserServiceImpl>();          // user CRUD
+builder.Services.AddScoped<ICowService, GrpcCowServiceImpl>();            // cows
+builder.Services.AddScoped<IMilkService, GrpcMilkServiceImpl>();          // milk
+builder.Services.AddScoped<ICustomerService, GrpcCustomerServiceImpl>();  // customers
+builder.Services.AddScoped<ISaleService, GrpcSaleServiceImpl>();          // sales
+builder.Services.AddScoped<IDepartmentService, GrpcDepartmentServiceImpl>(); // departments
+builder.Services.AddScoped<ITransferRecordService, GrpcTransferRecordServiceImpl>(); // transfers
+builder.Services.AddScoped<IContainerService, GrpcContainerServiceImpl>();    // containers
 
 // ---------- Global exception middleware ----------
 builder.Services.AddTransient<GlobalExceptionHandlerMiddleware>();

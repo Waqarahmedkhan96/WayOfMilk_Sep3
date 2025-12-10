@@ -1,4 +1,3 @@
-// File: Server/WoM_WebApi/Services/Implementation/GrpcAuthServiceImpl.cs
 using ApiContracts;
 using Sep3.WayOfMilk.Grpc;
 using WoM_WebApi.GlobalExceptionHandler;
@@ -22,7 +21,7 @@ public class GrpcAuthServiceImpl : IAuthService
     {
         var grpcRequest = new AuthenticationRequest
         {
-            Email = request.Email,
+            Email    = request.Email,
             Password = request.Password
         };
 
@@ -31,6 +30,7 @@ public class GrpcAuthServiceImpl : IAuthService
         if (reply == null || reply.Id == 0)
             throw new ValidationException("Invalid email or password.");
 
+        // extension method from UserGrpcMapper
         return reply.ToAuthenticatedUser();
     }
 
@@ -39,7 +39,7 @@ public class GrpcAuthServiceImpl : IAuthService
     {
         var grpcRequest = new ChangePasswordRequest
         {
-            Id = request.UserId,
+            Id          = request.UserId,
             OldPassword = request.OldPassword,
             NewPassword = request.NewPassword
         };

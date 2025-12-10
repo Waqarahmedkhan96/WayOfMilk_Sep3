@@ -21,7 +21,7 @@ public abstract class User
   private String email;
   private String phone;
   private String address;
-    // 1 User .. * Customers (customers registered by this user)
+    // 1 User  * Customers (customers registered by this user)
     @OneToMany(mappedBy = "registeredBy", cascade = CascadeType.ALL)
     private List<Customer> customers = new ArrayList<>();
 
@@ -142,21 +142,4 @@ public abstract class User
   {
     this.role = role;
   }
-
-    //HELPERS for password hashing
-  //no longer needed
-  //
-  //  private String hashPassword(String password)
-  //  {
-  //    return Integer.toString(password.hashCode());
-  //  }
-  //
-  //  public boolean checkPassword(String rawPassword) {
-  //    // Compare 'this.hashedPassword' (DB) with 'hashPassword(raw)' (Input)
-  //    if (!this.hashedPassword.equals(hashPassword(rawPassword))) {
-  //      throw new RuntimeException("Invalid password");
-  //    }
-  //    return true;
-  //  }
-
 }

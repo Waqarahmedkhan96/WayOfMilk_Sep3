@@ -1,4 +1,3 @@
-// File: Server/WoM_WebApi/RestController/AuthController.cs
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using ApiContracts;
@@ -21,9 +20,9 @@ public class AuthController : ControllerBase
         ITokenService tokenService,
         IUserService userService)
     {
-        _authService = authService;
+        _authService  = authService;
         _tokenService = tokenService;
-        _userService = userService;
+        _userService  = userService;
     }
 
     // -----------------------------
@@ -33,30 +32,30 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<LoginResponseDto>> Login(LoginRequestDto request)
     {
-        var user = await _authService.AuthenticateAsync(request); // gRPC
-        var token = _tokenService.GenerateToken(user);            // JWT
+        var user  = await _authService.AuthenticateAsync(request); // gRPC → DTO
+        var token = _tokenService.GenerateToken(user);             // JWT
 
         return Ok(new LoginResponseDto
         {
-            Id = user.Id,
-            Name = user.Name,
+            Id    = user.Id,
+            Name  = user.Name,
             Email = user.Email,
-            Role = user.Role,
+            Role  = user.Role, // UserRole → UserRole (OK)
             Token = token
         });
     }
 
     // -----------------------------
     // PUBLIC REGISTRATION
-    // Worker + Owner OK
-    // Vet NOT allowed
+    // Always Worker, no Vet/Owner
     // -----------------------------
     [HttpPost("register")]
     [AllowAnonymous]
     public async Task<ActionResult<UserDto>> Register(CreateUserDto dto)
     {
-        if (dto.Role == UserRole.Vet)
-            return BadRequest("Vets must be created by an Owner.");
+        // force Worker signup publicly
+        dto.Role          = UserRole.Worker;  // enum, not string
+        dto.LicenseNumber = null;
 
         var created = await _userService.CreateAsync(dto);
         return Ok(created);
@@ -75,7 +74,6 @@ public class AuthController : ControllerBase
         if (sub == null || !long.TryParse(sub.Value, out var userId))
             return Unauthorized();
 
-        // user can ONLY change their own password
         if (dto.UserId != userId)
             return Forbid();
 

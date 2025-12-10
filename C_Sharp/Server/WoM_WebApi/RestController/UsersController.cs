@@ -18,9 +18,9 @@ public class UsersController : ControllerBase
         _userService = userService;
     }
 
-    // ---------------------------------------
-    // GET /users/current-user
-    // ---------------------------------------
+    // -----------------------------
+    // GET current user
+    // -----------------------------
     [HttpGet("current-user")]
     [Authorize]
     public async Task<ActionResult<UserDto>> GetCurrentUser()
@@ -35,9 +35,9 @@ public class UsersController : ControllerBase
         return Ok(user);
     }
 
-    // ---------------------------------------
-    // GET /users (OWNER ONLY)
-    // ---------------------------------------
+    // -----------------------------
+    // GET all users (OWNER ONLY)
+    // -----------------------------
     [HttpGet]
     [Authorize(Policy = "OwnerOnly")]
     public async Task<ActionResult<UserListDto>> GetAll()
@@ -46,48 +46,68 @@ public class UsersController : ControllerBase
         return Ok(list);
     }
 
-    // ---------------------------------------
-    // GET /users/{id} (ANY LOGGED USER)
-    // ---------------------------------------
+    // -----------------------------
+    // GET by id
+    // Owner: any user
+    // Worker/Vet: only self
+    // -----------------------------
     [HttpGet("{id:long}")]
     [Authorize]
     public async Task<ActionResult<UserDto>> GetById(long id)
     {
+        var sub = User.FindFirst(ClaimTypes.NameIdentifier)
+                  ?? User.FindFirst(JwtRegisteredClaimNames.Sub);
+
+        if (sub == null || !long.TryParse(sub.Value, out var currentId))
+            return Unauthorized();
+
+        var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value ?? string.Empty;
+
+        if (!string.Equals(roleClaim, "Owner", StringComparison.OrdinalIgnoreCase) &&
+            id != currentId)
+        {
+            return Forbid();
+        }
+
         var user = await _userService.GetByIdAsync(id);
         return Ok(user);
     }
 
-    // ---------------------------------------
-    // POST /users
-    // PUBLIC SIGNUP
-    // Vet NOT allowed here
-    // ---------------------------------------
+    // -----------------------------
+    // CREATE user (OWNER ONLY)
+    // -----------------------------
     [HttpPost]
-    [AllowAnonymous]
+    [Authorize(Policy = "OwnerOnly")]
     public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto dto)
     {
-        if (dto.Role == UserRole.Vet)
-            return BadRequest("Vet accounts must be created by an Owner.");
+        // dto.Role is enum now
+        if (dto.Role == UserRole.Owner)
+            return BadRequest("Owner cannot be created via API.");
 
         var created = await _userService.CreateAsync(dto);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
-    // ---------------------------------------
-    // PUT /users/{id} (OWNER ONLY)
-    // ---------------------------------------
+    // -----------------------------
+    // UPDATE user (OWNER ONLY)
+    // -----------------------------
     [HttpPut("{id:long}")]
     [Authorize(Policy = "OwnerOnly")]
     public async Task<ActionResult<UserDto>> UpdateUser(long id, UpdateUserDto dto)
     {
         dto.Id = id;
+
+        // dto.Role is nullable enum
+        if (dto.Role.HasValue && dto.Role.Value == UserRole.Owner)
+            return BadRequest("Cannot change role to OWNER.");
+
         var updated = await _userService.UpdateAsync(dto);
         return Ok(updated);
     }
 
-    // ---------------------------------------
-    // DELETE /users/{id} (OWNER ONLY)
-    // ---------------------------------------
+    // -----------------------------
+    // DELETE user (OWNER ONLY)
+    // -----------------------------
     [HttpDelete("{id:long}")]
     [Authorize(Policy = "OwnerOnly")]
     public async Task<IActionResult> DeleteUser(long id)

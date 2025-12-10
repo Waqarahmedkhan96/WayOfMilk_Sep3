@@ -1,4 +1,3 @@
-// File: Server/WoM_WebApi/Mapping/UserGrpcMapper.cs
 using ApiContracts;
 using Sep3.WayOfMilk.Grpc;
 
@@ -7,36 +6,36 @@ namespace WoM_WebApi.Mapping;
 // Mapper: User DTOs ↔ gRPC
 public static class UserGrpcMapper
 {
-    // Map role string → enum
+    // Map role string from Java → enum
     private static UserRole MapRoleStringToEnum(string role)
         => role.ToUpperInvariant() switch
         {
             "OWNER" => UserRole.Owner,
             "WORKER" => UserRole.Worker,
-            "VET" => UserRole.Vet,
-            _ => UserRole.Worker
+            "VET"    => UserRole.Vet,
+            _        => UserRole.Worker
         };
 
-    // Map role enum → string
+    // Map enum → Java string
     private static string MapRoleEnumToString(UserRole role)
         => role switch
         {
-            UserRole.Owner => "OWNER",
+            UserRole.Owner  => "OWNER",
             UserRole.Worker => "WORKER",
-            UserRole.Vet => "VET",
-            _ => "WORKER"
+            UserRole.Vet    => "VET",
+            _               => "WORKER"
         };
 
     // DTO → gRPC create
     public static UserCreationRequest ToGrpc(this CreateUserDto dto)
         => new UserCreationRequest
         {
-            Name = dto.Name,
-            Email = dto.Email,
-            Phone = dto.Phone,
-            Address = dto.Address,
-            Password = dto.Password,
-            Role = MapRoleEnumToString(dto.Role),
+            Name          = dto.Name,
+            Email         = dto.Email,
+            Phone         = dto.Phone,
+            Address       = dto.Address,
+            Password      = dto.Password,
+            Role          = MapRoleEnumToString(dto.Role),        // enum → string
             LicenseNumber = dto.LicenseNumber ?? string.Empty
         };
 
@@ -44,12 +43,12 @@ public static class UserGrpcMapper
     public static UserDto ToDto(this UserData grpc)
         => new UserDto
         {
-            Id = grpc.Id,
-            Name = grpc.Name ?? string.Empty,
-            Email = grpc.Email ?? string.Empty,
-            Phone = grpc.Phone ?? string.Empty,
-            Address = grpc.Address ?? string.Empty,
-            Role = MapRoleStringToEnum(grpc.Role ?? "WORKER"),
+            Id            = grpc.Id,
+            Name          = grpc.Name ?? string.Empty,
+            Email         = grpc.Email ?? string.Empty,
+            Phone         = grpc.Phone ?? string.Empty,
+            Address       = grpc.Address ?? string.Empty,
+            Role          = MapRoleStringToEnum(grpc.Role ?? "WORKER"), // string → enum
             LicenseNumber = grpc.LicenseNumber
         };
 
@@ -64,16 +63,16 @@ public static class UserGrpcMapper
         return result;
     }
 
-    // gRPC → Authenticated user
+    // gRPC → Authenticated user (for login)
     public static AuthenticatedUserDto ToAuthenticatedUser(this UserData grpc)
         => new AuthenticatedUserDto
         {
-            Id = grpc.Id,
-            Name = grpc.Name ?? string.Empty,
-            Email = grpc.Email ?? string.Empty,
-            Address = grpc.Address ?? string.Empty,
-            Phone = grpc.Phone ?? string.Empty,
-            Role = MapRoleStringToEnum(grpc.Role ?? "WORKER"),
+            Id            = grpc.Id,
+            Name          = grpc.Name ?? string.Empty,
+            Email         = grpc.Email ?? string.Empty,
+            Address       = grpc.Address ?? string.Empty,
+            Phone         = grpc.Phone ?? string.Empty,
+            Role          = MapRoleStringToEnum(grpc.Role ?? "WORKER"), // string → enum
             LicenseNumber = grpc.LicenseNumber
         };
 }

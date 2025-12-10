@@ -8,11 +8,14 @@ public class CreateUserDto
 {
     public required string Name { get; set; }
     public required string Email { get; set; }
-    public required string Phone { get; set; }       // proto: phone
+    public required string Phone { get; set; }
     public required string Address { get; set; }
     public required string Password { get; set; }
-    public UserRole Role { get; set; } = UserRole.Worker; // default worker
-    public string? LicenseNumber { get; set; }            // for vets only
+
+    // IMPORTANT: enum, not string
+    public UserRole Role { get; set; } = UserRole.Worker; 
+
+    public string? LicenseNumber { get; set; } // for vets only
 }
 
 // DTO: single user (read)
@@ -23,18 +26,23 @@ public class UserDto
     public required string Email { get; set; }
     public required string Phone { get; set; }
     public required string Address { get; set; }
+
+    // enum here too
     public UserRole Role { get; set; }
+
     public string? LicenseNumber { get; set; }
 }
 
 // DTO: update user (no password)
 public class UpdateUserDto
 {
-    public required long Id { get; set; }     // user id
+    public required long Id { get; set; }
     public string? Name { get; set; }
     public string? Email { get; set; }
     public string? Phone { get; set; }
     public string? Address { get; set; }
+
+    // nullable enum (optional)
     public UserRole? Role { get; set; }
     public string? LicenseNumber { get; set; }
 }

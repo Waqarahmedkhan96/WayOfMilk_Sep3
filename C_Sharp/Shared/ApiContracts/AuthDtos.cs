@@ -15,7 +15,10 @@ public class LoginResponseDto
     public long Id { get; set; }
     public required string Name { get; set; }
     public required string Email { get; set; }
+
+    // enum for Swagger
     public UserRole Role { get; set; }
+
     public required string Token { get; set; } // JWT token string
 }
 
@@ -42,6 +45,9 @@ public class AuthenticatedUserDto
     public required string Email { get; set; }
     public required string Address { get; set; }
     public required string Phone { get; set; }
+
+    // IMPORTANT: enum, not string
     public UserRole Role { get; set; }
+
     public string? LicenseNumber { get; set; } // only for vets
 }
