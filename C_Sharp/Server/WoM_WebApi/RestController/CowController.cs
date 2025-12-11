@@ -1,19 +1,21 @@
+using WoM_WebApi.Services.Interfaces;
+
 namespace WoM_WebApi.RestController;
 
 using ApiContracts;
 using Microsoft.AspNetCore.Authorization;//for authorize
 using System.Security.Claims; //for accessing User Claims
 using Microsoft.AspNetCore.Mvc;
-using WoM_WebApi.Service;
+using WoM_WebApi.Services;
 [ApiController]
 [Route("[controller]")] // This maps to "http://localhost:PORT/cows"
 [Authorize] //base rule: user must be logged in
 public class CowsController : ControllerBase
 {
-    private readonly ICowBusinessLogic _cowLogic;
+    private readonly ICowService _cowLogic;
     private long _userId = 1; // Hardcoded for now, later will get from authentication
 
-    public CowsController(ICowBusinessLogic cowLogic)
+    public CowsController(ICowService cowLogic)
     {
         _cowLogic = cowLogic;
     }
