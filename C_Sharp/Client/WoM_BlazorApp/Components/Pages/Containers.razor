@@ -1,0 +1,120 @@
+@page "/containers"
+@attribute [Authorize(Roles = "Owner,Worker")]
+@using ApiContracts
+@using Microsoft.AspNetCore.Components.Authorization
+@inject WoM_BlazorApp.Services.Interfaces.IContainerService ContainerService
+
+<AuthorizeView Roles="Owner,Worker">
+    <Authorized>
+        <h3>Containers</h3>
+
+        <button class="btn btn-primary mb-3" @onclick="Reload">Reload</button>
+
+        <table class="table table-striped table-sm">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Capacity</th>
+                <th>Occupied</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var c in containers.Containers)
+            {
+                <tr>
+                    <td>@c.Id</td>
+                    <td>@c.CapacityL</td>
+                    <td>@c.OccupiedCapacityL</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary me-1" @onclick="() => StartEdit(c)">Edit</button>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(c.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+
+        <hr/>
+
+        <h4>@(isEditing ? "Edit Container" : "Create Container")</h4>
+
+        <div class="row g-2">
+            <div class="col-md-3">
+                <label class="form-label">Capacity (L)</label>
+                <input type="number" class="form-control" @bind="editCapacity" step="0.1" />
+            </div>
+        </div>
+
+        <button class="btn btn-success mt-3" @onclick="Save">
+            @(isEditing ? "Save changes" : "Create")
+        </button>
+        @if (isEditing)
+        {
+            <button class="btn btn-secondary mt-3 ms-2" @onclick="CancelEdit">Cancel</button>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>You must be logged in as Owner or Worker.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private ContainerListDto containers = new(); // all containers
+    private bool isEditing;                     // edit flag
+    private long editingId;                     // edit id
+    private double editCapacity;               // edit capacity
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Reload(); // load data
+    }
+
+    private async Task Reload()
+    {
+        // load list
+        containers = await ContainerService.GetAllAsync();
+    }
+
+    private void StartEdit(ContainerDto c)
+    {
+        // fill form
+        isEditing = true;
+        editingId = c.Id;
+        editCapacity = c.CapacityL;
+    }
+
+    private void CancelEdit()
+    {
+        // cancel edit
+        isEditing = false;
+        editingId = 0;
+        editCapacity = 0;
+    }
+
+    private async Task Save()
+    {
+        if (!isEditing)
+        {
+            // create
+            var dto = new CreateContainerDto { CapacityL = editCapacity };
+            await ContainerService.CreateAsync(dto);
+        }
+        else
+        {
+            // update
+            var dto = new UpdateContainerDto { Id = editingId, CapacityL = editCapacity };
+            await ContainerService.UpdateAsync(editingId, dto);
+        }
+
+        isEditing = false;
+        await Reload();
+    }
+
+    private async Task Delete(long id)
+    {
+        // delete row
+        await ContainerService.DeleteAsync(id);
+        await Reload();
+    }
+}

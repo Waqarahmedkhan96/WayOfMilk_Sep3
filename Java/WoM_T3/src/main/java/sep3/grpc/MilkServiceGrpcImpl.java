@@ -154,6 +154,7 @@ public class MilkServiceGrpcImpl extends MilkServiceGrpc.MilkServiceImplBase {
                 .setId(dto.getId())
                 .setCowId(dto.getCowId())
                 .setContainerId(dto.getContainerId())
+                .setRegisteredByUserId(dto.getRegisteredByUserId())   // NEW
                 .setVolumeL(dto.getVolumeL())
                 .setTestResult(mapFromDomainEnum(dto.getTestResult()))
                 .setApprovedForStorage(dto.isApprovedForStorage());

@@ -17,6 +17,8 @@ public class MilkDtos {
         private long containerId;
         private long registeredByUserId;
 
+        private boolean approvedForStorage; // currently not used on create, but kept
+
         public LocalDate getDate() { return date; }
         public void setDate(LocalDate date) { this.date = date; }
 
@@ -34,6 +36,9 @@ public class MilkDtos {
 
         public long getRegisteredByUserId() { return registeredByUserId; }
         public void setRegisteredByUserId(long registeredByUserId) { this.registeredByUserId = registeredByUserId; }
+
+        public boolean isApprovedForStorage() { return approvedForStorage; }
+        public void setApprovedForStorage(boolean approvedForStorage) { this.approvedForStorage = approvedForStorage; }
     }
 
     // ------------------- SINGLE MILK DTO -------------------
@@ -44,6 +49,7 @@ public class MilkDtos {
         private MilkTestResult testResult;
         private long cowId;
         private long containerId;
+        private long registeredByUserId;   // NEW: who registered
         private boolean approvedForStorage;
 
         public long getId() { return id; }
@@ -63,6 +69,9 @@ public class MilkDtos {
 
         public long getContainerId() { return containerId; }
         public void setContainerId(long containerId) { this.containerId = containerId; }
+
+        public long getRegisteredByUserId() { return registeredByUserId; }
+        public void setRegisteredByUserId(long registeredByUserId) { this.registeredByUserId = registeredByUserId; }
 
         public boolean isApprovedForStorage() { return approvedForStorage; }
         public void setApprovedForStorage(boolean approvedForStorage) { this.approvedForStorage = approvedForStorage; }

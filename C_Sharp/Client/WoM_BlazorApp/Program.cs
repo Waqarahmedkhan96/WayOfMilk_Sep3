@@ -1,38 +1,47 @@
+using Microsoft.AspNetCore.Components.Authorization;
 using WoM_BlazorApp.Components;
-using WoM_BlazorApp.Http;
+using WoM_BlazorApp.Services.Interfaces;
+using WoM_BlazorApp.Services.Implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// razor components
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// http client to WebApi
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://localhost:7216") // same port as the API project
+    BaseAddress = new Uri("https://localhost:5098") // <-- your WebApi base URL
 });
 
-builder.Services.AddScoped<ICowService, HttpCowService>();
-builder.Services.AddScoped<IContainerService, HttpContainerService>();
-builder.Services.AddScoped<ICustomerService, HttpCustomerService>();
-builder.Services.AddScoped<ISaleService, HttpSaleService>();
-builder.Services.AddScoped<IMilkService, HttpMilkService>();
-builder.Services.AddScoped<ITransferRecordService, HttpTransferRecordService>();
-builder.Services.AddScoped<IUserService, HttpUserService>();
+// auth core for <AuthorizeView> / [Authorize]
+builder.Services.AddAuthorizationCore();
+
+// auth state provider (your SimpleAuthProvider from other project)
+// make sure namespace + ctor match
+builder.Services.AddScoped<AuthenticationStateProvider, SimpleAuthProvider>();
+
+// token store
+builder.Services.AddScoped<ITokenService, TokenServiceImpl>();
+
+// domain services
+builder.Services.AddScoped<IMilkService, MilkServiceImpl>();
+builder.Services.AddScoped<IContainerService, ContainerServiceImpl>();
+
+// (you can also register IUserService, ICowService, etc. later)
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForErrors: true);
 
 app.UseHttpsRedirection();
-
 app.UseAntiforgery();
 
 app.MapStaticAssets();

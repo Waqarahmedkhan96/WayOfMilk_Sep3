@@ -17,7 +17,7 @@ public class ContainerController : ControllerBase
         _containerService = containerService;
     }
 
-    // GET /containers  (Owner, Worker, Vet)
+    // GET /containers  (Owner, Worker)
     [HttpGet]
     [Authorize(Roles = "Owner,Worker")]
     public async Task<ActionResult<ContainerListDto>> GetAll()
@@ -41,7 +41,7 @@ public class ContainerController : ControllerBase
         return Ok(container);
     }
 
-    // POST /containers   (Worker or Owner – your rule)
+    // POST /containers   (Worker or Owner)
     [HttpPost]
     [Authorize(Policy = "WorkerOrOwner")]
     public async Task<ActionResult<ContainerDto>> Create(CreateContainerDto dto)
@@ -53,9 +53,9 @@ public class ContainerController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
-    // PUT /containers/{id}   (Owner only)
+    // PUT /containers/{id}   (Owner or Worker only)
     [HttpPut("{id:long}")]
-    [Authorize(Policy = "OwnerOnly")]
+    [Authorize(Policy = "WorkerOrOwner")]
     public async Task<ActionResult<ContainerDto>> Update(long id, UpdateContainerDto dto)
     {
         // 1) call service to update

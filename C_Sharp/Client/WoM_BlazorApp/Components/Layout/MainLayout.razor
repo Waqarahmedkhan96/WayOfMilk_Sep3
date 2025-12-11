@@ -1,23 +1,50 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<CascadingAuthenticationState>
+    <div class="page">
+        <div class="sidebar bg-light border-end">
+            <nav class="nav flex-column p-3">
+                <h5>WoM</h5>
+                <a class="nav-link" href="">Home</a>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+                <AuthorizeView Roles="Owner,Worker">
+                    <Authorized>
+                        <a class="nav-link" href="milk">Milk</a>
+                        <a class="nav-link" href="containers">Containers</a>
+                    </Authorized>
+                    <NotAuthorized>
+                        <span class="text-muted small">Login to see pages</span>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </nav>
         </div>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+        <main class="main">
+            <div class="top-row px-4">
+                <span class="fw-bold">Way Of Milk – Blazor</span>
+                <AuthorizeView>
+                    <Authorized>
+                        <span class="small">Logged in</span>
+                    </Authorized>
+                    <NotAuthorized>
+                        <span class="small">Not logged in</span>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
 
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+            <article class="content px-4 py-3">
+                @Body
+            </article>
+        </main>
+    </div>
+</CascadingAuthenticationState>
+
+<style>
+    .page { display:flex; min-height:100vh; }
+    .sidebar { width:220px; }
+    .main { flex:1; display:flex; flex-direction:column; }
+    .top-row { border-bottom:1px solid #ddd; height:56px;
+               display:flex; align-items:center; justify-content:space-between; }
+    .content { flex:1; }
+</style>

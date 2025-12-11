@@ -12,6 +12,8 @@ public class CreateMilkDto
     public long CowId { get; set; }
     public long ContainerId { get; set; }
     public long RegisteredByUserId { get; set; }     // proto: registeredByUserId
+    // NEW: what the user *wants* as final approval state
+    public bool ApprovedForStorage { get; set; } = false;
 }
 
 // DTO: single milk record
@@ -35,6 +37,8 @@ public class UpdateMilkDto
     public double? VolumeL { get; set; }
     public MilkTestResult? TestResult { get; set; }
     public long? ContainerId { get; set; }
+     // NEW: optional – if provided, we will approve/deny
+    public bool? ApprovedForStorage { get; set; }
 }
 
 // DTO: approve/deny storage

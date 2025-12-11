@@ -24,6 +24,9 @@ public class MilkMapper {
         milk.setCow(cow);
         milk.setContainer(container);
         milk.setRegisteredBy(registeredBy);
+        // NOTE: we do NOT set approvedForStorage here.
+        // Creation always starts as "not yet approved";
+        // approval is handled centrally in approveForStorage(...)
         return milk;
     }
 
@@ -45,6 +48,8 @@ public class MilkMapper {
         dto.setTestResult(milk.getMilkTestResult());
         if (milk.getCow() != null) dto.setCowId(milk.getCow().getId());
         if (milk.getContainer() != null) dto.setContainerId(milk.getContainer().getId());
+        if (milk.getRegisteredBy() != null) dto.setRegisteredByUserId(milk.getRegisteredBy().getId());
+        dto.setApprovedForStorage(milk.isApprovedForStorage());
         return dto;
     }
 
