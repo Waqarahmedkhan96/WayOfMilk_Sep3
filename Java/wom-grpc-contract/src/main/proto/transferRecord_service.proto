@@ -14,12 +14,11 @@ message TransferRecordData {
 
   int64 fromDepartmentId = 3;
   int64 toDepartmentId = 4;
-  int64 departmentId = 5;
 
-  int64 requestedByUserId = 6;
-  int64 approvedByVetUserId = 7;
+  int64 requestedByUserId = 5;
+  int64 approvedByVetUserId = 6;
 
-  int64 cowId = 8;
+  int64 cowId = 7;
 }
 
 message TransferRecordCreationRequest {

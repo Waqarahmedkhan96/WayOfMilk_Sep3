@@ -1,6 +1,8 @@
 syntax = "proto3";
 
 import "repeatingMessageTypes.proto";
+import "cow_service.proto";
+import "transferRecord_service.proto";
 
 option java_package = "sep3.wayofmilk.grpc";
 option java_multiple_files = true;
@@ -12,6 +14,9 @@ option csharp_namespace = "Sep3.WayOfMilk.Grpc";
 message DepartmentData {
   int64 id = 1;
   string type = 2; // MILKING / RESTING / QUARANTINE
+  repeated CowData cows = 3;
+  repeated TransferRecordData transfersFrom = 4;
+  repeated TransferRecordData transfersTo = 5;
 }
 
 // Matches DepartmentCreationDTO
@@ -22,8 +27,6 @@ message DepartmentCreationRequest {
 message DepartmentIdRequest {
   int64 id = 1;
 }
-
-
 
 message DepartmentTypeRequest {
   string type = 1;  // MILKING/RESTING/QUARANTINE
@@ -42,5 +45,7 @@ service DepartmentService {
   rpc GetDepartmentsByType (DepartmentTypeRequest) returns (DepartmentList);
   rpc UpdateDepartment (DepartmentData) returns (DepartmentData);
   rpc DeleteDepartment (DepartmentIdRequest) returns (Empty);
+  rpc GetCowsByDepartment(DepartmentIdRequest) returns (CowList);
+  rpc GetTransferRecordsByDepartment(DepartmentIdRequest) returns (TransferRecordList);
 
 }

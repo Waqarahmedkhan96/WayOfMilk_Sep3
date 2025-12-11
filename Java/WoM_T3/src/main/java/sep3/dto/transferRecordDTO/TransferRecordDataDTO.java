@@ -9,7 +9,6 @@ public class TransferRecordDataDTO
 
     private Long fromDepartmentId;
     private Long toDepartmentId;
-    private Long departmentId;
 
     private Long requestedByUserId;
     private Long approvedByVetUserId;
@@ -19,7 +18,7 @@ public class TransferRecordDataDTO
     public TransferRecordDataDTO() { }
 
     public TransferRecordDataDTO(Long id, LocalDateTime movedAt,
-                                 Long fromDepartmentId, Long toDepartmentId, Long departmentId,
+                                 Long fromDepartmentId, Long toDepartmentId,
                                  Long requestedByUserId, Long approvedByVetUserId,
                                  Long cowId)
     {
@@ -27,7 +26,6 @@ public class TransferRecordDataDTO
         this.movedAt = movedAt;
         this.fromDepartmentId = fromDepartmentId;
         this.toDepartmentId = toDepartmentId;
-        this.departmentId = departmentId;
         this.requestedByUserId = requestedByUserId;
         this.approvedByVetUserId = approvedByVetUserId;
         this.cowId = cowId;
@@ -71,16 +69,6 @@ public class TransferRecordDataDTO
     public void setToDepartmentId(Long toDepartmentId)
     {
         this.toDepartmentId = toDepartmentId;
-    }
-
-    public Long getDepartmentId()
-    {
-        return departmentId;
-    }
-
-    public void setDepartmentId(Long departmentId)
-    {
-        this.departmentId = departmentId;
     }
 
     public Long getRequestedByUserId()

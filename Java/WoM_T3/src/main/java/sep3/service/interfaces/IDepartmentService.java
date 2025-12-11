@@ -1,7 +1,9 @@
 package sep3.service.interfaces;
 
+import sep3.dto.cowDTO.CowDataDTO;
 import sep3.dto.departmentDTO.DepartmentCreationDTO;
 import sep3.dto.departmentDTO.DepartmentDataDTO;
+import sep3.dto.transferRecordDTO.TransferRecordDataDTO;
 import sep3.entity.DepartmentType;
 
 import java.util.List;
@@ -14,4 +16,7 @@ public interface IDepartmentService
     List<DepartmentDataDTO> getDepartmentsByType(DepartmentType type);
     DepartmentDataDTO updateDepartment(DepartmentDataDTO department);
     void deleteDepartment(long departmentId);
+    List<CowDataDTO> getCowsByDepartment(long deptId);
+    List<TransferRecordDataDTO> getTransferRecordsByDepartment(long deptId);
+
 }
