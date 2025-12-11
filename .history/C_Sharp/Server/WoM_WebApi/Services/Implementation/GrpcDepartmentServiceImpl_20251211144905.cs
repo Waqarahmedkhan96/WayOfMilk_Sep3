@@ -92,23 +92,4 @@ public class GrpcDepartmentServiceImpl : IDepartmentService
         // 2) call delete
         await _client.DeleteDepartmentAsync(new DepartmentIdRequest { Id = id });
     }
-
-    // Get cows in department
-    public async Task<List<CowDto>> GetCowsByDepartmentAsync(long deptId)
-    {
-        var reply = await _client.GetCowsByDepartmentAsync(
-            new DepartmentIdRequest { Id = deptId });
-
-        return reply.ToListDto().Cows.ToList(); // używasz CowGrpcMapper
-    }
-
-    // Get transfer records in department
-    public async Task<List<TransferRecordDto>> GetTransferRecordsByDepartmentAsync(long deptId)
-    {
-        var reply = await _client.GetTransferRecordsByDepartmentAsync(
-            new DepartmentIdRequest { Id = deptId });
-
-        return reply.ToListDto().Transfers.ToList(); // używasz TransferRecordGrpcMapper
-    }
-
 }

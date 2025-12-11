@@ -44,27 +44,11 @@ public static class DepartmentGrpcMapper
 
     // gRPC → DTO
     public static DepartmentDto ToDto(this DepartmentData grpc)
-    {
-        var dto = new DepartmentDto
+        => new DepartmentDto
         {
             Id = grpc.Id,
             Type = FromGrpcString(grpc.Type)
         };
-
-        // cows
-        foreach (var cow in grpc.Cows)
-            dto.Cows.Add(cow.ToDto());
-
-        // transfers FROM
-        foreach (var tr in grpc.TransfersFrom)
-            dto.TransfersFrom.Add(tr.ToDto());
-
-        // transfers TO
-        foreach (var tr in grpc.TransfersTo)
-            dto.TransfersTo.Add(tr.ToDto());
-
-        return dto;
-    }
 
     // gRPC list → DTO list
     public static DepartmentListDto ToListDto(this DepartmentList grpc)

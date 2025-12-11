@@ -14,9 +14,6 @@ public class DepartmentDto
 {
     public long Id { get; set; }
     public DepartmentType Type { get; set; }
-    public ICollection<CowDto> Cows { get; set; } = new List<CowDto>();
-    public ICollection<TransferRecordDto> TransfersFrom { get; set; } = new List<TransferRecordDto>();
-    public ICollection<TransferRecordDto> TransfersTo { get; set; } = new List<TransferRecordDto>();
 }
 
 // DTO: update department

@@ -9,5 +9,4 @@ public interface ITransferRecordService
     Task<TransferRecordDto> CreateAsync(CreateTransferRecordDto dto);
     Task UpdateAsync(int id, UpdateTransferRecordDto dto);
     Task DeleteAsync(int id);
-    Task<TransferRecordDto> GetTransferRecordByCowIdAsync(long cowId);
 }

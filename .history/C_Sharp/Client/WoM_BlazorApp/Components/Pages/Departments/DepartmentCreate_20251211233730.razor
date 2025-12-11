@@ -1,0 +1,55 @@
+@page "/departments/create"
+@rendermode InteractiveServer
+
+@using ApiContracts.Departments
+@using WoM_BlazorApp.Http
+@inject IDepartmentService DepartmentService
+@inject NavigationManager Nav
+
+<PageTitle>Create Department</PageTitle>
+
+<h1>Create Department</h1>
+
+<div class="mb-3">
+    <label class="form-label">Department type</label>
+    <InputSelect @bind-Value="type" class="form-control">
+        @foreach (var dept in Enum.GetValues<DepartmentType>())
+        {
+            <option value="@dept">@dept</option>
+        }
+    </InputSelect>
+</div>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+
+<button class="btn btn-success" @onclick="CreateAsync">Save</button>
+<button class="btn btn-secondary ms-2" @onclick="@(() => Nav.NavigateTo("/departments"))">
+    Cancel
+</button>
+
+@code {
+    private DepartmentType type = DepartmentType.Milking;
+    private string? error;
+
+    private async Task CreateAsync()
+    {
+        error = null;
+        try
+        {
+            var dto = new CreateDepartmentDto
+            {
+                Type = type
+            };
+
+            await DepartmentService.CreateAsync(dto);
+            Nav.NavigateTo("/departments");
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}

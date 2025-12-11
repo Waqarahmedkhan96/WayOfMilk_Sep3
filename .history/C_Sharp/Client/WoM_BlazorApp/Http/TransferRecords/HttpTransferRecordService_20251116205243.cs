@@ -63,14 +63,4 @@ public class HttpTransferRecordService : ITransferRecordService
         if (!httpResponse.IsSuccessStatusCode)
             throw new Exception(response);
     }
-
-    public async Task<TransferRecordDto> GetTransferRecordByCowIdAsync(long cowId)
-    {
-        HttpResponseMessage response = await _client.GetAsync($"transferrecords/cow/{cowId}");
-        string content = await response.Content.ReadAsStringAsync();
-        if (!response.IsSuccessStatusCode)
-            throw new Exception(content);
-
-        return JsonSerializer.Deserialize<TransferRecordDto>(content, _jsonOptions)!;
-    }
 }

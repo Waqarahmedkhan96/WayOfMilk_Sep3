@@ -70,23 +70,4 @@ public class DepartmentController : ControllerBase
         // 2) return 204
         return NoContent();
     }
-
-    // GET /departments/{id}/cows
-    [HttpGet("{id:long}/cows")]
-    [Authorize(Roles = "Owner,Worker,Vet")]
-    public async Task<ActionResult<List<CowDto>>> GetCowsByDepartment(long id)
-    {
-        var cows = await _departmentService.GetCowsByDepartmentAsync(id);
-        return Ok(cows);
-    }
-
-    // GET /departments/{id}/transfers
-    [HttpGet("{id:long}/transfers")]
-    [Authorize(Roles = "Owner,Worker,Vet")]
-    public async Task<ActionResult<List<TransferRecordDto>>> GetTransferRecordsByDepartment(long id)
-    {
-        var transfers = await _departmentService.GetTransferRecordsByDepartmentAsync(id);
-        return Ok(transfers);
-    }
-
 }

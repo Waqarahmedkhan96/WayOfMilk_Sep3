@@ -22,6 +22,7 @@ public class TransferRecordDto
 
     public long? FromDepartmentId { get; set; }
     public long? ToDepartmentId { get; set; }
+    public long DepartmentId { get; set; }       // current dept (proto: departmentId)
 
     public long RequestedByUserId { get; set; }
     public long? ApprovedByVetUserId { get; set; }
@@ -34,6 +35,7 @@ public class UpdateTransferRecordDto
     public DateTime? MovedAt { get; set; }
     public long? FromDepartmentId { get; set; }
     public long? ToDepartmentId { get; set; }
+    public long? DepartmentId { get; set; }
     public long? RequestedByUserId { get; set; }
     public long? ApprovedByVetUserId { get; set; }
     public long? CowId { get; set; }
@@ -62,9 +64,9 @@ public class TransferRecordListDto
 public class TransferRecordQueryParameters
 {
     public long? CowId { get; set; }
-    public DateTime? MovedAt { get; set; }
-    public long? FromDepartmentId { get; set; }
-    public long? ToDepartmentId { get; set; }
+    public long? DepartmentId { get; set; }
+    public DateTime? FromMovedAt { get; set; }
+    public DateTime? ToMovedAt { get; set; }
     public int? Page { get; set; }
     public int? PageSize { get; set; }
 }

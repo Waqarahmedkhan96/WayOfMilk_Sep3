@@ -1,0 +1,98 @@
+@page "/departments"
+@rendermode InteractiveServer
+
+@using ApiContracts.Departments
+@using WoM_BlazorApp.Http
+@inject IDepartmentService DepartmentService
+@inject NavigationManager Nav
+
+<PageTitle>Departments</PageTitle>
+
+<h1>Departments</h1>
+
+<button class="btn btn-primary mb-3"
+        @onclick="@(() => Nav.NavigateTo("/departments/create"))">
+    Add new department
+</button>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+else if (departments is null || departments.Count == 0)
+{
+    <p>No departments yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Type</th>
+            <th>Cows</th>
+            <th>Transfers from</th>
+            <th>Transfers to</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var dept in departments)
+        {
+            <tr>
+                <td>@dept.Id</td>
+                <td>@dept.Type</td>
+                <td>@dept.Cows?.Count</td>
+                <td>@dept.TransfersFrom?.Count</td>
+                <td>@dept.TransfersTo?.Count</td>
+                <td>
+                    <button class="btn btn-sm btn-danger"
+                            @onclick="() => DeleteAsync(dept.Id)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private bool isLoading = true;
+    private string? error;
+    private ICollection<DepartmentDto>? departments;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            departments = await DepartmentService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteAsync(long id)
+    {
+        error = null;
+        try
+        {
+            await DepartmentService.DeleteAsync(id);
+            departments = await DepartmentService.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+    }
+}

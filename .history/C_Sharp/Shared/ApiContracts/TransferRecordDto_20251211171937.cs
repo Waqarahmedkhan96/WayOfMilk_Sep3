@@ -62,9 +62,8 @@ public class TransferRecordListDto
 public class TransferRecordQueryParameters
 {
     public long? CowId { get; set; }
-    public DateTime? MovedAt { get; set; }
-    public long? FromDepartmentId { get; set; }
-    public long? ToDepartmentId { get; set; }
+    public DateTime? FromMovedAt { get; set; }
+    public DateTime? ToMovedAt { get; set; }
     public int? Page { get; set; }
     public int? PageSize { get; set; }
 }

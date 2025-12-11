@@ -2,7 +2,8 @@
 @rendermode InteractiveServer
 
 @using ApiContracts.TransferRecords
-@using ApiContracts.Departments
+@using Entities
+@using WoM_BlazorApp.Http
 @inject ITransferRecordService TransferRecordService
 @inject NavigationManager Nav
 
@@ -23,9 +24,9 @@
 <div class="mb-3">
     <label class="form-label">From Department</label>
     <InputSelect @bind-Value="fromDept" class="form-control">
-        @foreach (var dept in Enum.GetValues<DepartmentType>())
+        @foreach (var deptName in Enum.GetNames(typeof(Department)))
         {
-            <option value="@dept">@dept</option>
+            <option value="@deptName">@deptName</option>
         }
     </InputSelect>
 </div>
@@ -33,9 +34,9 @@
 <div class="mb-3">
     <label class="form-label">To Department</label>
     <InputSelect @bind-Value="toDept" class="form-control">
-        @foreach (var dept in Enum.GetValues<DepartmentType>())
+        @foreach (var deptName in Enum.GetNames(typeof(Department)))
         {
-            <option value="@dept">@dept</option>
+            <option value="@deptName">@deptName</option>
         }
     </InputSelect>
 </div>
@@ -56,11 +57,11 @@
 </button>
 
 @code {
-    private long cowId;
+    private int cowId;
     private DateOnly moveDate = DateOnly.FromDateTime(DateTime.Today);
-    private DepartmentType fromDept = DepartmentType.Milking;
-    private DepartmentType toDept = DepartmentType.Resting;
-    private long requestedByUserId;
+    private string fromDept = Department.Milking.ToString();
+    private string toDept = Department.Resting.ToString();
+    private int requestedByUserId;
     private string? error;
 
     private async Task CreateAsync()
@@ -71,9 +72,9 @@
             var dto = new CreateTransferRecordDto
             {
                 CowId = cowId,
-                MovedAt = moveDate.ToDateTime(TimeOnly.MinValue),
-                FromDepartmentId = (long)fromDept,
-                ToDepartmentId = (long)toDept,
+                MovedAt = moveDate,
+                FromDept = Enum.Parse<Department>(fromDept),
+                ToDept = Enum.Parse<Department>(toDept),
                 RequestedByUserId = requestedByUserId
             };
 

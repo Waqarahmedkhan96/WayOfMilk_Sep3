@@ -47,6 +47,7 @@ public static class TransferRecordGrpcMapper
             MovedAt = current.MovedAt,
             FromDepartmentId = current.FromDepartmentId,
             ToDepartmentId = current.ToDepartmentId,
+            DepartmentId = current.DepartmentId,
             RequestedByUserId = current.RequestedByUserId,
             ApprovedByVetUserId = current.ApprovedByVetUserId,
             CowId = current.CowId
@@ -61,6 +62,9 @@ public static class TransferRecordGrpcMapper
 
         if (dto.ToDepartmentId.HasValue)
             result.ToDepartmentId = dto.ToDepartmentId.Value;
+
+        if (dto.DepartmentId.HasValue)
+            result.DepartmentId = dto.DepartmentId.Value;
 
         if (dto.RequestedByUserId.HasValue)
             result.RequestedByUserId = dto.RequestedByUserId.Value;
@@ -83,6 +87,7 @@ public static class TransferRecordGrpcMapper
             CowId = grpc.CowId,
             FromDepartmentId = grpc.FromDepartmentId == 0 ? null : grpc.FromDepartmentId,
             ToDepartmentId = grpc.ToDepartmentId == 0 ? null : grpc.ToDepartmentId,
+            DepartmentId = grpc.DepartmentId,
             RequestedByUserId = grpc.RequestedByUserId,
             ApprovedByVetUserId = grpc.ApprovedByVetUserId == 0 ? null : grpc.ApprovedByVetUserId
         };

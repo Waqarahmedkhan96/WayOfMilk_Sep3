@@ -11,6 +11,6 @@ public interface IDepartmentService
     Task<DepartmentListDto> GetByTypeAsync(DepartmentType type);                                // filter by type
     Task<DepartmentDto> UpdateAsync(long id, UpdateDepartmentDto dto);                          // update
     Task DeleteAsync(long id);                                                                  // delete
-    Task<List<CowDto>> GetCowsByDepartmentAsync(long departmentId);                             // get cows in dept
-    Task<List<TransferRecordDto>> GetTransferRecordsByDepartmentAsync(long departmentId);       // get transfers in dept
+    Task<List<CowDto>> GetCowsInDepartmentAsync(long departmentId);                             // get cows in dept
+    Task<List<TransferRecordDto>> GetTransferRecordsInDepartmentAsync(long departmentId);       // get transfers in dept
 }

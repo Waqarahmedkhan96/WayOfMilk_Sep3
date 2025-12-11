@@ -2,10 +2,11 @@
 @rendermode InteractiveServer
 
 @using ApiContracts.TransferRecords
-@inject ITransferRecordService TransferRecordService
+@using WoM_BlazorApp.Http
+@inject WoM_BlazorApp.Http.ITransferRecordService TransferRecordService
 @inject NavigationManager Nav
 
-<PageTitle>Transfer Records</PageTitle>
+<PageTitle>Transfer Records </PageTitle>
 
 <h1>Transfer Records</h1>
 
@@ -32,29 +33,30 @@ else
         <thead>
         <tr>
             <th>Id</th>
-            <th>Cow</th>
+            <th>Cow (id)</th>
             <th>Move Date</th>
-            <th>From Dept</th>
-            <th>To Dept</th>
-            <th>Requested By</th>
-            <th>Approved By</th>
+            <th>From Department</th>
+            <th>To Department</th>
+            <th>Requested By Employee (id)</th>
+            <th>Approved By Vet (employee id)</th>
+            <th>Department</th>
         </tr>
         </thead>
         <tbody>
-        @foreach (var record in transferRecords)
+        @foreach (var transferRecord in transferRecords)
         {
             <tr>
-                <td>@record.Id</td>
-                <td>@record.CowId</td>
-                <td>@record.MovedAt</td>
-                <td>@record.FromDepartmentId</td>
-                <td>@record.ToDepartmentId</td>
-                <td>@record.RequestedByUserId</td>
-                <td>@record.ApprovedByVetUserId</td>
-
+                <td>@transferRecord.Id</td>
+                <td>@transferRecord.CowId</td>
+                <td>@transferRecord.MovedAt</td>
+                <td>@transferRecord.FromDept</td>
+                <td>@transferRecord.ToDept</td>
+                <td>@transferRecord.RequestedByUserId</td>
+                <td>@transferRecord.ApprovedByVetUserId</td>
+                <td>@transferRecord.Department</td>
                 <td>
                     <button class="btn btn-sm btn-danger"
-                            @onclick="() => DeleteAsync(record.Id)">
+                            @onclick="() => DeleteAsync(transferRecord.Id)">
                         Delete
                     </button>
                 </td>
@@ -63,6 +65,7 @@ else
         </tbody>
     </table>
 }
+
 @code {
     private bool isLoading = true;
     private string? error;
@@ -84,7 +87,7 @@ else
         }
     }
 
-    private async Task DeleteAsync(long id)
+    private async Task DeleteAsync(int id)
     {
         error = null;
         try
