@@ -1,66 +1,72 @@
+using System;
+using System.Collections.Generic;
+
 namespace ApiContracts;
 
-// Create (user-requested transfer)
+// DTO: create transfer record
 public class CreateTransferRecordDto
 {
-    public DateOnly? MovedAt { get; set; } // null => backend may set today
+    public DateTime? MovedAt { get; set; }  // null => backend now() , Why both DateTime?
     public long FromDepartmentId { get; set; }
     public long ToDepartmentId { get; set; }
     public long RequestedByUserId { get; set; }
     public long CowId { get; set; }
 }
 
-// Read
+// DTO: single transfer record
 public class TransferRecordDto
 {
     public long Id { get; set; }
-    public DateOnly MovedAt { get; set; }
+    public DateTime MovedAt { get; set; }
     public long CowId { get; set; }
-    public long FromDepartmentId { get; set; }
-    public long ToDepartmentId { get; set; }
-    public long CurrentDepartmentId { get; set; }
+
+    public long? FromDepartmentId { get; set; }
+    public long? ToDepartmentId { get; set; }
+    public long DepartmentId { get; set; }       // current dept (proto: departmentId)
+
     public long RequestedByUserId { get; set; }
     public long? ApprovedByVetUserId { get; set; }
 }
 
-// Update (if you ever need to edit)
+// DTO: update transfer record (rarely used)
 public class UpdateTransferRecordDto
 {
-    public DateOnly MovedAt { get; set; }
-    public long FromDepartmentId { get; set; }
-    public long ToDepartmentId { get; set; }
-    public long CurrentDepartmentId { get; set; }
-    public long RequestedByUserId { get; set; }
+    public long Id { get; set; }
+    public DateTime? MovedAt { get; set; }
+    public long? FromDepartmentId { get; set; }
+    public long? ToDepartmentId { get; set; }
+    public long? DepartmentId { get; set; }
+    public long? RequestedByUserId { get; set; }
     public long? ApprovedByVetUserId { get; set; }
-    public long CowId { get; set; }
+    public long? CowId { get; set; }
 }
 
-// Action: approve
+// DTO: approve transfer (vet)
 public class ApproveTransferDto
 {
-    public long VetUserId { get; set; }
-    public long ToDepartmentId { get; set; } // used in controller
+    public long TransferId { get; set; }   // proto: transferId
+    public long VetUserId { get; set; }    // proto: vetUserId
 }
 
-// Delete (batch)
+// DTO: delete transfers batch
 public class DeleteTransfersDto
 {
     public required long[] Ids { get; set; }
 }
 
-// List
+// DTO: list of transfer records
 public class TransferRecordListDto
 {
     public List<TransferRecordDto> Transfers { get; set; } = new();
 }
 
-// Query
+// DTO: transfer filters
 public class TransferRecordQueryParameters
 {
     public long? CowId { get; set; }
-    public long? DepartmentId { get; set; } // filter by current dept
-    public DateOnly? FromMovedAt { get; set; }
-    public DateOnly? ToMovedAt { get; set; }
+    public long? DepartmentId { get; set; }
+    public DateTime? FromMovedAt { get; set; }
+    public DateTime? ToMovedAt { get; set; }
     public int? Page { get; set; }
     public int? PageSize { get; set; }
 }

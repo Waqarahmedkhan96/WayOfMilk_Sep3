@@ -231,13 +231,10 @@ public final class GrpcMapper
         return new DepartmentCreationDTO(type);
     }
 
-    /**
-     * Bezpieczna konwersja String -> DepartmentType.
-     * Zwraca null, jeśli string jest pusty – dzięki temu update bez typu nie wywala serwera.
-     */
+
     public static DepartmentType convertDepartmentTypeStringToEnum(String type) {
         if (type == null || type.isBlank()) {
-            return null; // 👈 przy update/getById nie rzucamy, tylko zostawiamy null
+            return null;
         }
 
         try {

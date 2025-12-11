@@ -75,28 +75,50 @@ public class CowBusinessLogic : ICowBusinessLogic
 
     //UPDATE
 
+    //Only Owner can change OTHER cow data fields
+    // This implies this method should NEVER change the Health status, since the vet doesn't have access to it'
     public async Task<CowDto> UpdateCowAsync(CowDto dto, long requesterUserId)
     {
-        // 1. Map DTO -> Proto Request
+        // Fetch the EXISTING cow first
+        // We do this to get the current reliable 'IsHealthy' status from the database.
+        // (We cannot trust the 'Healthy' bool coming from the frontend DTO in a general update)
+        var existingCowProto = await _client.GetCowByIdAsync(new CowIdRequest { Id = dto.Id });
+
+        // Map DTO -> Request
         var request = CowMapping.CowUpdateRequestToGrpc(dto, requesterUserId);
 
-        // 2. Call the gRPC method
-        CowData response = await _client.UpdateCowAsync(request);
+        // OVERRIDE the health in the request with the EXISTING health.
+        // This effectively makes the 'Healthy' field "Read-Only" for this endpoint.
+        request.CowData.IsHealthy = existingCowProto.IsHealthy;
 
-        // 3. Map Proto Response -> DTO
+        // Send the update request
+        CowData response = await _client.UpdateCowAsync(request);
         return CowMapping.CowGrpcToDto(response);
     }
 
     public async IAsyncEnumerable<CowDto> UpdateBatchAsync(IEnumerable<CowDto> dtos, long requesterUserId)
     {
-        var requests = dtos.Select(dto => CowMapping.CowUpdateRequestToGrpc(dto, requesterUserId));
-        foreach (var request in requests)
+        foreach (var dto in dtos)
         {
+            // Re-use the logic above to ensure safety for every single item in the batch
+            // (Yes, this is N+N calls, but it ensures safety without changing T3)
+
+            // 1. Fetch Existing
+            var existingCowProto = await _client.GetCowByIdAsync(new CowIdRequest { Id = dto.Id });
+
+            // 2. Prepare Request & Override Health
+            var request = CowMapping.CowUpdateRequestToGrpc(dto, requesterUserId);
+            request.CowData.IsHealthy = existingCowProto.IsHealthy;
+
+            // 3. Update
             CowData response = await _client.UpdateCowAsync(request);
             yield return CowMapping.CowGrpcToDto(response);
         }
     }
 
+    //rule: only vet can change a health status to positive (healthy)
+    //This is the ONLY method allowed to change health.
+    //The Controller enforces the Role (Vet/Owner) access.
     public async IAsyncEnumerable<CowDto> UpdateCowsHealthAsync(
         IEnumerable<long> cowIds, bool healthUpdate,long requesterUserId)
     {

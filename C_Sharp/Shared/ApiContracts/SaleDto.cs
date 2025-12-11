@@ -1,60 +1,64 @@
+using System;
+using System.Collections.Generic;
+
 namespace ApiContracts;
 
-// Create
+// DTO: create sale
 public class CreateSaleDto
 {
-    public long CreatedByUserId { get; set; }
-    public DateOnly Date { get; set; }
+    public long CustomerId { get; set; }
     public long ContainerId { get; set; }
     public double QuantityL { get; set; }
-    public decimal Price { get; set; }
-    public long CustomerId { get; set; }
-    public bool RecallCase { get; set; } // default false
+    public double Price { get; set; }           // proto: double price
+    public long CreatedByUserId { get; set; }
+    public DateTime? DateTime { get; set; }     // null => backend sets now
+    public bool RecallCase { get; set; }        // default false
 }
 
-// Read/ Get
+// DTO: single sale
 public class SaleDto
 {
     public long Id { get; set; }
-    public long CreatedByUserId { get; set; }
-    public DateOnly Date { get; set; }
+    public long CustomerId { get; set; }
     public long ContainerId { get; set; }
     public double QuantityL { get; set; }
-    public decimal Price { get; set; }
+    public double Price { get; set; }
+    public DateTime DateTime { get; set; }
     public bool RecallCase { get; set; }
-    public long CustomerId { get; set; }
+    public long CreatedByUserId { get; set; }
 }
 
-// Update
+// DTO: update sale (WebApi only)
 public class UpdateSaleDto
 {
-    public DateOnly Date { get; set; }
+    public long Id { get; set; }
+    public long CustomerId { get; set; }
     public long ContainerId { get; set; }
     public double QuantityL { get; set; }
-    public decimal Price { get; set; }
+    public double Price { get; set; }
+    public DateTime DateTime { get; set; }
     public bool RecallCase { get; set; }
-    public long CustomerId { get; set; }
 }
 
-// Delete (batch)
+// DTO: delete sales batch
 public class DeleteSalesDto
 {
     public required long[] Ids { get; set; }
 }
 
-// List
+// DTO: list of sales
 public class SaleListDto
 {
     public List<SaleDto> Sales { get; set; } = new();
 }
 
-// Query
+// DTO: sale filters
 public class SaleQueryParameters
 {
     public long? CustomerId { get; set; }
     public long? CreatedByUserId { get; set; }
-    public DateOnly? From { get; set; }
-    public DateOnly? To { get; set; }
+    public DateTime? From { get; set; }
+    public DateTime? To { get; set; }
     public int? Page { get; set; }
     public int? PageSize { get; set; }
 }

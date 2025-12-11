@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace ApiContracts;
 
 // 1. CREATE
@@ -9,33 +12,41 @@ public class CowCreationDto
     public long? DepartmentId { get; set; }
     public long RegisteredByUserId { get; set; }
 }
+//same function but in case someone is confused about the naming
+public class CreateCowDto
+{
+    public required string RegNo { get; set; }     // proto: regNo
+    public DateOnly BirthDate { get; set; }        // proto: birthDate string
+    public long RegisteredByUserId { get; set; }   // who registered
+    public long DepartmentId { get; set; }         // quarantine dept id
+}
 
-// 2. READ (The standard "Cow")
+// DTO: single cow (read)
 // This matches 'CowData' proto message
 public class CowDto
 {
     public long Id { get; set; }
     public required string RegNo { get; set; }
     public DateOnly BirthDate { get; set; }
-    public bool Healthy { get; set; }
-    public long? DepartmentId { get; set; }
-    public string? DepartmentName { get; set; }
+    public bool Healthy { get; set; }              // proto: isHealthy
+    public long? DepartmentId { get; set; }        // proto: departmentId
+    public string? DepartmentName { get; set; }    // UI-only enrichment
 }
 
-// 3. UPDATE
-// Kept separate for now just in case we need something without ID
-//although the t3 will never update and id
+// Update
+//not really what we use in the proto for this, however
 public class UpdateCowDto
 {
-    public required string RegNo { get; set; }
-    public DateOnly BirthDate { get; set; }
-    public bool Healthy { get; set; }
+    public required long Id { get; set; }
+    public string? RegNo { get; set; }
+    public DateOnly? BirthDate { get; set; }
+    public bool? Healthy { get; set; }
     public long? DepartmentId { get; set; }
-    public required long RegisteredByUserId { get; set; }
 }
 
-// 4. QUERY PARAMETERS
-// Excellent practice to keep this. It keeps your controller signatures clean.
+
+// QUERY PARAMETERS (filters)
+// Excellent practice to have this. It keeps your controller signatures clean.
 public class CowQueryParameters
 {
     public string? RegNoEquals { get; set; }
@@ -52,6 +63,7 @@ public class UpdateHealthRequest
     public required IEnumerable<long> CowIds { get; set; }
     public bool NewHealthStatus { get; set; }
 }
+
 
 // REMOVED: DeleteCowsDto
 // REMOVED: CowListDto
