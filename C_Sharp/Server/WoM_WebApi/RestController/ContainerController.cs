@@ -19,7 +19,7 @@ public class ContainerController : ControllerBase
 
     // GET /containers  (Owner, Worker, Vet)
     [HttpGet]
-    [Authorize(Roles = "Owner,Worker,Vet")]
+    [Authorize(Roles = "Owner,Worker")]
     public async Task<ActionResult<ContainerListDto>> GetAll()
     {
         // 1) fetch all containers
@@ -31,7 +31,7 @@ public class ContainerController : ControllerBase
 
     // GET /containers/{id}
     [HttpGet("{id:long}")]
-    [Authorize(Roles = "Owner,Worker,Vet")]
+    [Authorize(Roles = "Owner,Worker")]
     public async Task<ActionResult<ContainerDto>> GetById(long id)
     {
         // 1) fetch container by id
