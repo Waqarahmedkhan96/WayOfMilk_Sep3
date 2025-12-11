@@ -13,6 +13,7 @@ public class CreateUserDto
     public required string Password { get; set; }
 
     // IMPORTANT: enum, not string
+    // enum can be parsed to string upon creating the request to grpc
     public UserRole Role { get; set; } = UserRole.Worker; 
 
     public string? LicenseNumber { get; set; } // for vets only

@@ -13,7 +13,6 @@ using WoM_WebApi.Services;
 public class CowsController : ControllerBase
 {
     private readonly ICowService _cowLogic;
-    private long _userId = 1; // Hardcoded for now, later will get from authentication
 
     public CowsController(ICowService cowLogic)
     {
@@ -95,7 +94,7 @@ public class CowsController : ControllerBase
         {
             long requesterId = GetCurrentUserId();
 
-            CowDto updatedCow = await _cowLogic.UpdateCowAsync(dto, _userId);
+            CowDto updatedCow = await _cowLogic.UpdateCowAsync(dto, requesterId);
             return Ok(updatedCow);
         }
         catch (UnauthorizedAccessException e)
@@ -135,7 +134,7 @@ public class CowsController : ControllerBase
             long requesterId = GetCurrentUserId();
             // Collect the stream result into a List to return it
             List<CowDto> results = new();
-            await foreach (var cow in _cowLogic.UpdateCowsHealthAsync(request.CowIds, request.NewHealthStatus, _userId))
+            await foreach (var cow in _cowLogic.UpdateCowsHealthAsync(request.CowIds, request.NewHealthStatus, requesterId))
             {
                 results.Add(cow);
             }

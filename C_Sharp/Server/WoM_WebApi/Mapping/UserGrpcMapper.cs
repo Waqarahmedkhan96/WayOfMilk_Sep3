@@ -7,7 +7,8 @@ namespace WoM_WebApi.Mapping;
 public static class UserGrpcMapper
 {
     // Map role string from Java → enum
-    private static UserRole MapRoleStringToEnum(string role)
+    public static UserRole MapRoleStringToEnum(string role)
+    //made this public because it can be used in other classes too
         => role.ToUpperInvariant() switch
         {
             "OWNER" => UserRole.Owner,
@@ -17,7 +18,7 @@ public static class UserGrpcMapper
         };
 
     // Map enum → Java string
-    private static string MapRoleEnumToString(UserRole role)
+    public static string MapRoleEnumToString(UserRole role)
         => role switch
         {
             UserRole.Owner  => "OWNER",

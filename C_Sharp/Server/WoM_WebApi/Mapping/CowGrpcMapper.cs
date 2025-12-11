@@ -3,7 +3,7 @@ using Sep3.WayOfMilk.Grpc;
 
 namespace WoM_WebApi.Mapping;
 
-public class CowGrpcMapper
+public static class CowGrpcMapper
 {
     //=========== COW ===========
 
