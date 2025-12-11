@@ -19,6 +19,7 @@ public class ContainerDtos {
     public static class ContainerDto {
         private long id;
         private double capacityL;
+        private double occupiedCapacityL; // how full now
 
         public ContainerDto() {}
 
@@ -27,6 +28,9 @@ public class ContainerDtos {
 
         public double getCapacityL() { return capacityL; }
         public void setCapacityL(double capacityL) { this.capacityL = capacityL; }
+
+        public double getOccupiedCapacityL() { return occupiedCapacityL; }
+        public void setOccupiedCapacityL(double occupiedCapacityL) { this.occupiedCapacityL = occupiedCapacityL; }
     }
 
     // GetContainerList

@@ -2,6 +2,8 @@ package sep3.grpc;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
+import sep3.dto.cowDTO.CowDataDTO;
+import sep3.dto.transferRecordDTO.TransferRecordDataDTO;
 import sep3.entity.DepartmentType;
 import sep3.mapping.GrpcMapper;
 import sep3.service.interfaces.IDepartmentService;
@@ -23,26 +25,23 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
 
     @Override
     public void addDepartment(DepartmentCreationRequest request,
-                              StreamObserver<DepartmentData> responseObserver)
-    {
-        try
-        {
-            DepartmentCreationDTO creationDto =
-                    GrpcMapper.convertDepartmentProtoCreationToDto(request);
+                              StreamObserver<DepartmentData> responseObserver) {
 
-            DepartmentDataDTO createdDto = coreService.addDepartment(creationDto);
+        try {
+            DepartmentType type = DepartmentType.valueOf(request.getType().toUpperCase());
+            DepartmentCreationDTO dto = new DepartmentCreationDTO(type);
 
-            DepartmentData responseData =
-                    GrpcMapper.convertDepartmentDtoToProto(createdDto);
+            DepartmentDataDTO result = coreService.addDepartment(dto);
+            DepartmentData proto = GrpcMapper.convertDepartmentDtoToProto(result);
 
-            responseObserver.onNext(responseData);
+            responseObserver.onNext(proto);
             responseObserver.onCompleted();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
+            e.printStackTrace();
             responseObserver.onError(e);
         }
     }
+
 
     @Override
     public void getAllDepartments(Empty request,
@@ -65,6 +64,8 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
         {
             responseObserver.onError(e);
         }
+        System.out.println(">> GET ALL DEPARTMENTS CALLED");
+
     }
 
     @Override
@@ -82,6 +83,7 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
         {
             responseObserver.onError(e);
         }
+        System.out.println(">> GET DEPARTMENT BY ID CALLED");
     }
 
     @Override
@@ -105,6 +107,7 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
         catch (Exception e) {
             responseObserver.onError(e);
         }
+        System.out.println(">> GET DEPARTMENTS BY TYPE CALLED");
     }
 
     @Override
@@ -128,6 +131,7 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
         {
             responseObserver.onError(e);
         }
+        System.out.println(">> UPDATE DEPARTMENT CALLED");
     }
 
     @Override
@@ -145,5 +149,43 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
             responseObserver.onError(e);
         }
     }
+
+    @Override
+    public void getCowsByDepartment(DepartmentIdRequest request,
+                                    StreamObserver<CowList> responseObserver) {
+        try {
+            List<CowDataDTO> cows = coreService.getCowsByDepartment(request.getId());
+
+            CowList.Builder b = CowList.newBuilder();
+            cows.forEach(c -> b.addCows(GrpcMapper.convertCowDtoToProto(c)));
+
+            responseObserver.onNext(b.build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            e.printStackTrace(); // <-- DODAJ TO
+            responseObserver.onError(e);
+        }
+    }
+
+    @Override
+    public void getTransferRecordsByDepartment(DepartmentIdRequest request,
+                                               StreamObserver<TransferRecordList> responseObserver) {
+        try {
+            List<TransferRecordDataDTO> records =
+                    coreService.getTransferRecordsByDepartment(request.getId());
+
+            TransferRecordList.Builder b = TransferRecordList.newBuilder();
+            records.forEach(r -> b.addRecords(GrpcMapper.convertTransferRecordDtoToProto(r)));
+
+            responseObserver.onNext(b.build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            e.printStackTrace(); // <-- I TO
+            responseObserver.onError(e);
+        }
+    }
+
+
+
 
 }

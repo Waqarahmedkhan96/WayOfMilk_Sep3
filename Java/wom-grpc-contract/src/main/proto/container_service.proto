@@ -9,6 +9,7 @@ import "repeatingMessageTypes.proto";
 message ContainerMessage {
   int64 id = 1;
   double capacityL = 2;
+  double occupiedCapacityL = 3; // how full now
 }
 
 message CreateContainerRequest {

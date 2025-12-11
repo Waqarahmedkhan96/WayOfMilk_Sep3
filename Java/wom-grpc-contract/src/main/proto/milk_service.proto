@@ -16,32 +16,38 @@ message MilkMessage {
   int64 id = 1;
   int64 cowId = 2;
   int64 containerId = 3;
-  // DTO MilkDto currently has no registeredByUserId, so we leave this unused in responses:
   int64 registeredByUserId = 4;
-  string date = 5;          // ISO-8601 "yyyy-MM-dd"
-  double volumeL = 6;       // matches DTO field name
+  string date = 5;
+  double volumeL = 6;
   MilkTestResultEnum testResult = 7;
+  bool approvedForStorage = 8;   // NEW
 }
 
 message CreateMilkRequest {
   int64 cowId = 1;
   int64 containerId = 2;
   int64 registeredByUserId = 3;
-  string date = 4;          // optional; server can default to today
-  double volumeL = 5;       // matches CreateMilkDto.volumeL
+  string date = 4;
+  double volumeL = 5;
   MilkTestResultEnum testResult = 6;
 }
 
 message UpdateMilkRequest {
   int64 id = 1;
-  int64 containerId = 2;    // if 0 you can choose to ignore in server logic
+  int64 containerId = 2;
   string date = 3;
-  double volumeL = 4;       // matches UpdateMilkDto.volumeL
+  double volumeL = 4;
   MilkTestResultEnum testResult = 5;
 }
 
 message MilkByContainerQuery {
   int64 containerId = 1;
+}
+
+message ApproveMilkStorageRequest {
+  int64 milkId = 1;
+  int64 approvedByUserId = 2;
+  bool approvedForStorage = 3; // true to approve
 }
 
 message MilkListReply {
@@ -55,4 +61,7 @@ service MilkService {
   rpc GetMilk (SentId) returns (MilkMessage);
   rpc GetAllMilk (Empty) returns (MilkListReply);
   rpc GetMilkByContainer (MilkByContainerQuery) returns (MilkListReply);
+
+  // NEW
+  rpc ApproveMilkStorage (ApproveMilkStorageRequest) returns (MilkMessage);
 }

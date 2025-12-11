@@ -11,7 +11,6 @@ public class TransferRecordMapper
     {
         Long fromDeptId = entity.getFromDept() != null ? entity.getFromDept().getId() : null;
         Long toDeptId = entity.getToDept() != null ? entity.getToDept().getId() : null;
-        Long deptId = entity.getDepartment() != null ? entity.getDepartment().getId() : null;
         Long requestedById = entity.getRequestedBy() != null ? entity.getRequestedBy().getId() : null;
         Long approvedByVetId = entity.getApprovedByVet() != null ? entity.getApprovedByVet().getId() : null;
         Long cowId = entity.getCow() != null ? entity.getCow().getId() : null;
@@ -21,7 +20,6 @@ public class TransferRecordMapper
                 entity.getMovedAt(),
                 fromDeptId,
                 toDeptId,
-                deptId,
                 requestedById,
                 approvedByVetId,
                 cowId
