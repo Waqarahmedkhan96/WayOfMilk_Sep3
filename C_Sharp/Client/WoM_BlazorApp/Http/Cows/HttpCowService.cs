@@ -48,7 +48,7 @@ public class HttpCowService : ICowService
         return JsonSerializer.Deserialize<CowDto>(response, _jsonOptions)!;
     }
 
-    public async Task UpdateAsync(int id, UpdateCowDto dto)
+    public async Task UpdateAsync(int id, CowDto dto)
     {
         HttpResponseMessage httpResponse = await _client.PutAsJsonAsync($"cows/{id}", dto);
         string response = await httpResponse.Content.ReadAsStringAsync();

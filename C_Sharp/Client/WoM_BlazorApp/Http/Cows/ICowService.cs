@@ -8,6 +8,6 @@ public interface ICowService
     Task<ICollection<CowDto>> GetAllAsync();
     Task<CowDto> GetByIdAsync(int id);
     Task<CowDto> CreateAsync(CowCreationDto dto);
-    Task UpdateAsync(int id, UpdateCowDto dto);
+    Task UpdateAsync(int id, CowDto dto);
     Task DeleteAsync(long id);
 }

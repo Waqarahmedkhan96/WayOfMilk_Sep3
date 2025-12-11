@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Sep3.WayOfMilk.Grpc;
-//using WebAPI.GlobalExceptionHandler;
+using WoM_WebApi.GlobalExceptionHandler;
 using WoM_WebApi.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);

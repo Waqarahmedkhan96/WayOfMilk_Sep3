@@ -34,7 +34,10 @@ public class CowDto
 }
 
 // Update
-//not really what we use in the proto for this, however
+//not really what we use in the proto for this
+//removed where it was used thanks to that
+//please ask me (Ana) about it before uncommenting it, if you really think you need it
+/*
 public class UpdateCowDto
 {
     public required long Id { get; set; }
@@ -43,6 +46,7 @@ public class UpdateCowDto
     public bool? Healthy { get; set; }
     public long? DepartmentId { get; set; }
 }
+*/
 
 
 // QUERY PARAMETERS (filters)
@@ -67,5 +71,6 @@ public class UpdateHealthRequest
 
 // REMOVED: DeleteCowsDto
 // REMOVED: CowListDto
+//In C#, RepeatedField<T> implements IEnumerable<T>
 // Instead of wrapping the list in an object,
 // simply return IEnumerable<CowDto> or List<CowDto>
