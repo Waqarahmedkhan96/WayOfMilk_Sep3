@@ -23,7 +23,7 @@ public class GrpcUserServiceImpl : IUserService
     public async Task<UserDto> CreateAsync(CreateUserDto dto)
     {
         // DTO → gRPC
-        var request = dto.ToGrpc();
+        var request = dto.ToCreationGrpc();
 
         var reply = await _client.AddUserAsync(request);
 
@@ -49,10 +49,12 @@ public class GrpcUserServiceImpl : IUserService
     // -----------------------------
     // GET all users
     // -----------------------------
-    public async Task<UserListDto> GetAllAsync()
+    public async Task<IEnumerable<UserDto>> GetAllAsync()
     {
         var reply = await _client.GetAllUsersAsync(new Empty());
-        return reply.ToListDto();
+        // Unwrap and map using Lambda syntax
+        // "For every user 'u', call u.ToDto()"
+        return reply.Users.Select(u => u.ToDto());
     }
 
     // -----------------------------
@@ -75,13 +77,7 @@ public class GrpcUserServiceImpl : IUserService
         if (dto.Role.HasValue)
         {
             // enum → string for gRPC
-            current.Role = dto.Role.Value switch
-            {
-                UserRole.Owner  => "OWNER",
-                UserRole.Worker => "WORKER",
-                UserRole.Vet    => "VET",
-                _               => "WORKER"
-            };
+            current.Role = dto.Role.Value.MapRoleEnumToString();
         }
 
         if (dto.LicenseNumber is not null)

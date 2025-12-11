@@ -17,71 +17,155 @@ public class GrpcCowServiceImpl : ICowService
         _client = client;
     }
 
-    // Create new cow
-    public async Task<CowDto> CreateAsync(CreateCowDto dto, long requestedByUserId)
+    // --- CREATE ---
+    public async Task<CowDto> CreateAsync(CowCreationDto dto)
     {
-        // 1) map DTO → gRPC request
-        var request = dto.ToGrpc();
+        var request = CowGrpcMapper.CreationDtoToCow(dto);
 
-        // 2) call Java gRPC service
-        var reply = await _client.AddCowAsync(request);
+        // T3 defaults 'isHealthy' to false
+        CowData response = await _client.AddCowAsync(request);
 
-        if (reply == null || reply.Id == 0)
-            throw new ValidationException("Unable to create cow.");
+        // Validation: Ensure T3 actually created it
+        if (response == null || response.Id == 0)
+        {
+            throw new Exception("Failed to create cow. Backend returned empty ID.");
+            // If you have his 'ValidationException', throw that instead.
+        }
 
-        return reply.ToDto();
+        return CowGrpcMapper.ToDto(response);
     }
 
-    // Get cow by id
+    // --- READ ---
     public async Task<CowDto> GetByIdAsync(long id)
     {
-        // 1) call Java with id
-        var reply = await _client.GetCowByIdAsync(new CowIdRequest { Id = id });
+        var response = await _client.GetCowByIdAsync(new CowIdRequest { Id = id });
 
-        // 2) validate existence
-        if (reply == null || reply.Id == 0)
-            throw new NotFoundException($"Cow with id {id} not found.");
+        // Validation: Ensure it exists
+        if (response == null || response.Id == 0)
+        {
+            // Throw his 'NotFoundException' here if available
+            throw new KeyNotFoundException($"Cow with id {id} not found.");
+        }
 
-        return reply.ToDto();
+        return CowGrpcMapper.ToDto(response);
     }
 
-    // Get all cows
-    public async Task<CowListDto> GetAllAsync()
+    public async Task<IEnumerable<CowDto>> GetAllAsync()
     {
-        // 1) call Java list rpc
-        var reply = await _client.GetAllCowsAsync(new Empty());
-
-        // 2) map list → DTO list
-        return reply.ToListDto();
+        var response = await _client.GetAllCowsAsync(new Empty());
+        return response.Cows.Select(CowGrpcMapper.ToDto);
     }
 
-    // Update existing cow
-    public async Task<CowDto> UpdateAsync(UpdateCowDto dto, long requestedByUserId)
+    public async Task<CowDto> GetByRegNoAsync(string regNo)
     {
-        // 1) fetch current cow from Java
-        var current = await _client.GetCowByIdAsync(new CowIdRequest { Id = dto.Id });
+        var response = await _client.GetCowByRegNoAsync(new SentString { Value = regNo });
 
-        if (current == null || current.Id == 0)
-            throw new NotFoundException($"Cow with id {dto.Id} not found.");
+        if (response == null || response.Id == 0)
+        {
+            throw new KeyNotFoundException($"Cow with RegNo {regNo} not found.");
+        }
 
-        // 2) map DTO + current → update request
-        var updateRequest = dto.ToUpdateRequest(current, requestedByUserId);
-
-        // 3) call Java update rpc
-        var reply = await _client.UpdateCowAsync(updateRequest);
-        return reply.ToDto();
+        return CowGrpcMapper.ToDto(response);
     }
 
-    // Delete cow
+    // --- UPDATE (General) ---
+    public async Task<CowDto> UpdateCowAsync(CowDto dto, long requesterUserId)
+    {
+        // 1. Fetch Existing (Source of Truth)
+        var existingCowProto = await _client.GetCowByIdAsync(new CowIdRequest { Id = dto.Id });
+
+        if (existingCowProto == null || existingCowProto.Id == 0)
+        {
+            throw new KeyNotFoundException($"Cow with id {dto.Id} not found, cannot update.");
+        }
+
+        // 2. Prepare Request (Start with DB data)
+        var request = new CowUpdateRequest
+        {
+            CowData = existingCowProto,
+            RequestedBy = requesterUserId
+        };
+
+        // 3. Patch only allowed fields
+        request.CowData.RegNo = dto.RegNo;
+        // Handle potential null/missing BirthDate in DTO if necessary,
+        // strictly speaking DTO has DateOnly (struct), so it's never null, just MinValue
+        if (dto.BirthDate != DateOnly.MinValue)
+        {
+            request.CowData.BirthDate = dto.BirthDate.ToString("yyyy-MM-dd");
+        }
+
+        if (dto.DepartmentId.HasValue)
+        {
+            request.CowData.DepartmentId = dto.DepartmentId.Value;
+        }
+
+        // CRITICAL: Preserve Health Status (Do not touch IsHealthy)
+
+        // 4. Send Update
+        CowData response = await _client.UpdateCowAsync(request);
+        return CowGrpcMapper.ToDto(response);
+    }
+
+    // --- UPDATE (Batch) ---
+    public async IAsyncEnumerable<CowDto> UpdateBatchAsync(IEnumerable<CowDto> dtos, long requesterUserId)
+    {
+        foreach (var dto in dtos)
+        {
+            // Reuse the robust single update logic
+            // Note: If one fails (NotFound), this loop will crash.
+            // You might want to try-catch inside here if you want partial success.
+            var result = await UpdateCowAsync(dto, requesterUserId);
+            yield return result;
+        }
+    }
+
+    // --- UPDATE (Health) ---
+    public async IAsyncEnumerable<CowDto> UpdateCowsHealthAsync(
+        IEnumerable<long> cowIds, bool healthUpdate, long requesterUserId)
+    {
+        var request = new CowsHealthChangeRequest();
+        request.CowIds.AddRange(cowIds);
+        request.NewHealthStatus = healthUpdate;
+        request.RequestedByUserId = requesterUserId;
+
+        var response = await _client.UpdateCowsHealthAsync(request);
+
+        foreach (var item in response.Cows)
+        {
+            yield return CowGrpcMapper.ToDto(item);
+        }
+    }
+
+    // --- DELETE ---
     public async Task DeleteAsync(long id)
     {
-        // 1) ensure cow exists
-        var existing = await _client.GetCowByIdAsync(new CowIdRequest { Id = id });
-
-        if (existing == null || existing.Id == 0)
-            throw new NotFoundException($"Cow with id {id} not found.");
-
-        // 2) call delete rpc
+        // We skip the "GetBeforeDelete" check for efficiency unless strictly required.
+        // If the ID doesn't exist, T3 usually ignores it or throws RpcException.
         await _client.DeleteCowAsync(new CowIdRequest { Id = id });
+    }
+
+    public async Task DeleteBatchAsync(long[] ids)
+    {
+        var failedIds = new List<long>();
+
+        foreach (var id in ids)
+        {
+            try
+            {
+                await _client.DeleteCowAsync(new CowIdRequest { Id = id });
+            }
+            catch (Exception e)
+            {
+                // Simple logging for batch failures
+                Console.WriteLine($"Failed to delete cow {id}: {e.Message}");
+                failedIds.Add(id);
+            }
+        }
+
+        if (failedIds.Count > 0)
+        {
+             Console.WriteLine($"Failed to delete {failedIds.Count} cows.");
+        }
     }
 }

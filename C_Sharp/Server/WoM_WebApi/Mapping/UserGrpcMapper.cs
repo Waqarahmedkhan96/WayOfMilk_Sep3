@@ -7,7 +7,10 @@ namespace WoM_WebApi.Mapping;
 public static class UserGrpcMapper
 {
     // Map role string from Java → enum
-    private static UserRole MapRoleStringToEnum(string role)
+    //was going to remove this from all the methods but apparently it looks nicer once you get to use it
+    //and is chaineable
+    public static UserRole MapRoleStringToEnum(this string role)
+    //made this public because it can be used in other classes too
         => role.ToUpperInvariant() switch
         {
             "OWNER" => UserRole.Owner,
@@ -17,7 +20,7 @@ public static class UserGrpcMapper
         };
 
     // Map enum → Java string
-    private static string MapRoleEnumToString(UserRole role)
+    public static string MapRoleEnumToString(this UserRole role)
         => role switch
         {
             UserRole.Owner  => "OWNER",
@@ -27,7 +30,8 @@ public static class UserGrpcMapper
         };
 
     // DTO → gRPC create
-    public static UserCreationRequest ToGrpc(this CreateUserDto dto)
+    public static UserCreationRequest ToCreationGrpc(this CreateUserDto dto)
+    //renamed for clarity
         => new UserCreationRequest
         {
             Name          = dto.Name,
@@ -36,6 +40,19 @@ public static class UserGrpcMapper
             Address       = dto.Address,
             Password      = dto.Password,
             Role          = MapRoleEnumToString(dto.Role),        // enum → string
+            LicenseNumber = dto.LicenseNumber ?? string.Empty
+        };
+
+    public static UserData ToDataGrpc(this UserDto dto)
+    //added for clarity
+        => new UserData
+        {
+            Id            = dto.Id,
+            Name          = dto.Name,
+            Email         = dto.Email,
+            Phone         = dto.Phone,
+            Address       = dto.Address,
+            Role          = dto.Role.MapRoleEnumToString(),      // enum → string
             LicenseNumber = dto.LicenseNumber ?? string.Empty
         };
 
@@ -53,6 +70,8 @@ public static class UserGrpcMapper
         };
 
     // gRPC list → DTO list
+    //not needed because we are using IEnumerable<UserDto>
+    /*
     public static UserListDto ToListDto(this UserList grpc)
     {
         var result = new UserListDto();
@@ -62,6 +81,7 @@ public static class UserGrpcMapper
         }
         return result;
     }
+    */
 
     // gRPC → Authenticated user (for login)
     public static AuthenticatedUserDto ToAuthenticatedUser(this UserData grpc)

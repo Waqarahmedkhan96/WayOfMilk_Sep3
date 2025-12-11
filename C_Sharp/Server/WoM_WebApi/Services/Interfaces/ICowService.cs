@@ -6,9 +6,17 @@ namespace WoM_WebApi.Services.Interfaces;
 // Service: cow CRUD + queries
 public interface ICowService
 {
-    Task<CowDto> CreateAsync(CreateCowDto dto, long requestedByUserId); // create cow
-    Task<CowDto> GetByIdAsync(long id);                                 // get one
-    Task<CowListDto> GetAllAsync();                                     // list all
-    Task<CowDto> UpdateAsync(UpdateCowDto dto, long requestedByUserId); // update cow
-    Task DeleteAsync(long id);                                          // delete cow
+    Task<CowDto> CreateAsync(CowCreationDto dto);
+    Task<CowDto> GetByIdAsync(long id);
+    Task<IEnumerable<CowDto>> GetAllAsync();
+    Task<CowDto> GetByRegNoAsync(string regNo);
+
+    // Updates
+    Task<CowDto> UpdateCowAsync(CowDto dto, long requesterUserId);
+    IAsyncEnumerable<CowDto> UpdateBatchAsync(IEnumerable<CowDto> dtos, long requesterUserId);
+    IAsyncEnumerable<CowDto> UpdateCowsHealthAsync(IEnumerable<long> cowIds, bool healthUpdate, long requesterUserId);
+
+    // Deletes
+    Task DeleteAsync(long id);
+    Task DeleteBatchAsync(long[] ids);
 }

@@ -1,4 +1,5 @@
 package sep3.mapping;
+import sep3.dto.MilkDtos.*;
 import sep3.dto.cowDTO.*;
 import sep3.dto.departmentDTO.DepartmentCreationDTO;
 import sep3.dto.departmentDTO.DepartmentDataDTO;
@@ -11,27 +12,17 @@ import sep3.dto.saleDTO.SaleCreationDTO;
 import sep3.dto.saleDTO.SaleDataDTO;
 
 import sep3.entity.DepartmentType;
-import sep3.wayofmilk.grpc.CowCreationRequest; // Import your generated classes
-import sep3.wayofmilk.grpc.CowData; // Import your generated classes
-import sep3.wayofmilk.grpc.UserCreationRequest;
-import sep3.wayofmilk.grpc.UserData;
-import sep3.wayofmilk.grpc.DepartmentCreationRequest;
-import sep3.wayofmilk.grpc.DepartmentData;
-import sep3.wayofmilk.grpc.TransferRecordCreationRequest;
-import sep3.wayofmilk.grpc.TransferRecordData;
-import sep3.wayofmilk.grpc.AuthenticationRequest;
-import sep3.wayofmilk.grpc.CustomerCreationRequest;
-import sep3.wayofmilk.grpc.CustomerData;
-import sep3.wayofmilk.grpc.SaleCreationRequest;
-import sep3.wayofmilk.grpc.SaleData;
-
+import sep3.entity.MilkTestResult;
+import sep3.wayofmilk.grpc.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
-public class GrpcMapper {
+public final class GrpcMapper
+{
 
+  //no constructor because it's a utility class with static methods only (also why final)
   //COW mappers
 
   //OUT
@@ -66,30 +57,38 @@ public class GrpcMapper {
   }
 
   //  Converts the gRPC CowData message (with 'optional' fields)
-   // into internal CowDataDTO (with nulls).
-   // This is for handling an incoming partial UPDATE request.
+  // into internal CowDataDTO (with nulls).
+  // This is for handling an incoming partial UPDATE request.
 
-  public static CowDataDTO convertCowProtoToDto(CowData proto) {
+  public static CowDataDTO convertCowProtoToDto(CowData proto)
+  {
     CowDataDTO dto = new CowDataDTO();
 
     // ID is always present
     dto.setId(proto.getId());
 
     // Use has...() to check if a value was ACTUALLY sent
-    if (proto.hasRegNo()) {
+    if (proto.hasRegNo())
+    {
       dto.setRegNo(proto.getRegNo());
     }
-    if (proto.hasBirthDate()) {
-      if (proto.getBirthDate().isEmpty()) {
+    if (proto.hasBirthDate())
+    {
+      if (proto.getBirthDate().isEmpty())
+      {
         dto.setBirthDate(null);
-      } else {
+      }
+      else
+      {
         dto.setBirthDate(LocalDate.parse(proto.getBirthDate()));
       }
     }
-    if (proto.hasIsHealthy()) {
+    if (proto.hasIsHealthy())
+    {
       dto.setHealthy(proto.getIsHealthy());
     }
-    if (proto.hasDepartmentId()) {
+    if (proto.hasDepartmentId())
+    {
       dto.setDepartmentId(proto.getDepartmentId());
     }
 
@@ -97,17 +96,19 @@ public class GrpcMapper {
   }
 
   // Converts an incoming gRPC CowCreationRequest
-   // into internal CowCreationDTO
+  // into internal CowCreationDTO
 
-  public static CowCreationDTO convertCowProtoCreationToDto(CowCreationRequest proto) {
+  public static CowCreationDTO convertCowProtoCreationToDto(CowCreationRequest proto)
+  {
     // Assumes fields are required for creation
-    try {
-      return new CowCreationDTO(
-          proto.getRegNo(),
+    try
+    {
+      return new CowCreationDTO(proto.getRegNo(),
           LocalDate.parse(proto.getBirthDate()), // Expects YYYY-MM-DD
-          proto.getRegisteredByUserId(), proto.getQuarantineDepartmentId()
-      );
-    } catch (DateTimeParseException e) {
+          proto.getRegisteredByUserId(), proto.getQuarantineDepartmentId());
+    }
+    catch (DateTimeParseException e)
+    {
       throw new IllegalArgumentException("Date must be in YYYY-MM-DD format");
     }
   }
@@ -129,74 +130,111 @@ public class GrpcMapper {
   }
 
   // 2. User Data (DTO -> Proto) - For sending user info back to T2/Client
-  public static UserData convertUserDtoToProto(UserDataDTO dto) {
+  public static UserData convertUserDtoToProto(UserDataDTO dto)
+  {
     UserData.Builder builder = UserData.newBuilder();
 
     // ID is primitive long
     builder.setId(dto.getId());
 
     // Null checks for Strings to prevent NullPointerExceptions
-    if (dto.getName() != null) builder.setName(dto.getName());
-    if (dto.getEmail() != null) builder.setEmail(dto.getEmail());
-    if (dto.getAddress() != null) builder.setAddress(dto.getAddress());
-    if (dto.getPhone() != null) builder.setPhone(dto.getPhone());
-    if (dto.getRole() != null) builder.setRole(dto.getRole());
-    if (dto.getLicenseNumber() != null) builder.setLicenseNumber(dto.getLicenseNumber());
+    if (dto.getName() != null)
+      builder.setName(dto.getName());
+    if (dto.getEmail() != null)
+      builder.setEmail(dto.getEmail());
+    if (dto.getAddress() != null)
+      builder.setAddress(dto.getAddress());
+    if (dto.getPhone() != null)
+      builder.setPhone(dto.getPhone());
+    if (dto.getRole() != null)
+      builder.setRole(dto.getRole());
+    if (dto.getLicenseNumber() != null)
+      builder.setLicenseNumber(dto.getLicenseNumber());
 
     return builder.build();
   }
 
   // 3. User Data (Proto -> DTO) - For receiving updates from T2
-  public static UserDataDTO convertUserProtoToDto(UserData proto) {
+  public static UserDataDTO convertUserProtoToDto(UserData proto)
+  {
     UserDataDTO dto = new UserDataDTO();
 
     dto.setId(proto.getId());
 
     // Only set fields that were actually sent (Optional check)
-    if (proto.hasName()) dto.setName(proto.getName());
-    if (proto.hasEmail()) dto.setEmail(proto.getEmail());
-    if (proto.hasAddress()) dto.setAddress(proto.getAddress());
-    if (proto.hasPhone()) dto.setPhone(proto.getPhone());
-    if (proto.hasRole()) dto.setRole(proto.getRole());
-    if (proto.hasLicenseNumber()) dto.setLicenseNumber(proto.getLicenseNumber());
+    if (proto.hasName())
+      dto.setName(proto.getName());
+    if (proto.hasEmail())
+      dto.setEmail(proto.getEmail());
+    if (proto.hasAddress())
+      dto.setAddress(proto.getAddress());
+    if (proto.hasPhone())
+      dto.setPhone(proto.getPhone());
+    if (proto.hasRole())
+      dto.setRole(proto.getRole());
+    if (proto.hasLicenseNumber())
+      dto.setLicenseNumber(proto.getLicenseNumber());
 
     return dto;
   }
 
   // 4. Login Request (Proto -> DTO)
-  public static UserLoginDTO convertLoginProtoToDto(AuthenticationRequest proto) {
+  public static UserLoginDTO convertLoginProtoToDto(AuthenticationRequest proto)
+  {
     UserLoginDTO dto = new UserLoginDTO();
     dto.setEmail(proto.getEmail());
     dto.setPassword(proto.getPassword());
     return dto;
   }
 
-  // Department mappers
+    // Department mappers
 
-    public static DepartmentData convertDepartmentDtoToProto(DepartmentDataDTO dto)
-    {
-        return DepartmentData.newBuilder()
-                .setId(dto.getId())
-                .setType(dto.getType().toString())
-                .build();
+
+    public static DepartmentData convertDepartmentDtoToProto(DepartmentDataDTO dto) {
+
+        DepartmentData.Builder b = DepartmentData.newBuilder();
+
+        if (dto.getId() != null) {
+            b.setId(dto.getId());
+        }
+
+        if (dto.getType() != null) {
+            // enum -> STRING dla proto
+            b.setType(dto.getType().name());
+        }
+
+        // UWAGA: proto NIE ma cows ani transferów – nic więcej nie mapujemy
+
+        return b.build();
     }
+
 
     public static DepartmentDataDTO convertDepartmentProtoToDto(DepartmentData proto)
     {
+        DepartmentDataDTO dto = new DepartmentDataDTO();
+        dto.setId(proto.getId());
+
+        // tutaj typ jest OPCJONALNY (np. przy update tylko ID)
         DepartmentType type = convertDepartmentTypeStringToEnum(proto.getType());
-        return new DepartmentDataDTO(proto.getId(), type);
+        dto.setType(type);
+
+        return dto;
     }
 
     public static DepartmentCreationDTO convertDepartmentProtoCreationToDto(
             DepartmentCreationRequest proto)
     {
         DepartmentType type = convertDepartmentTypeStringToEnum(proto.getType());
+        if (type == null) {
+            throw new IllegalArgumentException("Department type is required for creation.");
+        }
         return new DepartmentCreationDTO(type);
     }
 
+
     public static DepartmentType convertDepartmentTypeStringToEnum(String type) {
         if (type == null || type.isBlank()) {
-            throw new IllegalArgumentException("Department type cannot be null or blank");
+            return null;
         }
 
         try {
@@ -205,6 +243,7 @@ public class GrpcMapper {
             throw new IllegalArgumentException("Invalid department type: " + type);
         }
     }
+
 
     // Transfer Record mapping
     public static TransferRecordData convertTransferRecordDtoToProto(TransferRecordDataDTO dto)
@@ -216,7 +255,6 @@ public class GrpcMapper {
 
         if (dto.getFromDepartmentId() != null) builder.setFromDepartmentId(dto.getFromDepartmentId());
         if (dto.getToDepartmentId() != null) builder.setToDepartmentId(dto.getToDepartmentId());
-        if (dto.getDepartmentId() != null) builder.setDepartmentId(dto.getDepartmentId());
 
         if (dto.getRequestedByUserId() != null) builder.setRequestedByUserId(dto.getRequestedByUserId());
         if (dto.getApprovedByVetUserId() != null) builder.setApprovedByVetUserId(dto.getApprovedByVetUserId());
@@ -226,16 +264,16 @@ public class GrpcMapper {
         return builder.build();
     }
 
-    public static TransferRecordData convertTransferDtoToProto(TransferRecordDataDTO dto)
-    {
-        return convertTransferRecordDtoToProto(dto);
-    }
+  public static TransferRecordData convertTransferDtoToProto(
+      TransferRecordDataDTO dto)
+  {
+    return convertTransferRecordDtoToProto(dto);
+  }
 
-    public static TransferRecordCreationDTO convertTransferRecordProtoCreationToDto(
-            TransferRecordCreationRequest proto)
-    {
-        LocalDateTime movedAt =
-                proto.getMovedAt().isBlank() ? null : LocalDateTime.parse(proto.getMovedAt());
+  public static TransferRecordCreationDTO convertTransferRecordProtoCreationToDto(
+      TransferRecordCreationRequest proto)
+  {
+    LocalDateTime movedAt = proto.getMovedAt().isBlank() ? null : LocalDateTime.parse(proto.getMovedAt());
 
         return new TransferRecordCreationDTO(
                 proto.getCowId(),
@@ -259,12 +297,11 @@ public class GrpcMapper {
 
         dto.setId(proto.getId());
 
-        if (proto.getMovedAt() != null && !proto.getMovedAt().isBlank())
-            dto.setMovedAt(LocalDateTime.parse(proto.getMovedAt()));
+    if (proto.getMovedAt() != null && !proto.getMovedAt().isBlank())
+      dto.setMovedAt(LocalDateTime.parse(proto.getMovedAt()));
 
         dto.setFromDepartmentId(proto.getFromDepartmentId());
         dto.setToDepartmentId(proto.getToDepartmentId());
-        dto.setDepartmentId(proto.getDepartmentId());
 
         dto.setRequestedByUserId(proto.getRequestedByUserId());
         dto.setApprovedByVetUserId(proto.getApprovedByVetUserId());
@@ -410,5 +447,65 @@ public class GrpcMapper {
         return dto;
     }
 
+  //Milk mappers
+
+  public static MilkDto convertMilkProtoToDto(MilkMessage proto)
+  {
+
+    MilkDto dto = new MilkDto();
+    dto.setId(proto.getId());
+    dto.setVolumeL(proto.getVolumeL());
+    dto.setDate(LocalDate.parse(proto.getDate()));
+    dto.setContainerId(proto.getContainerId());
+    dto.setCowId(proto.getCowId());
+    //no registeredBy field in this dto, although the proto has it
+    dto.setTestResult(convertProtoMilkTestResult(proto.getTestResult()));
+    return dto;
+  }
+
+  public static MilkMessage convertMilkDtoToProto(MilkDto dto)
+  {
+    MilkMessage.Builder builder = MilkMessage.newBuilder();
+    builder.setId(dto.getId());
+    builder.setVolumeL(dto.getVolumeL());
+    builder.setDate(dto.getDate().toString());
+    builder.setContainerId(dto.getContainerId());
+    builder.setCowId(dto.getCowId());
+    builder.setTestResult(convertDtoMilkTestResult(dto.getTestResult()));
+
+    //no registeredBy field in this dto, so remember to set it up manually in the grpc implementation
+    return builder.build();
+  }
+
+  //helper method to parse one enum to the other
+
+  public static MilkTestResult convertProtoMilkTestResult(MilkTestResultEnum proto)
+  {
+    if (proto == null)
+      return null;
+    try
+    {
+      // map by enum name; falls back to null if no matching value exists
+      return MilkTestResult.valueOf(proto.name());
+    }
+    catch (IllegalArgumentException e)
+    {
+      return null;
+    }
+  }
+
+  public static MilkTestResultEnum convertDtoMilkTestResult(MilkTestResult dto)
+  {
+    if (dto == null)
+      return null;
+    try
+    {
+      return MilkTestResultEnum.valueOf(dto.toString());
+    }
+    catch (IllegalArgumentException e)
+    {
+      return null;
+    }
+  }
 
 }

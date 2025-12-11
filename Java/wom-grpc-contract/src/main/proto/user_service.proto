@@ -6,6 +6,19 @@ option java_package = "sep3.wayofmilk.grpc";
 option java_multiple_files = true;
 option csharp_namespace = "Sep3.WayOfMilk.Grpc";
 
+// User roles here not yet implemented in the service logic
+// but defined just in case they are needed in the future
+// currently t3 is parsing them as strings and t2 should do the same
+//commented out because it was causing confusion with string representation
+/*
+enum UserRole {
+  ROLE_OWNER = 0;
+  ROLE_WORKER = 1;
+  ROLE_ADMIN = 2;
+}
+
+ */
+
 service UserService {
   rpc GetAllUsers (Empty) returns (UserList);
   rpc AddUser (UserCreationRequest) returns (UserData);

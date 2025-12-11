@@ -3,6 +3,7 @@ syntax = "proto3";
 //if importing related proto files:
 //import "other_service.proto";
 import "repeatingMessageTypes.proto";
+import "milk_service.proto";
 
 // Defining the Java package where the generated code will live
 option java_package = "sep3.wayofmilk.grpc";
@@ -20,6 +21,8 @@ service CowService {
   rpc GetCowByRegNo (SentString) returns (CowData);
   rpc DeleteCow (CowIdRequest) returns (Empty);
   rpc UpdateCowsHealth (CowsHealthChangeRequest) returns (CowList);
+  rpc GetCowsByDepartmentId (SentId) returns (CowList);
+  rpc GetMilksByCowId (CowIdRequest) returns (MilkListReply);
 }
 
 // Message definitions

@@ -1,100 +1,212 @@
-// File: Server/WoM_WebApi/RestController/CowController.cs
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using ApiContracts;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using WoM_WebApi.Services.Interfaces;
 
 namespace WoM_WebApi.RestController;
 
+using ApiContracts;
+using Microsoft.AspNetCore.Authorization;//for authorize
+using System.Security.Claims; //for accessing User Claims
+using Microsoft.AspNetCore.Mvc;
+using WoM_WebApi.Services;
 [ApiController]
-[Route("cows")]
-public class CowController : ControllerBase
+[Route("[controller]")] // This maps to "http://localhost:PORT/cows"
+[Authorize] //base rule: user must be logged in
+public class CowsController : ControllerBase
 {
-    private readonly ICowService _cowService;
+    private readonly ICowService _cowLogic;
 
-    public CowController(ICowService cowService)
+    public CowsController(ICowService cowLogic)
     {
-        _cowService = cowService;
+        _cowLogic = cowLogic;
     }
 
-    // helper: get current user id from JWT
+    // POST cows
+    [HttpPost]
+    public async Task<ActionResult<CowDto>> CreateAsync([FromBody] CowCreationDto dto)
+    {
+        try
+        {
+            //security measure: overwrite the ID in the DTO with the real ID from the token.
+            // This prevents users from faking who registered the cow.
+            dto.RegisteredByUserId = GetCurrentUserId();
+
+            CowDto createdCow = await _cowLogic.CreateAsync(dto);
+            // Returns 201 Created and the location of the new resource
+            return Created($"/cows/{createdCow.Id}", createdCow);
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            return Unauthorized(e.Message);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    // GET cows
+    // GET cows?regNo=123
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<CowDto>>> GetAsync([FromQuery] string? regNo)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(regNo))
+            {
+                // If query param ?regNo=... is present, find specific cow
+                CowDto cow = await _cowLogic.GetByRegNoAsync(regNo);
+                return Ok(new List<CowDto> { cow }); // Return as list for consistency? Or just the object.
+            }
+
+            // Otherwise get all
+            IEnumerable<CowDto> cows = await _cowLogic.GetAllAsync();
+            return Ok(cows);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    // GET cows/5
+    [HttpGet("{id:long}")]
+    public async Task<ActionResult<CowDto>> GetByIdAsync([FromRoute] long id)
+    {
+        try
+        {
+            CowDto cow = await _cowLogic.GetByIdAsync(id);
+            return Ok(cow);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    // PUT cows
+    [HttpPut]
+    [Authorize(Policy = "OwnerOnly")]//only owner can change important data fields (ex: regNo, dateOfBirth)
+    public async Task<ActionResult<CowDto>> UpdateAsync([FromBody] CowDto dto)
+    {
+        try
+        {
+            long requesterId = GetCurrentUserId();
+
+            CowDto updatedCow = await _cowLogic.UpdateCowAsync(dto, requesterId);
+            return Ok(updatedCow);
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            return Unauthorized(e.Message);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    // PUT cows/health
+    // Updates health for a list of cows
+    [HttpPut("health")]
+    //any user can update health, but only to false, unless user is vet
+    public async Task<ActionResult<IEnumerable<CowDto>>> UpdateHealthAsync([FromBody] UpdateHealthRequest request)
+    {
+        // NOTE: You need a small DTO for this request body (Ids + Status)
+        // Or pass them as query parameters, but Body is cleaner for arrays.
+        try
+        {
+            if (request.NewHealthStatus == true)
+            {
+                // If trying to make cow healthy, MUST be a vet
+                if (!IsVet())
+                {
+                    return Forbid("Only a Veterinarian can declare a cow healthy.");
+                }
+            }
+
+            // If we get here, either:
+            // a) They are setting it to False (Allowed for everyone)
+            // b) They are setting it to True AND they are a Vet (Allowed)
+
+            long requesterId = GetCurrentUserId();
+            // Collect the stream result into a List to return it
+            List<CowDto> results = new();
+            await foreach (var cow in _cowLogic.UpdateCowsHealthAsync(request.CowIds, request.NewHealthStatus, requesterId))
+            {
+                results.Add(cow);
+            }
+
+            return Ok(results);
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            return Unauthorized(e.Message);
+        }
+        catch (Exception e)
+        {
+             Console.WriteLine(e);
+             return StatusCode(500, e.Message);
+        }
+    }
+
+    // DELETE cows/5
+    [HttpDelete("{id:long}")]
+    [Authorize(Roles = "Owner")]
+    public async Task<ActionResult> DeleteAsync([FromRoute] long id)
+    {
+        try
+        {
+            await _cowLogic.DeleteAsync(id);
+            return NoContent();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    // DELETE cows/batch
+    [HttpDelete("batch")]
+    [Authorize(Roles = "Owner")]
+    public async Task<ActionResult> DeleteBatchAsync([FromBody] long[] ids)
+    {
+        try
+        {
+            await _cowLogic.DeleteBatchAsync(ids);
+            return NoContent();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, e.Message);
+        }
+    }
+
+    //=========== HELPER methods ============
+
+    // Gets the ID of the current user from the JWT token
     private long GetCurrentUserId()
     {
-        var sub = User.FindFirst(ClaimTypes.NameIdentifier)
-                  ?? User.FindFirst(JwtRegisteredClaimNames.Sub);
+        // "ClaimTypes.NameIdentifier" is the standard name for the ID inside a token
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
-        return sub != null && long.TryParse(sub.Value, out var id)
-            ? id
-            : 0;
+        if (idClaim != null && long.TryParse(idClaim.Value, out long userId))
+        {
+            return userId;
+        }
+
+        // If we can't find the ID, it means something is wrong with the token
+        // or the middleware configuration.
+        throw new UnauthorizedAccessException("Invalid User ID in token.");
     }
 
-    // GET /cows  (Owner, Worker, Vet)
-    [HttpGet]
-    [Authorize(Roles = "Owner,Worker,Vet")]
-    public async Task<ActionResult<CowListDto>> GetAll()
+    // Helper to check role
+    private bool IsVet()
     {
-        // 1) fetch list from service
-        var list = await _cowService.GetAllAsync();
-
-        // 2) return ok with cows
-        return Ok(list);
-    }
-
-    // GET /cows/{id}
-    [HttpGet("{id:long}")]
-    [Authorize(Roles = "Owner,Worker,Vet")]
-    public async Task<ActionResult<CowDto>> GetById(long id)
-    {
-        // 1) fetch cow by id
-        var cow = await _cowService.GetByIdAsync(id);
-
-        // 2) return single cow
-        return Ok(cow);
-    }
-
-    // POST /cows   (Worker or Owner)
-    [HttpPost]
-    [Authorize(Policy = "WorkerOrOwner")]
-    public async Task<ActionResult<CowDto>> Create(CreateCowDto dto)
-    {
-        // 1) take user id from token
-        var userId = GetCurrentUserId();
-
-        // 2) call service to create cow
-        var created = await _cowService.CreateAsync(dto, userId);
-
-        // 3) return 201 with location
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
-    }
-
-    // PUT /cows/{id}   (Worker or Owner)
-    [HttpPut("{id:long}")]
-    [Authorize(Policy = "WorkerOrOwner")]
-    public async Task<ActionResult<CowDto>> Update(long id, UpdateCowDto dto)
-    {
-        // 1) sync route id → dto
-        dto.Id = id;
-
-        // 2) get user id for audit
-        var userId = GetCurrentUserId();
-
-        // 3) call service update
-        var updated = await _cowService.UpdateAsync(dto, userId);
-
-        return Ok(updated);
-    }
-
-    // DELETE /cows/{id}   (Owner only)
-    [HttpDelete("{id:long}")]
-    [Authorize(Policy = "OwnerOnly")]
-    public async Task<IActionResult> Delete(long id)
-    {
-        // 1) ask service to delete
-        await _cowService.DeleteAsync(id);
-
-        // 2) return 204
-        return NoContent();
+        return User.IsInRole("Vet"); // Or check specific claim depending on your JWT setup
     }
 }

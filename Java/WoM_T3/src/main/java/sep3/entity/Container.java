@@ -11,9 +11,11 @@ public class Container {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "capacity_l")
     private double capacityL;
 
     // how full now
+    @Column(name = "occupied_capacity_l")
     private double occupiedCapacityL;
 
     // 1 Container  * Milk

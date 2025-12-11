@@ -8,32 +8,33 @@ import sep3.entity.Department;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CowMapper
+public final class CowMapper
 {
   //static methods to map between entities and DTOs for request handlers
-  public CowMapper()
+  private CowMapper()
   {
   }
+  //constructor private here because this is a utility class
+  // and doesn't need to be instantiated'
 
   public static CowDataDTO convertCowToDto(Cow cow)
   {
     // Check if department exists before asking for its ID
     //shouldn't be null, but just in case the database chokes on this specifically
-    Long deptId = (cow.getDepartment() != null) ? cow.getDepartment().getId() : null;
+    Long deptId = (cow.getDepartment() != null) ?
+        cow.getDepartment().getId() :
+        null;
 
     // You use the parameterized constructor of the CowDataDTO
     return new CowDataDTO(cow.getId(), cow.getRegNo(), cow.getBirthDate(),
-        cow.isHealthy(), deptId
-    );
+        cow.isHealthy(), deptId);
   }
-/*
-  public static Cow convertDtoToEntity (CowDataDTO dto)
-  {
-    //initialised by null fields, but this might need revisiting
-    //since it risks rewriting stuff as null in the database
-    Cow entity = new Cow(null, null, null, null);
 
-      if (dto.getRegNo() != null && !dto.getRegNo().isEmpty())
+  public static Cow convertDtoToEntity(CowDataDTO dto, Cow cowToConvert,
+      Department departmentFromDto)
+  {
+    Cow entity = cowToConvert;
+    if (dto.getRegNo() != null && !dto.getRegNo().isEmpty())
     {
       entity.setRegNo(dto.getRegNo());
     }
@@ -46,7 +47,8 @@ public class CowMapper
     // since this is now a Long, not long, a null check can be made
     if (dto.getDepartmentId() != null)
     {
-      entity.setDepartment(department);
+      entity.setDepartment(departmentFromDto);
+      //keeping this entirely away from the repos
     }
 
     // boolean is no longer a primitive so null checks can be made
@@ -58,23 +60,15 @@ public class CowMapper
     return entity;
   }
 
-   */
-
   public static List<CowDataDTO> convertCowListToDTO(List<Cow> cows)
   {
     return cows.stream().map(CowMapper::convertCowToDto).collect(Collectors.toList());
   }
-/*
-  public static List<Cow> convertDtoListToEntity(List<CowDataDTO> cows)
-  {
-      return cows.stream().map(CowMapper::convertDtoToEntity(cows)).collect(Collectors.toList());
-  }
-
- */
 
   //for update methods
   //because proto could be missing some fields on some occasions (ex on transfers)
-  public static void updateCowFromDto(Cow entityToUpdate, CowDataDTO dto, Department department)
+  public static void updateCowFromDto(Cow entityToUpdate, CowDataDTO dto,
+      Department department)
   {
     // Check if the DTO actually provided a new value before setting it.
     // We check for null and empty string (Protobuf default).
@@ -95,7 +89,7 @@ public class CowMapper
     }
 
     // boolean is no longer a primitive so null checks can be made
-      //this will be set only after user check, handled in service
+    //this will be set only after user check, handled in service
       /*
         if (dto.isHealthy() != null)
         {

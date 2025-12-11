@@ -77,6 +77,11 @@ public class AuthController : ControllerBase
         if (dto.UserId != userId)
             return Forbid();
 
+        // Force the operation to apply to the logged-in user
+        //the id is taken from the token, since the user is already logged in at this step
+        // safer
+        dto.UserId = userId;
+
         await _authService.ChangePasswordAsync(dto);
         return NoContent();
     }
