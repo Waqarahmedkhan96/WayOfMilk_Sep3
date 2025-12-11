@@ -44,6 +44,7 @@ public class GrpcAuthServiceImpl : IAuthService
             NewPassword = request.NewPassword
         };
 
+
         var result = await _client.ChangePasswordAsync(grpcRequest);
         if (!result.Value)
             throw new ValidationException("Password change failed.");

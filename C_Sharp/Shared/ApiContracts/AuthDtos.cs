@@ -34,7 +34,8 @@ public class ChangePasswordDto
 public class ResetPasswordDto
 {
     public long UserId { get; set; }
-    public required string NewPassword { get; set; }
+    //public required string NewPassword { get; set; }
+    //resetting password is done by the owner only and it's coded in t3 to automatically become 0000
 }
 
 // DTO: user from gRPC AuthService

@@ -48,17 +48,7 @@ public class UpdateUserDto
     public string? LicenseNumber { get; set; }
 }
 
-// DTO: delete users batch
-public class DeleteUsersDto
-{
-    public required long[] Ids { get; set; }
-}
 
-// DTO: list of users
-public class UserListDto
-{
-    public List<UserDto> Users { get; set; } = new();
-}
 
 // DTO: filter + paging
 public class UserQueryParameters
@@ -69,5 +59,7 @@ public class UserQueryParameters
     public int? Page { get; set; }
     public int? PageSize { get; set; }
 }
+
+//removed wrapper classes --> boilerplate code
 
 
