@@ -83,7 +83,7 @@ public class CowServiceGrpcImpl extends CowServiceGrpc.CowServiceImplBase
     responseObserver.onCompleted();
   }
 @Override
-  public void getCowsByDepartmentId(SentId departmentId, StreamObserver<CowList> responseObserver)
+public void getCowsByDepartmentId(SentId departmentId, StreamObserver<CowList> responseObserver)
   {
     List<CowDataDTO> foundCows = coreService.getCowsByDepartmentId(departmentId.getId());
     CowList.Builder cowListBuilder = CowList.newBuilder();
@@ -95,8 +95,9 @@ public class CowServiceGrpcImpl extends CowServiceGrpc.CowServiceImplBase
     responseObserver.onCompleted();
   }
 
-  @Override public void getMilksByCowId(CowIdRequest request,
-      StreamObserver<MilkListReply> responseObserver)
+  @Override
+  public void getMilksByCowId(CowIdRequest request,
+                              StreamObserver<MilkListReply> responseObserver)
   {
     List<MilkDtos.MilkDto> milkList = coreService.getCowMilk(request.getId());
     MilkListReply.Builder milkListBuilder = MilkListReply.newBuilder();
