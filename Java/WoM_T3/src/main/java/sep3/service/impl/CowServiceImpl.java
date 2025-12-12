@@ -42,6 +42,14 @@ import java.util.List;
   {
     //making sure new cows are added to a quarrantine department
     Department quarantine = departmentRepository.findById(cow.getDepartmentId()).orElseThrow(() -> new RuntimeException("Department not found"));
+    if (quarantine == null)
+    {
+      //if no specific department is provided, find the first 'available' quarantine department
+      //we currently have no limit to how many cows can be in a department, so this should always work
+      //especially now that there's a bean that automatically gets created for us
+      quarantine = departmentRepository.findByType(DepartmentType.QUARANTINE).
+          stream().findFirst().orElseThrow(() -> new RuntimeException("Quarantine department not found."));
+    }
     if (!quarantine.getType().equals(DepartmentType.QUARANTINE))
     {
         throw new RuntimeException("Cows can only be added to a quarantine department.");
