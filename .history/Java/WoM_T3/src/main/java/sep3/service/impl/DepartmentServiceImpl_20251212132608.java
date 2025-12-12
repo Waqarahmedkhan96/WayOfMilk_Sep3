@@ -13,6 +13,7 @@ import sep3.entity.Department;
 import sep3.entity.DepartmentType;
 import sep3.service.interfaces.IDepartmentService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
