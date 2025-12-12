@@ -108,6 +108,24 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
     }
 
     @Override
+    public void getDepartmentByName(DepartmentNameRequest request,
+                                    StreamObserver<DepartmentData> responseObserver)
+    {
+        try
+        {
+            DepartmentDataDTO dto = coreService.getDepartmentByName(request.getName());
+            DepartmentData response = GrpcMapper.convertDepartmentDtoToProto(dto);
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        }
+        catch (Exception e)
+        {
+            responseObserver.onError(e);
+        }
+    }
+    
+
+    @Override
     public void updateDepartment(DepartmentData request,
                                  StreamObserver<DepartmentData> responseObserver)
     {

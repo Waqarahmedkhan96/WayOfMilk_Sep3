@@ -16,7 +16,8 @@ public class DepartmentMapper
 
         return new DepartmentDataDTO(
                 department.getId(),
-                department.getType()
+                department.getType(),
+                department.getName()
         );
     }
 }

@@ -10,6 +10,7 @@ import sep3.entity.DepartmentType;
 import sep3.service.interfaces.IDepartmentService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,12 +26,15 @@ public class DepartmentServiceImpl implements IDepartmentService
     @Override
     public DepartmentDataDTO addDepartment(DepartmentCreationDTO request)
     {
-        if (request.getType() == null)
-        {
-            throw new IllegalArgumentException("Department type must be provided.");
+        if (request.getName() == null || request.getName().isBlank()) {
+            throw new IllegalArgumentException("Department name is required");
         }
 
-        Department department = new Department(request.getType());
+        if (request.getType() == null || request.getType().toString().isBlank()) {
+            throw new IllegalArgumentException("Department type is required");
+        }
+
+        Department department = new Department(request.getType(), request.getName());
         Department saved = departmentRepository.save(department);
         return DepartmentMapper.convertDepartmentToDto(saved);
     }
@@ -61,6 +65,17 @@ public class DepartmentServiceImpl implements IDepartmentService
                 .toList();
     }
 
+    @Override
+    public DepartmentDataDTO getDepartmentByName(String name)
+    {
+        Optional<Department> department = departmentRepository.findByName(name);
+        if (department == null)
+        {
+            throw new IllegalArgumentException("Department not found name: " + name);
+        }
+        return DepartmentMapper.convertDepartmentToDto(department.get());
+    }
+
 
 
     @Override
@@ -72,8 +87,16 @@ public class DepartmentServiceImpl implements IDepartmentService
         Department dept = departmentRepository.findById(request.getId())
                 .orElseThrow(() -> new RuntimeException("Department not found: " + request.getId()));
 
-        if (request.getType() != null)
-            dept.setType(request.getType());
+        if (request.getName() == null || request.getName().isBlank()) {
+            throw new IllegalArgumentException("Department name is required");
+        }
+
+        if (request.getType() == null || request.getType().toString().isBlank()) {
+            throw new IllegalArgumentException("Department type is required");
+        }
+
+        dept.setName(request.getName());
+        dept.setType(request.getType());
 
         Department saved = departmentRepository.save(dept);
         return DepartmentMapper.convertDepartmentToDto(saved);

@@ -73,7 +73,6 @@ public class TransferRecordServiceImpl implements ITransferRecordService
                 movedAt,
                 fromDept,
                 toDept,
-                toDept,
                 requestedBy,
                 null,
                 cow
@@ -136,7 +135,6 @@ public class TransferRecordServiceImpl implements ITransferRecordService
             Department to = departmentRepository.findById(dto.getToDepartmentId())
                     .orElseThrow(() -> new RuntimeException("Department not found"));
             entity.setToDept(to);
-            entity.setDepartment(to);
         }
 
         if (dto.getApprovedByVetUserId() != null)

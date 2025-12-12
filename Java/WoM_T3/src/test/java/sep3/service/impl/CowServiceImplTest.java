@@ -79,7 +79,7 @@ class CowServiceImplTest {
   @Test
   void testGetCowById_Success() {
     // 1. Arrange
-    Department dept = new Department(DepartmentType.QUARANTINE);
+    Department dept = new Department(DepartmentType.QUARANTINE, "Quarantine Dept");
     User user = new Owner("Owie", "owie@email.com", "25648454", "Street 123", "password");
 
     Cow foundCow = new Cow("Reg123", LocalDate.now(), dept, user);
@@ -113,7 +113,7 @@ class CowServiceImplTest {
   @Test
   void testGetAllCows() {
     // 1. Arrange
-    Department dept = new Department(DepartmentType.QUARANTINE);
+    Department dept = new Department(DepartmentType.QUARANTINE, "Quarantine Dept");
     User user = new Owner("Owie", "owie@email.com", "25648454", "Street 123", "password");
 
     Cow cow1 = new Cow("Reg1", LocalDate.now(), dept, user);
@@ -136,7 +136,7 @@ class CowServiceImplTest {
   @Test
   void testDeleteCow() {
     // 1. Arrange
-    Department dept = new Department(DepartmentType.QUARANTINE);
+    Department dept = new Department(DepartmentType.QUARANTINE, "Quarantine Dept");
     User user = new Owner("Owie", "owie@email.com", "25648454", "Street 123", "password");
 
     Cow cow1 = new Cow("Reg1", LocalDate.now(), dept, user);

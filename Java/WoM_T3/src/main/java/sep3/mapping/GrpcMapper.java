@@ -178,20 +178,21 @@ public class GrpcMapper {
         return DepartmentData.newBuilder()
                 .setId(dto.getId())
                 .setType(dto.getType().toString())
+                .setName(dto.getName())
                 .build();
     }
 
     public static DepartmentDataDTO convertDepartmentProtoToDto(DepartmentData proto)
     {
         DepartmentType type = convertDepartmentTypeStringToEnum(proto.getType());
-        return new DepartmentDataDTO(proto.getId(), type);
+        return new DepartmentDataDTO(proto.getId(), type, proto.getName());
     }
 
     public static DepartmentCreationDTO convertDepartmentProtoCreationToDto(
             DepartmentCreationRequest proto)
     {
         DepartmentType type = convertDepartmentTypeStringToEnum(proto.getType());
-        return new DepartmentCreationDTO(type);
+        return new DepartmentCreationDTO(type, proto.getName());
     }
 
     public static DepartmentType convertDepartmentTypeStringToEnum(String type) {
@@ -216,7 +217,6 @@ public class GrpcMapper {
 
         if (dto.getFromDepartmentId() != null) builder.setFromDepartmentId(dto.getFromDepartmentId());
         if (dto.getToDepartmentId() != null) builder.setToDepartmentId(dto.getToDepartmentId());
-        if (dto.getDepartmentId() != null) builder.setDepartmentId(dto.getDepartmentId());
 
         if (dto.getRequestedByUserId() != null) builder.setRequestedByUserId(dto.getRequestedByUserId());
         if (dto.getApprovedByVetUserId() != null) builder.setApprovedByVetUserId(dto.getApprovedByVetUserId());
@@ -264,7 +264,6 @@ public class GrpcMapper {
 
         dto.setFromDepartmentId(proto.getFromDepartmentId());
         dto.setToDepartmentId(proto.getToDepartmentId());
-        dto.setDepartmentId(proto.getDepartmentId());
 
         dto.setRequestedByUserId(proto.getRequestedByUserId());
         dto.setApprovedByVetUserId(proto.getApprovedByVetUserId());

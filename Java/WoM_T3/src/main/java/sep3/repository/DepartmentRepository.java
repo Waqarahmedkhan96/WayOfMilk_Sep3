@@ -5,10 +5,11 @@ import sep3.entity.Department;
 import sep3.entity.DepartmentType;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DepartmentRepository extends JpaRepository<Department, Long>
 {
 
   List<Department> findByType(DepartmentType type);
-
+  Optional<Department> findByName(String name);
 }

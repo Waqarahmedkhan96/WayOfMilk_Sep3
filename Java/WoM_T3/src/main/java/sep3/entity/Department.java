@@ -13,12 +13,19 @@ public class Department
     @Enumerated(EnumType.STRING) // FIX: Stores "QUARANTINE" instead of "0" in the DB
     private DepartmentType type;
 
+    @Column(nullable = false, unique = true, name = "name")
+    private String name;
+
     protected Department() {}
 
-    public Department(DepartmentType type)
+    public Department(DepartmentType type, String name)
     {
         this.type = type;
+        this.name = name;
     }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }

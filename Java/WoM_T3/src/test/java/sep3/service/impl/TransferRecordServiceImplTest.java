@@ -54,14 +54,14 @@ class TransferRecordServiceImplTest {
         Cow cow = new Cow("COW1", LocalDate.now(), true, new Owner("Owie", "owie@email.com", "25648454", "Street 123", "password"));
         cow.setId(cowId);
 
-        Department fromDept = new Department(DepartmentType.MILKING); fromDept.setId(fromDeptId);
-        Department toDept = new Department(DepartmentType.RESTING); toDept.setId(toDeptId);
+        Department fromDept = new Department(DepartmentType.MILKING, "Milking Dept"); fromDept.setId(fromDeptId);
+        Department toDept = new Department(DepartmentType.RESTING, "Resting Dept"); toDept.setId(toDeptId);
 
         User requester = new Owner("A", "a@a.com", "999", "Addr", "pw");
         requester.setId(userId);
 
         TransferRecord saved = new TransferRecord(
-                dto.getMovedAt(), fromDept, toDept, toDept, requester, null, cow
+                dto.getMovedAt(), fromDept, toDept, requester, null, cow
         );
         saved.setId(999L);
 
@@ -158,11 +158,11 @@ class TransferRecordServiceImplTest {
 
     // ---------- Helper ----------
     private TransferRecord mockTransferRecord(long id) {
-        Department dept = new Department(DepartmentType.MILKING); dept.setId(10L);
+        Department dept = new Department(DepartmentType.MILKING, "Milking Dept"); dept.setId(10L);
         Cow cow = new Cow("A", LocalDate.now(), true, new Owner("Owie", "owie@email.com", "25648454", "Street 123", "password")); cow.setId(99L);
 
         TransferRecord r = new TransferRecord(
-                LocalDateTime.now(), dept, dept, dept,
+                LocalDateTime.now(), dept, dept,
                 new Owner("Owie", "owie@email.com", "25648454", "Street 123", "password"), null, cow
         );
         r.setId(id);
