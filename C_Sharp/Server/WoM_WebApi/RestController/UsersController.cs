@@ -88,7 +88,7 @@ public class UsersController : ControllerBase
     // CREATE user (OWNER ONLY)
     // -----------------------------
     [HttpPost]
-    [Authorize(Policy = "OwnerOnly")]
+    [Authorize(Policy = "WorkerOrOwner")]
     public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto dto)
     {
         // dto.Role is enum now
@@ -101,7 +101,7 @@ public class UsersController : ControllerBase
     // UPDATE user (OWNER ONLY)
     // -----------------------------
     [HttpPut("{id:long}")]
-    [Authorize(Policy = "OwnerOnly")]
+    [Authorize(Policy = "WorkerOrOwner")]
     public async Task<ActionResult<UserDto>> UpdateUser(long id, UpdateUserDto dto)
     {
         dto.Id = id;
