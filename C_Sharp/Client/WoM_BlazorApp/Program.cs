@@ -39,7 +39,12 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
-//TODO come back and uncomment this then gigure out what it does
+
+app.UseStatusCodePagesWithReExecute("/not-found");
+
+    //createScopeForErrors is neither a defined variable
+    //nor a valid named parameter for UseStatusCodePagesWithReExecute.
+//replaced with above
 //app.UseStatusCodePagesWithReExecute("/not-found", createScopeForErrors: true);
 
 app.UseHttpsRedirection();
