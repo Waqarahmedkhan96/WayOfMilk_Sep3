@@ -8,14 +8,8 @@ using WoM_WebApi.Configuration;         // JwtOptions class
 using WoM_WebApi.GlobalExceptionHandler;
 using WoM_WebApi.Services.Implementation;
 using WoM_WebApi.Services.Interfaces;
-
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Sep3.WayOfMilk.Grpc;
-using WoM_WebApi.GlobalExceptionHandler;
-using WoM_WebApi.Configuration;
+//removed double imports
+using WoM_WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -128,7 +122,15 @@ builder.Services.AddScoped<ICustomerService, GrpcCustomerServiceImpl>();  // cus
 builder.Services.AddScoped<ISaleService, GrpcSaleServiceImpl>();          // sales
 builder.Services.AddScoped<IDepartmentService, GrpcDepartmentServiceImpl>(); // departments
 builder.Services.AddScoped<ITransferRecordService, GrpcTransferRecordServiceImpl>(); // transfers
-builder.Services.AddScoped<IContainerService, GrpcContainerServiceImpl>();    // containers
+builder.Services.AddScoped<IContainerService, GrpcContainerServiceImpl>();
+builder.Services.AddScoped<ILogService, LogServiceImpl>();
+
+// ----------- LOGGER-related services -----------
+builder.Services.AddControllers(options =>
+{
+    // This adds the filter to every controller automatically
+    options.Filters.Add<SecurityAuditFilter>();
+});
 
 // ---------- Global exception middleware ----------
 builder.Services.AddTransient<GlobalExceptionHandlerMiddleware>();

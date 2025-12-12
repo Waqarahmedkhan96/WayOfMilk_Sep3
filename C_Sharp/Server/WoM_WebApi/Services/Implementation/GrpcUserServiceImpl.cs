@@ -2,6 +2,7 @@
 using ApiContracts;
 using Sep3.WayOfMilk.Grpc;
 using WoM_WebApi.GlobalExceptionHandler;
+using WoM_WebApi.Log;
 using WoM_WebApi.Mapping;
 using WoM_WebApi.Services.Interfaces;
 
@@ -22,14 +23,19 @@ public class GrpcUserServiceImpl : IUserService
     // -----------------------------
     public async Task<UserDto> CreateAsync(CreateUserDto dto)
     {
+        ActivityLog.Instance.Log("Create", "User trying to create new account", dto.Email);
         // DTO → gRPC
         var request = dto.ToCreationGrpc();
 
         var reply = await _client.AddUserAsync(request);
 
         if (reply == null || reply.Id == 0)
+        {
+            ActivityLog.Instance.Log("Create", "User creation failed", dto.Email);
             throw new ValidationException("Unable to create user.");
+        }
 
+        ActivityLog.Instance.Log("Create", "User created successfully", dto.Email);
         return reply.ToDto();
     }
 
@@ -38,6 +44,7 @@ public class GrpcUserServiceImpl : IUserService
     // -----------------------------
     public async Task<UserDto> GetByIdAsync(long id)
     {
+        //no logs needed (not really sensitive info)
         var reply = await _client.GetUserByIdAsync(new SentId { Id = id });
 
         if (reply == null || reply.Id == 0)
@@ -84,6 +91,7 @@ public class GrpcUserServiceImpl : IUserService
             current.LicenseNumber = dto.LicenseNumber;
 
         var reply = await _client.UpdateUserAsync(current);
+        ActivityLog.Instance.Log("Update", $"User {dto.Name} with id {dto.Id} updated successfully", dto.Name, dto.Id);
         return reply.ToDto();
     }
 
@@ -95,8 +103,12 @@ public class GrpcUserServiceImpl : IUserService
         var existing = await _client.GetUserByIdAsync(new SentId { Id = id });
 
         if (existing == null || existing.Id == 0)
+        {
+            ActivityLog.Instance.Log("Delete User Failed", $"User ID {id} not found", "", id);
             throw new NotFoundException($"User with id {id} not found.");
+        }
 
         await _client.DeleteUserAsync(new SentId { Id = id });
+        ActivityLog.Instance.Log("Delete User Successful", $"User {existing.Name} id {id} deleted successfully", existing.Name, id);
     }
 }

@@ -19,4 +19,8 @@ public interface ICowService
     // Deletes
     Task DeleteAsync(long id);
     Task DeleteBatchAsync(long[] ids);
+
+    //other methods
+    Task<IEnumerable<CowDto>> GetCowsByDepartmentAsync(long departmentId);
+    Task<IEnumerable<MilkDto>> GetMilkByCowIdAsync(long cowId);
 }
