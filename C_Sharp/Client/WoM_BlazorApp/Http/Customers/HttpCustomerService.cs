@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using ApiContracts.Customers;
+using ApiContracts;
 
 namespace WoM_BlazorApp.Http;
 

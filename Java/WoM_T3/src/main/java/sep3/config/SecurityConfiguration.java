@@ -5,8 +5,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import sep3.entity.Department;
+import sep3.entity.DepartmentType;
 import sep3.entity.user.Owner;
 import sep3.entity.user.UserRole;
+import sep3.repository.DepartmentRepository;
 import sep3.repository.UserRepository;
 
 @Configuration
@@ -52,4 +55,17 @@ public class SecurityConfiguration {
             }
         };
     }
+
+    @Bean
+    CommandLineRunner seedQuarantineDepartment(DepartmentRepository departmentRepository)
+    {
+      return args ->{
+        long departmentCount = departmentRepository.count();
+        if(departmentCount == 0)
+        {
+          departmentRepository.save(new Department(DepartmentType.QUARANTINE));
+          System.out.println(">>> Seeded default QUARANTINE department");
+        }
+    };
+  }
 }

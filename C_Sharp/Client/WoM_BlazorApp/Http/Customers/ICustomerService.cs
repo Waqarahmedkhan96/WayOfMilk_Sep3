@@ -1,4 +1,4 @@
-using ApiContracts.Customers;
+using ApiContracts;
 
 namespace WoM_BlazorApp.Http;
 

@@ -4,5 +4,5 @@ public enum DepartmentType
 {
   QUARANTINE,
   MILKING,
-  RESTING
+  RESTING;
 }
