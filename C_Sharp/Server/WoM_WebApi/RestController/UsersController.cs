@@ -61,7 +61,7 @@ public class UsersController : ControllerBase
     // -----------------------------
     // GET current user
     // -----------------------------
-    [HttpGet( Name = "GetCurrentUser")]
+    [HttpGet("current-user", Name = "GetCurrentUser")]
     [Authorize]
     public async Task<ActionResult<UserDto>> GetCurrentUser()
     {
@@ -77,7 +77,7 @@ public class UsersController : ControllerBase
     // -----------------------------
     // GET all users (OWNER ONLY)
     // -----------------------------
-    [HttpGet(Name = "GetAllUsers")]
+    [HttpGet("all-users",Name = "GetAllUsers")]
     [Authorize(Policy = "OwnerOnly")]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
     {

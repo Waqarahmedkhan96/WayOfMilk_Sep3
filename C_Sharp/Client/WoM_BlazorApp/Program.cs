@@ -1,3 +1,4 @@
+using WoM_BlazorApp;
 using Microsoft.AspNetCore.Components.Authorization;
 using WoM_BlazorApp.Components;
 using WoM_BlazorApp.Services.Interfaces;
@@ -38,8 +39,8 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
-
-app.UseStatusCodePagesWithReExecute("/not-found", createScopeForErrors: true);
+//TODO come back and uncomment this then gigure out what it does
+//app.UseStatusCodePagesWithReExecute("/not-found", createScopeForErrors: true);
 
 app.UseHttpsRedirection();
 app.UseAntiforgery();

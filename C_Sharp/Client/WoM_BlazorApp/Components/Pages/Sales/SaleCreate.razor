@@ -1,7 +1,7 @@
 @page "/sales/create"
 @rendermode InteractiveServer
 
-@using ApiContracts.Sales
+@using ApiContracts
 @using WoM_BlazorApp.Http
 @inject ISaleService SaleService
 @inject NavigationManager Nav
@@ -46,9 +46,9 @@
 </button>
 
 @code {
-    private DateOnly dateOnly = DateOnly.FromDateTime(DateTime.Today);
+    private DateTime dateOnly = DateTime.Today;
     private double quantityL;
-    private decimal price;
+    private double price;
     private int customerId;
     private int createdByUserId;
     private string? error;
@@ -58,9 +58,9 @@
         error = null;
         try
         {
-            var dto = new CreateSaleDto
+            var dto = new CreateSaleDto()
             {
-                DateOnly = dateOnly,
+                DateTime = dateOnly,
                 QuantityL = quantityL,
                 Price = price,
                 CustomerId = customerId,

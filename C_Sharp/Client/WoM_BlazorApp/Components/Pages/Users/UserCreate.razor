@@ -2,8 +2,7 @@
 @rendermode InteractiveServer
 
 @using System
-@using ApiContracts.Users
-@using Entities
+@using ApiContracts
 @using WoM_BlazorApp.Http
 @inject IUserService UserService
 @inject NavigationManager Nav
@@ -43,20 +42,29 @@
 
 @code {
     private string name = "";
+    private string email = "";
     private string password = "";
+    private string phone = "";
+    private string address = "";
     private UserRole role;
+    private string licenseNumber;
     private string? error;
+
 
     private async Task CreateAsync()
     {
         error = null;
         try
         {
-            var dto = new CreateUserDto
+            var dto = new CreateUserDto()
             {
                 Name = name,
+                Email = email,
+                Phone =phone,
                 Password = password,
-                Role = role
+                Role = role,
+                Address = address,
+                LicenseNumber = licenseNumber
             };
 
             await UserService.CreateAsync(dto);

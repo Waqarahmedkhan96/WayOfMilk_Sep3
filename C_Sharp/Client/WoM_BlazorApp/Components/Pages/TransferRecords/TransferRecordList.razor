@@ -1,7 +1,7 @@
 @page "/transfer-records"
 @rendermode InteractiveServer
 
-@using ApiContracts.TransferRecords
+@using ApiContracts
 @using WoM_BlazorApp.Http
 @inject WoM_BlazorApp.Http.ITransferRecordService TransferRecordService
 @inject NavigationManager Nav
@@ -49,11 +49,11 @@ else
                 <td>@transferRecord.Id</td>
                 <td>@transferRecord.CowId</td>
                 <td>@transferRecord.MovedAt</td>
-                <td>@transferRecord.FromDept</td>
-                <td>@transferRecord.ToDept</td>
+                <td>@transferRecord.FromDepartmentId</td>
+                <td>@transferRecord.ToDepartmentId</td>
                 <td>@transferRecord.RequestedByUserId</td>
                 <td>@transferRecord.ApprovedByVetUserId</td>
-                <td>@transferRecord.Department</td>
+                <td>@transferRecord.DepartmentId</td>
                 <td>
                     <button class="btn btn-sm btn-danger"
                             @onclick="() => DeleteAsync(transferRecord.Id)">
@@ -87,7 +87,7 @@ else
         }
     }
 
-    private async Task DeleteAsync(int id)
+    private async Task DeleteAsync(long id)
     {
         error = null;
         try

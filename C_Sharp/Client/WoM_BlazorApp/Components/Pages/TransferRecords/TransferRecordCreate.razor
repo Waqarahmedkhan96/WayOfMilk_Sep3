@@ -1,8 +1,7 @@
 @page "/transfer-records/create"
 @rendermode InteractiveServer
 
-@using ApiContracts.TransferRecords
-@using Entities
+@using ApiContracts
 @using WoM_BlazorApp.Http
 @inject ITransferRecordService TransferRecordService
 @inject NavigationManager Nav
@@ -18,13 +17,13 @@
 
 <div class="mb-3">
     <label class="form-label">Move Date</label>
-    <InputDate @bind-Value="moveDate" TValue="DateOnly" class="form-control" />
+    <InputDate @bind-Value="moveDate" TValue="DateTime" class="form-control" />
 </div>
 
 <div class="mb-3">
     <label class="form-label">From Department</label>
     <InputSelect @bind-Value="fromDept" class="form-control">
-        @foreach (var deptName in Enum.GetNames(typeof(Department)))
+        @foreach (var deptName in Enum.GetNames(typeof(DepartmentType)))
         {
             <option value="@deptName">@deptName</option>
         }
@@ -34,7 +33,7 @@
 <div class="mb-3">
     <label class="form-label">To Department</label>
     <InputSelect @bind-Value="toDept" class="form-control">
-        @foreach (var deptName in Enum.GetNames(typeof(Department)))
+        @foreach (var deptName in Enum.GetNames(typeof(DepartmentType)))
         {
             <option value="@deptName">@deptName</option>
         }
@@ -58,9 +57,9 @@
 
 @code {
     private int cowId;
-    private DateOnly moveDate = DateOnly.FromDateTime(DateTime.Today);
-    private string fromDept = Department.Milking.ToString();
-    private string toDept = Department.Resting.ToString();
+    private DateTime moveDate = DateTime.Today;
+    private long fromDept;
+    private long toDept;
     private int requestedByUserId;
     private string? error;
 
@@ -73,8 +72,8 @@
             {
                 CowId = cowId,
                 MovedAt = moveDate,
-                FromDept = Enum.Parse<Department>(fromDept),
-                ToDept = Enum.Parse<Department>(toDept),
+                FromDepartmentId = fromDept,
+                ToDepartmentId = toDept,
                 RequestedByUserId = requestedByUserId
             };
 

@@ -1,4 +1,4 @@
-using ApiContracts.Users;
+using ApiContracts;
 
 namespace WoM_BlazorApp.Http;
 
@@ -8,5 +8,5 @@ public interface IUserService
     Task<UserDto> GetByIdAsync(int id);
     Task<UserDto> CreateAsync(CreateUserDto dto);
     Task UpdateAsync(int id, UpdateUserDto dto);
-    Task DeleteAsync(int id);
+    Task DeleteAsync(long id);
 }

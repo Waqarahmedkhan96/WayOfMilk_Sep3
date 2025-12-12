@@ -1,7 +1,7 @@
 @page "/sales"
 @rendermode InteractiveServer
 
-@using ApiContracts.Sales
+@using ApiContracts
 @using WoM_BlazorApp.Http
 @inject WoM_BlazorApp.Http.ISaleService SaleService
 @inject NavigationManager Nav
@@ -46,7 +46,7 @@ else
         {
             <tr>
                 <td>@sale.Id</td>
-                <td>@sale.DateOnly</td>
+                <td>@sale.DateTime</td>
                 <td>@sale.QuantityL</td>
                 <td>@sale.Price</td>
                 <td>@sale.CustomerId</td>
@@ -85,7 +85,7 @@ else
         }
     }
 
-    private async Task DeleteAsync(int id)
+    private async Task DeleteAsync(long id)
     {
         error = null;
         try

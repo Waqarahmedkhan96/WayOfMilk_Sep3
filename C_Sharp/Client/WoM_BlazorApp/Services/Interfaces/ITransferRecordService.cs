@@ -1,4 +1,4 @@
-using ApiContracts.TransferRecords;
+using ApiContracts;
 
 namespace WoM_BlazorApp.Http;
 
@@ -8,5 +8,5 @@ public interface ITransferRecordService
     Task<TransferRecordDto> GetByIdAsync(int id);
     Task<TransferRecordDto> CreateAsync(CreateTransferRecordDto dto);
     Task UpdateAsync(int id, UpdateTransferRecordDto dto);
-    Task DeleteAsync(int id);
+    Task DeleteAsync(long id);
 }
