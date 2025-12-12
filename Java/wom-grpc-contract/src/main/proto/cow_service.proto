@@ -50,7 +50,7 @@ message CowData {
   // date format: "YYYY-MM-DD"
   optional string birthDate = 3;
   optional bool isHealthy = 4;
-  optional int64 departmentId = 5; //TODO: consider whether it should be a translated string instead of an id
+  optional int64 departmentId = 5;
 }
 
 message CowIdRequest {

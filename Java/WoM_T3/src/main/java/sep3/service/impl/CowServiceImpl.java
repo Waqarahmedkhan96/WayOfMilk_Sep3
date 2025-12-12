@@ -135,7 +135,9 @@ import java.util.List;
       if (requester instanceof Vet) {
         cowToUpdate.setHealthy(true);
       } else {
-        throw new RuntimeException("Only a veterinarian can mark a cow as healthy.");
+        //throw new RuntimeException("Only a veterinarian can mark a cow as healthy.");
+        //soft denial: leave the field as is
+        System.out.println("WARNING: User " + userId + " tried to mark a cow as healthy, but is not a vet.");
       }
     } else {
       // anyone (including vets) can mark a cow as not healthy

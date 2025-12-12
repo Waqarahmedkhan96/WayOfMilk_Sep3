@@ -89,12 +89,10 @@ public final class CowMapper
     }
 
     // boolean is no longer a primitive so null checks can be made
-    //this will be set only after user check, handled in service
-      /*
-        if (dto.isHealthy() != null)
-        {
-          entityToUpdate.setHealthy(dto.isHealthy());
-        }
-       */
+    //this is now handled in the service layer, after the user is checked for role
+//        if (dto.isHealthy() != null)
+//        {
+//          entityToUpdate.setHealthy(dto.isHealthy());
+//        }
   }
 }
