@@ -1,6 +1,8 @@
 syntax = "proto3";
 
 import "repeatingMessageTypes.proto";
+import "cow_service.proto";
+import "transferRecord_service.proto";
 
 option java_package = "sep3.wayofmilk.grpc";
 option java_multiple_files = true;
@@ -47,5 +49,7 @@ service DepartmentService {
   rpc GetDepartmentByName (DepartmentNameRequest) returns (DepartmentData);
   rpc UpdateDepartment (DepartmentData) returns (DepartmentData);
   rpc DeleteDepartment (DepartmentIdRequest) returns (Empty);
+  rpc GetCowsByDepartment(DepartmentIdRequest) returns (CowList);
+  rpc GetTransferRecordsByDepartment(DepartmentIdRequest) returns (TransferRecordList);
 
 }

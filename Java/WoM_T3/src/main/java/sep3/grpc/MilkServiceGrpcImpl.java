@@ -1,22 +1,14 @@
 package sep3.grpc;
 
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 import sep3.dto.MilkDtos;
 import sep3.service.interfaces.IMilkService;
 
-// from repeatingMessageTypes.proto
-import sep3.wayofmilk.grpc.Empty;
-import sep3.wayofmilk.grpc.SentId;
+import sep3.wayofmilk.grpc.*;
 
-// from milk_service.proto
-import sep3.wayofmilk.grpc.MilkByContainerQuery;
-import sep3.wayofmilk.grpc.MilkListReply;
-import sep3.wayofmilk.grpc.MilkMessage;
-import sep3.wayofmilk.grpc.MilkServiceGrpc;
-import sep3.wayofmilk.grpc.CreateMilkRequest;
-import sep3.wayofmilk.grpc.UpdateMilkRequest;
-import sep3.wayofmilk.grpc.MilkTestResultEnum;
+import java.time.LocalDate;
 
 @GrpcService
 public class MilkServiceGrpcImpl extends MilkServiceGrpc.MilkServiceImplBase {
@@ -27,96 +19,119 @@ public class MilkServiceGrpcImpl extends MilkServiceGrpc.MilkServiceImplBase {
         this.milkService = milkService;
     }
 
-    // CREATE
+    // ---------- CREATE ----------
     @Override
     public void createMilk(CreateMilkRequest request,
                            StreamObserver<MilkMessage> responseObserver) {
 
-        MilkDtos.CreateMilkDto dto = new MilkDtos.CreateMilkDto();
-        dto.setCowId(request.getCowId());
-        dto.setContainerId(request.getContainerId());
-        dto.setRegisteredByUserId(request.getRegisteredByUserId());
+        try {
+            MilkDtos.CreateMilkDto dto = new MilkDtos.CreateMilkDto();
+            dto.setCowId(request.getCowId());
+            dto.setContainerId(request.getContainerId());
+            dto.setRegisteredByUserId(request.getRegisteredByUserId());
+            if (!request.getDate().isEmpty())
+                dto.setDate(LocalDate.parse(request.getDate()));
 
-        // date: if empty string, let service / mapper default to today
-        if (!request.getDate().isEmpty()) {
-            dto.setDate(java.time.LocalDate.parse(request.getDate()));
+            dto.setVolumeL(request.getVolumeL());
+            dto.setTestResult(mapToDomainEnum(request.getTestResult()));
+
+            MilkMessage reply = toGrpc(milkService.create(dto));
+
+            responseObserver.onNext(reply);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseObserver.onError(
+                    Status.INTERNAL.withDescription("Create failed: " + e.getMessage())
+                            .withCause(e)
+                            .asRuntimeException()
+            );
         }
-
-        dto.setVolumeL(request.getVolumeL());
-        dto.setTestResult(mapToDomainEnum(request.getTestResult()));
-
-        MilkDtos.MilkDto created = milkService.create(dto);
-
-        MilkMessage reply = toGrpc(created);
-        responseObserver.onNext(reply);
-        responseObserver.onCompleted();
     }
 
-    // UPDATE
+    // ---------- UPDATE ----------
     @Override
     public void updateMilk(UpdateMilkRequest request,
                            StreamObserver<MilkMessage> responseObserver) {
 
         MilkDtos.UpdateMilkDto dto = new MilkDtos.UpdateMilkDto();
+
         dto.setId(request.getId());
-
-        // containerId: treat 0 as "no change" if that's how your DTO works
-        if (request.getContainerId() != 0) {
+        if (request.getContainerId() != 0)
             dto.setContainerId(request.getContainerId());
-        }
 
-        if (!request.getDate().isEmpty()) {
-            dto.setDate(java.time.LocalDate.parse(request.getDate()));
-        }
+        if (!request.getDate().isEmpty())
+            dto.setDate(LocalDate.parse(request.getDate()));
 
         dto.setVolumeL(request.getVolumeL());
         dto.setTestResult(mapToDomainEnum(request.getTestResult()));
 
-        MilkDtos.MilkDto updated = milkService.update(dto);
+        MilkMessage reply = toGrpc(milkService.update(dto));
 
-        MilkMessage reply = toGrpc(updated);
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
-    // DELETE
+    // ---------- APPROVE STORAGE ----------
+    @Override
+    public void approveMilkStorage(ApproveMilkStorageRequest request,
+                                   StreamObserver<MilkMessage> responseObserver) {
+
+        try {
+            MilkDtos.ApproveMilkStorageDto dto = new MilkDtos.ApproveMilkStorageDto();
+            dto.setId(request.getMilkId());
+            dto.setApprovedByUserId(request.getApprovedByUserId());
+            dto.setApprovedForStorage(request.getApprovedForStorage());
+
+            MilkMessage reply = toGrpc(milkService.approveForStorage(dto));
+            responseObserver.onNext(reply);
+            responseObserver.onCompleted();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseObserver.onError(
+                    Status.INTERNAL.withDescription("Approve failed: " + e.getMessage())
+                            .withCause(e)
+                            .asRuntimeException()
+            );
+        }
+    }
+
+    // ---------- DELETE ----------
     @Override
     public void deleteMilk(SentId request,
                            StreamObserver<Empty> responseObserver) {
 
         milkService.delete(request.getId());
-
         responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
     }
 
-    // GET ONE
+    // ---------- GET ----------
     @Override
     public void getMilk(SentId request,
                         StreamObserver<MilkMessage> responseObserver) {
 
-        MilkDtos.MilkDto dto = milkService.get(request.getId());
-
-        MilkMessage reply = toGrpc(dto);
+        MilkMessage reply = toGrpc(milkService.get(request.getId()));
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
 
-    // GET ALL
+    // ---------- GET ALL ----------
     @Override
     public void getAllMilk(Empty request,
                            StreamObserver<MilkListReply> responseObserver) {
 
-        MilkDtos.MilkListDto listDto = milkService.getAll();
-
         MilkListReply.Builder builder = MilkListReply.newBuilder();
-        listDto.getMilkRecords().forEach(m -> builder.addMilk(toGrpc(m)));
+        milkService.getAll()
+                .getMilkRecords()
+                .forEach(m -> builder.addMilk(toGrpc(m)));
 
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
 
-    // GET BY CONTAINER
+    // ---------- GET BY CONTAINER ----------
     @Override
     public void getMilkByContainer(MilkByContainerQuery request,
                                    StreamObserver<MilkListReply> responseObserver) {
@@ -124,49 +139,46 @@ public class MilkServiceGrpcImpl extends MilkServiceGrpc.MilkServiceImplBase {
         MilkDtos.MilkByContainerQuery dto = new MilkDtos.MilkByContainerQuery();
         dto.setContainerId(request.getContainerId());
 
-        MilkDtos.MilkListDto listDto = milkService.getByContainer(dto);
-
         MilkListReply.Builder builder = MilkListReply.newBuilder();
-        listDto.getMilkRecords().forEach(m -> builder.addMilk(toGrpc(m)));
+        milkService.getByContainer(dto)
+                .getMilkRecords()
+                .forEach(m -> builder.addMilk(toGrpc(m)));
 
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
 
-    // Helper: map internal DTO -> gRPC message
+    // ---------- MAPPING ----------
     private MilkMessage toGrpc(MilkDtos.MilkDto dto) {
         MilkMessage.Builder builder = MilkMessage.newBuilder()
                 .setId(dto.getId())
                 .setCowId(dto.getCowId())
                 .setContainerId(dto.getContainerId())
                 .setVolumeL(dto.getVolumeL())
-                .setTestResult(mapFromDomainEnum(dto.getTestResult()));
+                .setTestResult(mapFromDomainEnum(dto.getTestResult()))
+                .setApprovedForStorage(dto.isApprovedForStorage());
 
-        // MilkDto has no registeredByUserId, so we leave it as default 0
-
-        if (dto.getDate() != null) {
-            builder.setDate(dto.getDate().toString()); // yyyy-MM-dd
-        }
+        if (dto.getDate() != null)
+            builder.setDate(dto.getDate().toString());
 
         return builder.build();
     }
 
-    // Map gRPC enum -> domain enum (MilkTestResult)
     private sep3.entity.MilkTestResult mapToDomainEnum(MilkTestResultEnum grpcEnum) {
         return switch (grpcEnum) {
             case MILK_TEST_PASS -> sep3.entity.MilkTestResult.PASS;
             case MILK_TEST_FAIL -> sep3.entity.MilkTestResult.FAIL;
-            case MILK_TEST_UNKNOWN, UNRECOGNIZED -> sep3.entity.MilkTestResult.UNKNOWN;
+            default -> sep3.entity.MilkTestResult.UNKNOWN;
         };
     }
 
-    // Map domain enum -> gRPC enum
-    private MilkTestResultEnum mapFromDomainEnum(sep3.entity.MilkTestResult domainEnum) {
-        if (domainEnum == null) return MilkTestResultEnum.MILK_TEST_UNKNOWN;
-        return switch (domainEnum) {
+    private MilkTestResultEnum mapFromDomainEnum(sep3.entity.MilkTestResult domain) {
+        if (domain == null) return MilkTestResultEnum.MILK_TEST_UNKNOWN;
+
+        return switch (domain) {
             case PASS -> MilkTestResultEnum.MILK_TEST_PASS;
             case FAIL -> MilkTestResultEnum.MILK_TEST_FAIL;
-            case UNKNOWN -> MilkTestResultEnum.MILK_TEST_UNKNOWN;
+            default -> MilkTestResultEnum.MILK_TEST_UNKNOWN;
         };
     }
 }

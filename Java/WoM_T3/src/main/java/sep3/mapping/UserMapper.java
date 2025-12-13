@@ -4,94 +4,101 @@ import sep3.dto.userDTO.UserCreationDTO;
 import sep3.dto.userDTO.UserDataDTO;
 import sep3.entity.user.*;
 
+/**
+ * UserMapper
+ * Converts between DTOs and User entities.
+ * Works with polymorphic classes: Owner, Worker, Vet.
+ */
 public class UserMapper
 {
 
-  // DTO -> Entity (For Registration)
-  public static User toEntity(UserCreationDTO dto)
-  {
-    // Normalize the role string (handle "vet", "VET", "Vet")
-    String roleString = dto.getRole() != null ? dto.getRole().toUpperCase() : "";
-
-    UserRole roleEnum;
-    try
+    // ---------------------------------------------------------------------------
+    // DTO → ENTITY (For Registration)
+    // ---------------------------------------------------------------------------
+    public static User toEntity(UserCreationDTO dto)
     {
-      roleEnum = UserRole.valueOf(roleString);
-    }
-    catch (IllegalArgumentException e)
-    {
-      // enforcing a role (error if no role is provided)
-      throw new RuntimeException("Invalid or missing User Role: " + dto.getRole());
-    }
+        // Normalize incoming role (UI may send worker, WORKER, Worker)
+        String roleString = dto.getRole() != null ? dto.getRole().toUpperCase() : "";
 
-    switch (roleEnum)
-    {
-      case VET:
-        return new Vet(dto.getName(), dto.getEmail(), dto.getPhone(),
-            dto.getAddress(), dto.getPassword(), dto.getLicenseNumber());
+        UserRole roleEnum;
+        try {
+            roleEnum = UserRole.valueOf(roleString);
+        }
+        catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid or missing User Role: " + dto.getRole());
+        }
 
-      case OWNER:
-        return new Owner(dto.getName(), dto.getEmail(), dto.getPhone(),
-            dto.getAddress(), dto.getPassword());
+        switch (roleEnum) {
+            case VET:
+                return new Vet(
+                        dto.getName(), dto.getEmail(), dto.getPhone(),
+                        dto.getAddress(), dto.getPassword(), dto.getLicenseNumber()
+                );
 
-      case WORKER:
-        return new Worker(dto.getName(), dto.getEmail(), dto.getPhone(),
-            dto.getAddress(), dto.getPassword());
+            case OWNER:
+                return new Owner(
+                        dto.getName(), dto.getEmail(), dto.getPhone(),
+                        dto.getAddress(), dto.getPassword()
+                );
 
-      default:
-        throw new RuntimeException("Role logic not implemented for: " + roleEnum);
-    }
-
-  }
-
-  //DTO -> Entity for updating
-  public static User updateEntity(UserDataDTO dto, User userToUpdate)
-  {
-    if (dto.getName() != null && !dto.getName().isBlank())
-    {
-      userToUpdate.setName(dto.getName());
-    }
-    if (dto.getEmail() != null && !dto.getEmail().isBlank())
-    {
-      userToUpdate.setEmail(dto.getEmail());
-    }
-    if (dto.getPhone() != null && !dto.getPhone().isBlank())
-    {
-      userToUpdate.setPhone(dto.getPhone());
-    }
-    if (dto.getAddress() != null && !dto.getAddress().isBlank())
-    {
-      userToUpdate.setAddress(dto.getAddress());
+            case WORKER:
+            default:
+                return new Worker(
+                        dto.getName(), dto.getEmail(), dto.getPhone(),
+                        dto.getAddress(), dto.getPassword()
+                );
+        }
     }
 
-    // Polymorphism check for Vet License
-    if (dto.getLicenseNumber() != null && !dto.getLicenseNumber().isBlank())
+    // ---------------------------------------------------------------------------
+    // DTO → ENTITY (For Updating)
+    // Only applies basic updates (name, email, phone, address)
+    // Polymorphic fields (Vet license) handled inside updateUser()
+    // ---------------------------------------------------------------------------
+    public static User updateEntity(UserDataDTO dto, User userToUpdate)
     {
-      if (userToUpdate instanceof Vet)
-      {
-        ((Vet) userToUpdate).setLicenseNumber(dto.getLicenseNumber());
-      }
+        if (dto.getName() != null && !dto.getName().isBlank())
+            userToUpdate.setName(dto.getName());
+
+        if (dto.getEmail() != null && !dto.getEmail().isBlank())
+            userToUpdate.setEmail(dto.getEmail());
+
+        if (dto.getPhone() != null && !dto.getPhone().isBlank())
+            userToUpdate.setPhone(dto.getPhone());
+
+        if (dto.getAddress() != null && !dto.getAddress().isBlank())
+            userToUpdate.setAddress(dto.getAddress());
+
+        // VET license update (only works if entity is Vet)
+        if (dto.getLicenseNumber() != null && !dto.getLicenseNumber().isBlank()) {
+            if (userToUpdate instanceof Vet vet) {
+                vet.setLicenseNumber(dto.getLicenseNumber());
+            }
+        }
+
+        return userToUpdate;
     }
 
-    return userToUpdate;
-  }
-
-  // Entity -> DTO (For Viewing Users)
-  public static UserDataDTO toDTO(User user)
-  {
-    String licenseNumber = null;
-
-    // check if user is a vet
-    if (user instanceof Vet)
+    // ---------------------------------------------------------------------------
+    // ENTITY → DTO (For Viewing Users)
+    // Includes licenseNumber only if user is Vet
+    // ---------------------------------------------------------------------------
+    public static UserDataDTO toDTO(User user)
     {
-      licenseNumber = ((Vet) user).getLicenseNumber();
+        String licenseNumber = null;
+
+        if (user instanceof Vet vet) {
+            licenseNumber = vet.getLicenseNumber();
+        }
+
+        return new UserDataDTO(
+                user.getName(),
+                user.getEmail(),
+                user.getAddress(),
+                user.getPhone(),
+                user.getId(),
+                user.getRole().toString(),   // OWNER, WORKER, VET
+                licenseNumber                // null for non-VET users
+        );
     }
-
-    return new UserDataDTO(user.getName(), user.getEmail(), user.getAddress(),
-        user.getPhone(), user.getId(), user.getRole().toString(), licenseNumber
-        // Will be null for Owners and Workers
-    );
-  }
-
-
 }

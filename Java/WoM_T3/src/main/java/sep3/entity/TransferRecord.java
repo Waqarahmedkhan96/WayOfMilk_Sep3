@@ -16,9 +16,11 @@ public class TransferRecord
     private LocalDateTime movedAt;
 
     @ManyToOne
+    @JoinColumn(name = "from_department_id")
     private Department fromDept;
 
     @ManyToOne
+    @JoinColumn(name = "to_department_id")
     private Department toDept;
 
     @ManyToOne
@@ -28,6 +30,7 @@ public class TransferRecord
     private User approvedByVet;
 
     @ManyToOne
+    @JoinColumn(name = "cow_id")
     private Cow cow;
 
     protected TransferRecord() {}

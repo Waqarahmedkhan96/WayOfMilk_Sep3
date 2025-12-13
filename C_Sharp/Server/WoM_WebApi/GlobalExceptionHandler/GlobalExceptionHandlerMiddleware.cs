@@ -1,37 +1,35 @@
-using System.Net;
-using System.Text.Json;
+// File: Server/WoM_WebApi/GlobalExceptionHandler/GlobalExceptionHandlerMiddleware.cs
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using RepositoryContracts.ExceptionHandling; 
 
-namespace WebAPI.GlobalExceptionHandler;
+namespace WoM_WebApi.GlobalExceptionHandler;
 
+// Middleware: catch all exceptions
 public class GlobalExceptionHandlerMiddleware : IMiddleware
 {
-    // Handles all exceptions in one place for the entire app
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         try
         {
-            await next(context); // run next middleware or controller
+            // go to next middleware / controller
+            await next(context);
         }
         catch (NotFoundException ex)
         {
-            Console.WriteLine(ex); // log error
-            context.Response.StatusCode = StatusCodes.Status404NotFound; // 404 if not found
-            await context.Response.WriteAsync(ex.Message); // send message to client
+            Console.WriteLine(ex);
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            await context.Response.WriteAsync(ex.Message);
         }
         catch (ValidationException ex)
         {
-            Console.WriteLine(ex); // log error
-            context.Response.StatusCode = StatusCodes.Status400BadRequest; // 400 if bad input
-            await context.Response.WriteAsync(ex.Message); // send message to client
+            Console.WriteLine(ex);
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsync(ex.Message);
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex); // log unexpected error
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError; // 500 for server errors
-            await context.Response.WriteAsync(ex.Message); // send message to client
+            Console.WriteLine(ex);
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsync("An unexpected error occurred.");
         }
     }
 }

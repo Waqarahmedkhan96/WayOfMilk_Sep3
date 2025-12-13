@@ -1,24 +1,27 @@
+using System;
+
 namespace ApiContracts;
 
-// Must match Java/Proto names & meaning
+// Enum: user role (JWT)
 public enum UserRole
 {
-    Owner = 0,
-    Worker = 1,
-    Vet = 2
+    Owner = 0,   // Java: OWNER
+    Worker = 1,  // Java: WORKER
+    Vet = 2      // Java: VET
 }
 
-
+// Enum: department type
 public enum DepartmentType
 {
-    Resting = 0,
-    Milking = 1,
-    Quarantine = 2
+    Resting = 0,    // Java: RESTING
+    Milking = 1,    // Java: MILKING
+    Quarantine = 2  // Java: QUARANTINE
 }
 
+// Enum: milk test result
 public enum MilkTestResult
 {
-    Unknown = 0,
-    Pass = 1,
-    Fail = 2
+    Unknown = 0, // Java: UNKNOWN
+    Pass = 1,    // Java: PASS
+    Fail = 2     // Java: FAIL
 }

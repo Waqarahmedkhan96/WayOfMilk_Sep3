@@ -26,6 +26,7 @@ public class ContainerMapper {
         ContainerDtos.ContainerDto dto = new ContainerDtos.ContainerDto();
         dto.setId(c.getId());
         dto.setCapacityL(c.getCapacityL());
+        dto.setOccupiedCapacityL(c.getOccupiedCapacityL()); // map occupied
         return dto;
     }
 

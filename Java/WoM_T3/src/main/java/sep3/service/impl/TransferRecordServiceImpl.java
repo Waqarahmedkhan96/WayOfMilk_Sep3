@@ -68,7 +68,7 @@ public class TransferRecordServiceImpl implements ITransferRecordService
 
         LocalDateTime movedAt = dto.getMovedAt() != null ? dto.getMovedAt() : LocalDateTime.now();
 
-        // Uproszczenie: we treat department as the target department
+        //  we treat department as the target department
         TransferRecord entity = new TransferRecord(
                 movedAt,
                 fromDept,

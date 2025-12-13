@@ -1,37 +1,42 @@
-namespace ApiContracts.Container;
+using System;
+using System.Collections.Generic;
 
-// Create
+namespace ApiContracts;
+
+// DTO: create container
 public class CreateContainerDto
 {
     public double CapacityL { get; set; }
 }
 
-// Read
+// DTO: single container
 public class ContainerDto
+{
+    public long Id { get; set; }
+    public double CapacityL { get; set; }
+    public double OccupiedCapacityL { get; set; } // current volume
+}
+
+// DTO: update container
+public class UpdateContainerDto
 {
     public long Id { get; set; }
     public double CapacityL { get; set; }
 }
 
-// Update
-public class UpdateContainerDto
-{
-    public double CapacityL { get; set; }
-}
-
-// Delete (batch)
+// DTO: delete containers batch
 public class DeleteContainersDto
 {
     public required long[] Ids { get; set; }
 }
 
-// List
+// DTO: list of containers
 public class ContainerListDto
 {
     public List<ContainerDto> Containers { get; set; } = new();
 }
 
-// Query
+// DTO: container filters
 public class ContainerQueryParameters
 {
     public double? MinCapacityL { get; set; }

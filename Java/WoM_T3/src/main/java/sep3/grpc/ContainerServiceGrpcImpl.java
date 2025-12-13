@@ -103,6 +103,7 @@ public class ContainerServiceGrpcImpl extends ContainerServiceGrpc.ContainerServ
         return ContainerMessage.newBuilder()
                 .setId(dto.getId())
                 .setCapacityL(dto.getCapacityL())
+                .setOccupiedCapacityL(dto.getOccupiedCapacityL()) // send occupied
                 .build();
     }
 }

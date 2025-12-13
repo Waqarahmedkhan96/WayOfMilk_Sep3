@@ -52,6 +52,11 @@ public class SaleServiceImpl implements ISaleService
                     "customerId, containerId, quantityL, price and createdByUserId are required.");
         }
 
+        // validate quantity
+        if (dto.getQuantityL() <= 0) {
+            throw new IllegalArgumentException("quantityL must be positive.");
+        }
+
         Customer customer = customerDAO.findById(dto.getCustomerId())
                 .orElseThrow(() ->
                         new EntityNotFoundException("Customer not found with id: " + dto.getCustomerId()));
@@ -63,6 +68,12 @@ public class SaleServiceImpl implements ISaleService
         User createdBy = userDAO.findById(dto.getCreatedByUserId())
                 .orElseThrow(() ->
                         new EntityNotFoundException("User not found with id: " + dto.getCreatedByUserId()));
+
+        // check container stock
+        if (container.getOccupiedCapacityL() < dto.getQuantityL()) {
+            throw new IllegalArgumentException(
+                    "Container " + container.getId() + " does not have enough milk for this sale.");
+        }
 
         LocalDateTime dateTime = (dto.getDateTime() != null)
                 ? dto.getDateTime()
@@ -78,6 +89,9 @@ public class SaleServiceImpl implements ISaleService
         sale.setDateTime(dateTime);
         sale.setRecallCase(recallCase);
         sale.setCreatedBy(createdBy);
+
+        container.removeMilk(dto.getQuantityL()); // decrease container stock
+        containerDAO.save(container);             // save container change
 
         Sale saved = saleDAO.save(sale);
 

@@ -11,7 +11,7 @@ import jakarta.persistence.Entity;
 public class Owner extends User
 {
 
-  protected Owner()
+  public Owner()
   {
     super();
   }

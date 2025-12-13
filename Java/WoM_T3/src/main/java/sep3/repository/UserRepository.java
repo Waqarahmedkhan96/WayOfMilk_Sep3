@@ -24,4 +24,7 @@ import java.util.Optional;
 
   //Find user(s) by name
   List<User> findByNameContainingIgnoreCase(String name);
+
+    // NEW: count users by role (used to see if an OWNER exists)
+    long countByRole(UserRole role);
 }
