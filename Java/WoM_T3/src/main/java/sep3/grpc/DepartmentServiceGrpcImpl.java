@@ -180,7 +180,7 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
             responseObserver.onNext(b.build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            e.printStackTrace(); // <-- DODAJ TO
+            e.printStackTrace();
             responseObserver.onError(e);
         }
     }
@@ -198,7 +198,7 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
             responseObserver.onNext(b.build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            e.printStackTrace(); // <-- I TO
+            e.printStackTrace();
             responseObserver.onError(e);
         }
     }
