@@ -21,7 +21,8 @@ builder.Services.AddAuthorizationCore();
 
 // auth state provider (your SimpleAuthProvider from other project)
 // make sure namespace + ctor match
-builder.Services.AddScoped<AuthenticationStateProvider, SimpleAuthProvider>();
+builder.Services.AddScoped<SimpleAuthProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(p => p.GetRequiredService<SimpleAuthProvider>());
 
 // token store
 builder.Services.AddScoped<ITokenService, TokenServiceImpl>();

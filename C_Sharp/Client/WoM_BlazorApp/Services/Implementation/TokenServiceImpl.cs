@@ -6,7 +6,5 @@ namespace WoM_BlazorApp.Services.Implementation;
 public class TokenServiceImpl : ITokenService
 {
     public string? JwtToken { get; set; }
-    //Ana’s login code (SimpleAuthProvider) will, after successful /auth/login, just do:
 
-//_tokenService.JwtToken = loginResponse.Token;
 }

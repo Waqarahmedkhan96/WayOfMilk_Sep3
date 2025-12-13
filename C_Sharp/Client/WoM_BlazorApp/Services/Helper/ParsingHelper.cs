@@ -13,21 +13,15 @@ public static class ParsingHelper
 
         var claims = new List<Claim>();
 
-        if (keyValuePairs == null) return claims;
-
-        foreach (var kvp in keyValuePairs)
+        if (keyValuePairs != null)
         {
-            // Handle array claims (like roles)
-            if (kvp.Value is JsonElement element && element.ValueKind == JsonValueKind.Array)
+            foreach (var kvp in keyValuePairs)
             {
-                foreach (var item in element.EnumerateArray())
+                if (kvp.Value is JsonElement element && element.ValueKind == JsonValueKind.Array)
                 {
-                    claims.Add(new Claim(kvp.Key, item.ToString()));
+                    foreach (var item in element.EnumerateArray()) claims.Add(new Claim(kvp.Key, item.ToString()));
                 }
-            }
-            else
-            {
-                claims.Add(new Claim(kvp.Key, kvp.Value.ToString()!));
+                else claims.Add(new Claim(kvp.Key, kvp.Value.ToString()!));
             }
         }
         return claims;
