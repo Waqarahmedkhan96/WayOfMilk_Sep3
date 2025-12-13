@@ -27,7 +27,12 @@ public class JwtAuthHandler : DelegatingHandler
 
         if (!string.IsNullOrWhiteSpace(token))
         {
+            Console.WriteLine($"[JwtAuthHandler] Attaching Token: {token.Substring(0, 10)}...");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+        else
+        {
+            Console.WriteLine("[JwtAuthHandler] ⚠️ Handler is running, but Token is NULL!");
         }
 
         return await base.SendAsync(request, cancellationToken);

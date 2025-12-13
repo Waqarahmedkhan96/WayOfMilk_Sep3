@@ -132,6 +132,7 @@ public class SimpleAuthProvider : AuthenticationStateProvider
     // ------------------------------------------------------------------------
     private void UpdateAuthenticationState(LoginResponseDto dto)
     {
+        Console.WriteLine($"[AuthProvider] Setting Token: {dto.Token.Substring(0, 10)}...");
         // Sync Token Service
         _tokenService.JwtToken = dto.Token;
 

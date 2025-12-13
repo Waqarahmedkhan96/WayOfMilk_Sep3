@@ -17,9 +17,10 @@ public class UserServiceImpl : IUserService
         Converters = { new JsonStringEnumConverter() } // <--- converter here
     };
 
-    public UserServiceImpl(HttpClient client)
+    public UserServiceImpl(IHttpClientFactory factory)
     {
-        _client = client;
+        // This ensures we get the BaseAddress + JwtAuthHandler
+        _client = factory.CreateClient("WomAPI");
     }
 
     // READ
@@ -57,7 +58,7 @@ public class UserServiceImpl : IUserService
     public async Task CreateAsync(CreateUserDto dto)
     {
         // POST /users
-        var response = await _client.PostAsJsonAsync("users", dto);
+        var response = await _client.PostAsJsonAsync("users", dto, _options);
         await HandleErrors(response);
     }
 
@@ -65,14 +66,14 @@ public class UserServiceImpl : IUserService
     public async Task UpdateAsync(long id, UpdateUserDto dto)
     {
         // PUT /users/{id}
-        var response = await _client.PutAsJsonAsync($"users/{id}", dto);
+        var response = await _client.PutAsJsonAsync($"users/{id}", dto, _options);
         await HandleErrors(response);
     }
 
     public async Task UpdateProfileAsync(UpdateUserDto dto)
     {
         // PUT /users/profile
-        var response = await _client.PutAsJsonAsync("users/profile", dto);
+        var response = await _client.PutAsJsonAsync("users/profile", dto, _options);
         await HandleErrors(response);
     }
 
