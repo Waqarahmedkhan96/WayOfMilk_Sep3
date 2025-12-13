@@ -1,6 +1,7 @@
 //Dummy Code for Path: Client/WoM_BlazorApp/Services/Implementation/SimpleAuthProvider.cs
 
 using WoM_BlazorApp.Services.Helper;
+using WoM_BlazorApp.Services.Interfaces;
 
 namespace WoM_BlazorApp.Services.Implementation;
 using System.Security.Claims;
@@ -16,16 +17,17 @@ public class SimpleAuthProvider : AuthenticationStateProvider
 {
     private readonly HttpClient _httpClient;
     private readonly IJSRuntime _jsRuntime;
+    private readonly ITokenService _tokenService;
 
     // We store the current user here
     private ClaimsPrincipal _currentUser = new(new ClaimsIdentity());
 
 
-     public SimpleAuthProvider(HttpClient httpClient, IJSRuntime jsRuntime)
+     public SimpleAuthProvider(HttpClient httpClient, IJSRuntime jsRuntime, ITokenService tokenService)
     {
-        this._httpClient = httpClient;
-        this._jsRuntime = jsRuntime;
-        // +ADD: nothing else needed here; jsRuntime is already injected for cache/restore
+        _httpClient = httpClient;
+        _jsRuntime = jsRuntime;
+        _tokenService = tokenService;
     }
 
 
@@ -65,6 +67,8 @@ public class SimpleAuthProvider : AuthenticationStateProvider
         // Set the JWT in the HTTP Client so all future requests use it
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", dto.Token);
+        //sync the token service with the new token
+        _tokenService.JwtToken = dto.Token;
 
 
         var claims = dto.Token.ParseClaimsFromJwt();
@@ -89,6 +93,8 @@ public class SimpleAuthProvider : AuthenticationStateProvider
     {
         // Clear Headers
         _httpClient.DefaultRequestHeaders.Authorization = null;
+        // Clear Token Service
+        _tokenService.JwtToken = null;
 
         // Clear Cache
         await _jsRuntime.InvokeVoidAsync("sessionStorage.removeItem", "currentUser");
@@ -109,13 +115,19 @@ public class SimpleAuthProvider : AuthenticationStateProvider
             var json = await _jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "currentUser");
             if (string.IsNullOrWhiteSpace(json)) return;
 
-            var dto = JsonSerializer.Deserialize<LoginResponseDto>(json);
+            var dto = JsonSerializer.Deserialize<LoginResponseDto>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+                //preventive to avoid deserialization errors
+            });
+
             if (dto == null) return;
 
-            // Re-apply the login logic (set headers, parse claims)
+            // Re-apply the login logic (set headers, parse claims, restore token)
             // Note: We duplicate logic slightly to avoid re-saving to session storage
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", dto.Token);
+            _tokenService.JwtToken = dto.Token;
 
             var claims = dto.Token.ParseClaimsFromJwt();
             var identity = new ClaimsIdentity(claims, "jwt");

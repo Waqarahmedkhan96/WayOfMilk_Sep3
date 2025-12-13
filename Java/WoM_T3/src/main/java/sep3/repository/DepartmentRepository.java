@@ -9,11 +9,13 @@ import sep3.entity.DepartmentType;
 import sep3.entity.TransferRecord;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DepartmentRepository extends JpaRepository<Department, Long>
 {
 
   List<Department> findByType(DepartmentType type);
+    Optional<Department> findByName(String name);
 
     @Query("SELECT d.cows FROM Department d WHERE d.id = :id")
     List<Cow> findCowsByDepartmentId(@Param("id") long id);

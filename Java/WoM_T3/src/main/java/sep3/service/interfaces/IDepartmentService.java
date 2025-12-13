@@ -14,6 +14,7 @@ public interface IDepartmentService
     List<DepartmentDataDTO> getAllDepartments();
     DepartmentDataDTO getDepartmentById(long departmentId);
     List<DepartmentDataDTO> getDepartmentsByType(DepartmentType type);
+    DepartmentDataDTO getDepartmentByName(String name);
     DepartmentDataDTO updateDepartment(DepartmentDataDTO department);
     void deleteDepartment(long departmentId);
     List<CowDataDTO> getCowsByDepartment(long deptId);

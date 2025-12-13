@@ -29,7 +29,7 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
 
         try {
             DepartmentType type = DepartmentType.valueOf(request.getType().toUpperCase());
-            DepartmentCreationDTO dto = new DepartmentCreationDTO(type);
+            DepartmentCreationDTO dto = new DepartmentCreationDTO(type, request.getName());
 
             DepartmentDataDTO result = coreService.addDepartment(dto);
             DepartmentData proto = GrpcMapper.convertDepartmentDtoToProto(result);
@@ -111,6 +111,23 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
     }
 
     @Override
+    public void getDepartmentByName(DepartmentNameRequest request,
+                                    StreamObserver<DepartmentData> responseObserver)
+    {
+        try
+        {
+            DepartmentDataDTO dto = coreService.getDepartmentByName(request.getName());
+            DepartmentData response = GrpcMapper.convertDepartmentDtoToProto(dto);
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        }
+        catch (Exception e)
+        {
+            responseObserver.onError(e);
+        }
+    }
+
+    @Override
     public void updateDepartment(DepartmentData request,
                                  StreamObserver<DepartmentData> responseObserver)
     {
@@ -162,7 +179,7 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
             responseObserver.onNext(b.build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            e.printStackTrace(); // <-- DODAJ TO
+            e.printStackTrace();
             responseObserver.onError(e);
         }
     }
@@ -180,7 +197,7 @@ public class DepartmentServiceGrpcImpl extends DepartmentServiceGrpc.DepartmentS
             responseObserver.onNext(b.build());
             responseObserver.onCompleted();
         } catch (Exception e) {
-            e.printStackTrace(); // <-- I TO
+            e.printStackTrace();
             responseObserver.onError(e);
         }
     }

@@ -15,6 +15,7 @@ import sep3.service.interfaces.IDepartmentService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +31,7 @@ public class DepartmentServiceImpl implements IDepartmentService
     @Override
     public DepartmentDataDTO addDepartment(DepartmentCreationDTO dto) {
 
-        Department department = new Department(dto.getType());
+        Department department = new Department(dto.getType(), dto.getName());
         Department saved = departmentRepository.save(department);
 
         return DepartmentMapper.convertDepartmentToDto(saved);
@@ -63,7 +64,16 @@ public class DepartmentServiceImpl implements IDepartmentService
                 .toList();
     }
 
-
+    @Override
+    public DepartmentDataDTO getDepartmentByName(String name)
+    {
+        Optional<Department> department = departmentRepository.findByName(name);
+        if (department.isEmpty())
+        {
+            throw new IllegalArgumentException("Department not found name: " + name);
+        }
+        return DepartmentMapper.convertDepartmentToDto(department.get());
+    }
 
     @Override
     public DepartmentDataDTO updateDepartment(DepartmentDataDTO request)
@@ -75,7 +85,10 @@ public class DepartmentServiceImpl implements IDepartmentService
                 .orElseThrow(() -> new RuntimeException("Department not found: " + request.getId()));
 
         if (request.getType() != null)
+
             dept.setType(request.getType());
+            dept.setName(request.getName());
+
 
         Department saved = departmentRepository.save(dept);
         return DepartmentMapper.convertDepartmentToDto(saved);

@@ -5,12 +5,14 @@ import sep3.entity.DepartmentType;
 public class DepartmentCreationDTO
 {
     private DepartmentType type;
+    private String name;
 
     public DepartmentCreationDTO() { }
 
-    public DepartmentCreationDTO(DepartmentType type)
+    public DepartmentCreationDTO(DepartmentType type, String name)
     {
         this.type = type;
+        this.name = name;
     }
 
     public DepartmentType getType()
@@ -22,4 +24,15 @@ public class DepartmentCreationDTO
     {
         this.type = type;
     }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
 }

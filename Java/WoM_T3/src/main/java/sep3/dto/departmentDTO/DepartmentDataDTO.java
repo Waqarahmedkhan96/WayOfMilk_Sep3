@@ -8,28 +8,34 @@ import java.util.List;
 
 public class DepartmentDataDTO
 {
-  private Long id;
-  private DepartmentType type;
+    private Long id;
+    private DepartmentType type;
+    private String name;
 
     private List<CowDataDTO> cows;
     private List<TransferRecordDataDTO> transferRecordsFrom;
     private List<TransferRecordDataDTO> transferRecordsTo;
 
-  public DepartmentDataDTO() { }
+    public DepartmentDataDTO() { }
 
-  public DepartmentDataDTO(Long id, DepartmentType type)
-  {
-    this.id = id;
-    this.type = type;
-  }
+    public DepartmentDataDTO(Long id, DepartmentType type, String name)
+    {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+    }
 
-  public Long getId() { return id; }
+    public Long getId() { return id; }
 
-  public void setId(Long id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 
-  public DepartmentType getType() { return type; }
+    public DepartmentType getType() { return type; }
 
-  public void setType(DepartmentType type) { this.type = type; }
+    public void setType(DepartmentType type) { this.type = type; }
+
+    public String getName() { return name; }
+
+    public void setName(String name) { this.name = name; }
 
     public List<CowDataDTO> getCows() {
         return cows;

@@ -42,7 +42,7 @@ public class DatabaseConfiguration
       long departmentCount = departmentRepository.count();
       if(departmentCount == 0)
       {
-        departmentRepository.save(new Department(DepartmentType.QUARANTINE));
+        departmentRepository.save(new Department(DepartmentType.QUARANTINE, "Quarantine"));
         System.out.println(">>> Seeded default QUARANTINE department");
       }
     };

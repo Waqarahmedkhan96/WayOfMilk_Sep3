@@ -14,14 +14,13 @@ option csharp_namespace = "Sep3.WayOfMilk.Grpc";
 message DepartmentData {
   int64 id = 1;
   string type = 2; // MILKING / RESTING / QUARANTINE
-  repeated CowData cows = 3;
-  repeated TransferRecordData transfersFrom = 4;
-  repeated TransferRecordData transfersTo = 5;
+  string name = 3;
 }
 
 // Matches DepartmentCreationDTO
 message DepartmentCreationRequest {
   string type = 1; // enum as string because we parse in mapper/service
+  string name = 2;
 }
 
 message DepartmentIdRequest {
@@ -30,6 +29,10 @@ message DepartmentIdRequest {
 
 message DepartmentTypeRequest {
   string type = 1;  // MILKING/RESTING/QUARANTINE
+}
+
+message DepartmentNameRequest {
+  string name = 1;
 }
 
 message DepartmentList {
@@ -43,6 +46,7 @@ service DepartmentService {
   rpc AddDepartment (DepartmentCreationRequest) returns (DepartmentData);
   rpc GetDepartmentById (DepartmentIdRequest) returns (DepartmentData);
   rpc GetDepartmentsByType (DepartmentTypeRequest) returns (DepartmentList);
+  rpc GetDepartmentByName (DepartmentNameRequest) returns (DepartmentData);
   rpc UpdateDepartment (DepartmentData) returns (DepartmentData);
   rpc DeleteDepartment (DepartmentIdRequest) returns (Empty);
   rpc GetCowsByDepartment(DepartmentIdRequest) returns (CowList);
