@@ -9,18 +9,11 @@ public class DepartmentMapper
 
     public static DepartmentDataDTO convertDepartmentToDto(Department department) {
 
-        DepartmentDataDTO dto = new DepartmentDataDTO();
-        dto.setId(department.getId());
-        dto.setType(department.getType());   // ! department.setType(DepartmentType.valueOf(proto.getType()));
-
-
-        dto.setCows(null);                          // !!!
-        dto.setTransferRecordsFrom(null);           // !!!  Delete if problem
-        dto.setTransferRecordsTo(null);             // !!!
-
-
-
-        return dto;
+        return new DepartmentDataDTO(
+                department.getId(),
+                department.getType(),
+                department.getName()
+        );
     }
 
 }

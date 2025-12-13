@@ -189,23 +189,13 @@ public final class GrpcMapper
 
     // Department mappers
 
-
-    public static DepartmentData convertDepartmentDtoToProto(DepartmentDataDTO dto) {
-
-        DepartmentData.Builder b = DepartmentData.newBuilder();
-
-        if (dto.getId() != null) {
-            b.setId(dto.getId());
-        }
-
-        if (dto.getType() != null) {
-            // enum -> STRING dla proto
-            b.setType(dto.getType().name());
-        }
-
-        // UWAGA: proto NIE ma cows ani transferów – nic więcej nie mapujemy
-
-        return b.build();
+    public static DepartmentData convertDepartmentDtoToProto(DepartmentDataDTO dto)
+    {
+        return DepartmentData.newBuilder()
+                .setId(dto.getId())
+                .setType(dto.getType().toString())
+                .setName(dto.getName())
+                .build();
     }
 
 
@@ -216,9 +206,7 @@ public final class GrpcMapper
 
         // tutaj typ jest OPCJONALNY (np. przy update tylko ID)
         DepartmentType type = convertDepartmentTypeStringToEnum(proto.getType());
-        dto.setType(type);
-
-        return dto;
+        return new DepartmentDataDTO(proto.getId(), type, proto.getName());
     }
 
     public static DepartmentCreationDTO convertDepartmentProtoCreationToDto(
@@ -228,7 +216,7 @@ public final class GrpcMapper
         if (type == null) {
             throw new IllegalArgumentException("Department type is required for creation.");
         }
-        return new DepartmentCreationDTO(type);
+        return new DepartmentCreationDTO(type, proto.getName());
     }
 
 
@@ -297,8 +285,8 @@ public final class GrpcMapper
 
         dto.setId(proto.getId());
 
-    if (proto.getMovedAt() != null && !proto.getMovedAt().isBlank())
-      dto.setMovedAt(LocalDateTime.parse(proto.getMovedAt()));
+        if (proto.getMovedAt() != null && !proto.getMovedAt().isBlank())
+            dto.setMovedAt(LocalDateTime.parse(proto.getMovedAt()));
 
         dto.setFromDepartmentId(proto.getFromDepartmentId());
         dto.setToDepartmentId(proto.getToDepartmentId());

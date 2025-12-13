@@ -31,9 +31,9 @@ class DepartmentServiceImplTest {
     @Test
     void testAddDepartment_Success() {
         // Arrange
-        DepartmentCreationDTO creationDTO = new DepartmentCreationDTO(DepartmentType.MILKING);
+        DepartmentCreationDTO creationDTO = new DepartmentCreationDTO(DepartmentType.MILKING, "Milking Dept");
 
-        Department saved = new Department(DepartmentType.MILKING);
+        Department saved = new Department(DepartmentType.MILKING, "Milking Dept");
         saved.setId(1L);
 
         when(mockDepartmentRepository.save(any(Department.class))).thenReturn(saved);
@@ -51,7 +51,7 @@ class DepartmentServiceImplTest {
     // ---------- GET BY ID ----------
     @Test
     void testGetDepartmentById_Success() {
-        Department dept = new Department(DepartmentType.RESTING);
+        Department dept = new Department(DepartmentType.RESTING, "Resting Dept");
         dept.setId(5L);
 
         when(mockDepartmentRepository.findById(5L)).thenReturn(Optional.of(dept));
@@ -93,8 +93,8 @@ class DepartmentServiceImplTest {
     // ---------- GET ALL ----------
     @Test
     void testGetAllDepartments() {
-        Department d1 = new Department(DepartmentType.MILKING); d1.setId(1L);
-        Department d2 = new Department(DepartmentType.RESTING); d2.setId(2L);
+        Department d1 = new Department(DepartmentType.MILKING, "Milking dept"); d1.setId(1L);
+        Department d2 = new Department(DepartmentType.RESTING, "Resting dept"); d2.setId(2L);
 
         when(mockDepartmentRepository.findAll()).thenReturn(List.of(d1, d2));
 
