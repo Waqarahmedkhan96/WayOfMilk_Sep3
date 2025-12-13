@@ -1,0 +1,116 @@
+﻿@page "/register"
+@rendermode InteractiveServer
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using WoM_BlazorApp.Services.Implementation
+@using ApiContracts
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject SimpleAuthProvider AuthProvider
+
+
+<PageTitle>Register</PageTitle>
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="card-title text-center mb-4">Create Account</h3>
+
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <div class="alert alert-danger text-center">@error</div>
+                }
+
+                <EditForm Model="registerModel" OnValidSubmit="HandleRegister" FormName="RegisterForm">
+                    <DataAnnotationsValidator />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Full Name</label>
+                            <InputText @bind-Value="registerModel.Name" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone</label>
+                            <InputText @bind-Value="registerModel.Phone" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <InputText @bind-Value="registerModel.Address" class="form-control" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <InputText @bind-Value="registerModel.Email" type="email" class="form-control" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <InputText @bind-Value="registerModel.Password" type="password" class="form-control" />
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100" disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                        }
+                        Register
+                    </button>
+                </EditForm>
+
+                <div class="text-center mt-3">
+                    <small>Already have an account? <a href="login">Login here</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    // Initialize required fields to empty strings to avoid null errors in the form
+    private CreateUserDto registerModel = new()
+    {
+        Name = "",
+        Email = "",
+        Password = "",
+        Phone = "",
+        Address = "",
+        Role = UserRole.Worker // Default role for public registration
+    };
+
+    private string? error;
+    private bool isLoading;
+
+    private async Task HandleRegister()
+    {
+        isLoading = true;
+        error = null;
+
+        try
+        {
+            // Call the Public Register Endpoint (AuthController)
+            var response = await Http.PostAsJsonAsync("auth/register", registerModel);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                throw new Exception(content);
+            }
+
+            // On success, go to login
+            Nav.NavigateTo("/login");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+}

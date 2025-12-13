@@ -34,24 +34,34 @@ public class SimpleAuthProvider : AuthenticationStateProvider
     public override Task<AuthenticationState> GetAuthenticationStateAsync()
         => Task.FromResult(new AuthenticationState(_currentUser));
 
-    // async login 
-    public async Task LoginAsync(string email, string password)
+    // async login
+    public async Task LoginWithCacheAsync(string email, string password)
     {
-        // LoginRequest uses set-properties; use object initializer:
+        // Step A: Perform the standard login (API Call + Token Update)
+        var loginResponse = await LoginAsync(email, password);
+
+        // Step B: Cache the result in the browser session
+        // We serialize the entire DTO so we can restore the token later
+        string json = JsonSerializer.Serialize(loginResponse);
+        await _jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "currentUser", json);
+    }
+
+    public async Task<LoginResponseDto> LoginAsync(string email, string password)
+    {
         var request = new LoginRequestDto
         {
             Email = email,
             Password = password
         };
 
-        HttpResponseMessage response = await _httpClient.PostAsJsonAsync("auth/login", request);
+        var response = await _httpClient.PostAsJsonAsync("auth/login", request);
+
         if (!response.IsSuccessStatusCode)
         {
             string errorContent = await response.Content.ReadAsStringAsync();
             throw new Exception($"Login failed: {errorContent}");
         }
 
-        // Deserialize correct DTO (LoginResponseDto)
         var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponseDto>(new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
@@ -59,31 +69,10 @@ public class SimpleAuthProvider : AuthenticationStateProvider
 
         if (loginResponse == null) throw new Exception("Login response was empty.");
 
-        // 3. Process the login (Update headers and state)
-        await HandleLoginSuccess(loginResponse);
-    }
-    private async Task HandleLoginSuccess(LoginResponseDto dto)
-    {
-        // Set the JWT in the HTTP Client so all future requests use it
-        _httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", dto.Token);
-        //sync the token service with the new token
-        _tokenService.JwtToken = dto.Token;
+        // Update the application state immediately
+        UpdateAuthenticationState(loginResponse);
 
-
-        var claims = dto.Token.ParseClaimsFromJwt();
-
-        // Create the Identity
-        var identity = new ClaimsIdentity(claims, "jwt");
-        _currentUser = new ClaimsPrincipal(identity);
-
-        // Cache the result so we stay logged in on refresh
-        // We store the whole DTO as JSON string
-        string json = JsonSerializer.Serialize(dto);
-        await _jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "currentUser", json);
-
-        // Notify Blazor
-        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+        return loginResponse;
     }
 
     // ----------------------------------------
@@ -91,12 +80,10 @@ public class SimpleAuthProvider : AuthenticationStateProvider
     // ----------------------------------------
     public async Task LogoutAsync()
     {
-        // Clear Headers
-        _httpClient.DefaultRequestHeaders.Authorization = null;
         // Clear Token Service
         _tokenService.JwtToken = null;
 
-        // Clear Cache
+        // Clear Browser Cache
         await _jsRuntime.InvokeVoidAsync("sessionStorage.removeItem", "currentUser");
 
         // Reset State to Anonymous
@@ -113,32 +100,58 @@ public class SimpleAuthProvider : AuthenticationStateProvider
         try
         {
             var json = await _jsRuntime.InvokeAsync<string>("sessionStorage.getItem", "currentUser");
-            if (string.IsNullOrWhiteSpace(json)) return;
+            if (string.IsNullOrWhiteSpace(json))
+                return;
 
             var dto = JsonSerializer.Deserialize<LoginResponseDto>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
-                //preventive to avoid deserialization errors
             });
 
-            if (dto == null) return;
+            if (dto == null || string.IsNullOrEmpty(dto.Token))
+                return;
 
-            // Re-apply the login logic (set headers, parse claims, restore token)
-            // Note: We duplicate logic slightly to avoid re-saving to session storage
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", dto.Token);
-            _tokenService.JwtToken = dto.Token;
+            if ((dto.Token).IsTokenExpired())
+            {
+                Console.WriteLine("Token expired during restore. Logging out.");
+                await LogoutAsync(); // Clean up storage
+                return;
+            }
 
-            var claims = dto.Token.ParseClaimsFromJwt();
-            var identity = new ClaimsIdentity(claims, "jwt");
-            _currentUser = new ClaimsPrincipal(identity);
-
-            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+            UpdateAuthenticationState(dto);
         }
         catch
         {
-            // If restore fails, user is effectively logged out
+            // If restore fails (e.g. invalid JSON), clear everything
+            await LogoutAsync();
         }
+    }
+
+    // ------------------------------------------------------------------------
+    // Helper: Update State
+    // ------------------------------------------------------------------------
+    private void UpdateAuthenticationState(LoginResponseDto dto)
+    {
+        // Sync Token Service
+        _tokenService.JwtToken = dto.Token;
+
+        // Parse Claims & Update Principal
+        // Uses the ParsingHelper extension method
+        var claims = dto.Token.ParseClaimsFromJwt();
+
+        var identity = new ClaimsIdentity(
+            claims,
+            "jwt",
+            // Map .Identity.Name to the standard long URL claim
+            nameType: ClaimTypes.Name,
+            // Map .IsInRole() to the standard long URL claim
+            roleType: ClaimTypes.Role
+        );
+
+        _currentUser = new ClaimsPrincipal(identity);
+
+        // Notify Blazor to re-render
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 }
 

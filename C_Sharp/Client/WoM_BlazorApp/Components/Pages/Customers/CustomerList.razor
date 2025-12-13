@@ -2,8 +2,8 @@
 @rendermode InteractiveServer
 
 @using ApiContracts
-@using WoM_BlazorApp.Http
-@inject WoM_BlazorApp.Http.ICustomerService CustomerService
+@using WoM_BlazorApp.Services.Interfaces
+@inject ICustomerService CustomerService
 @inject NavigationManager Nav
 
 <PageTitle>Customers</PageTitle>

@@ -1,6 +1,6 @@
 using ApiContracts;
 
-namespace WoM_BlazorApp.Http;
+namespace WoM_BlazorApp.Services.Interfaces;
 
 public interface ITransferRecordService
 {

@@ -1,57 +1,75 @@
 using WoM_BlazorApp;
 using Microsoft.AspNetCore.Components.Authorization;
 using WoM_BlazorApp.Components;
+using WoM_BlazorApp.Services.Http;
 using WoM_BlazorApp.Services.Interfaces;
 using WoM_BlazorApp.Services.Implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// razor components
+// ==========================================
+// 1. FRAMEWORK SERVICES
+// ==========================================
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// http client to WebApi
-builder.Services.AddScoped(sp => new HttpClient
-{
-    BaseAddress = new Uri("https://localhost:5098") // <-- your WebApi base URL
-});
-
-// auth core for <AuthorizeView> / [Authorize]
 builder.Services.AddAuthorizationCore();
+builder.Services.AddCascadingAuthenticationState();
 
-// auth state provider (your SimpleAuthProvider from other project)
-// make sure namespace + ctor match
+// ==========================================
+// 2. INFRASTRUCTURE (Token & Http)
+// ==========================================
+
+// A. Register TokenService first (The Handler needs this!)
+builder.Services.AddScoped<ITokenService, TokenServiceImpl>();
+
+// B. Register the Handler (The HttpClient needs this!)
+builder.Services.AddTransient<JwtAuthHandler>();
+
+// C. Register the Named Client (Configures the Base Address + Handler)
+builder.Services.AddHttpClient("WomAPI", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5098");
+})
+.AddHttpMessageHandler<JwtAuthHandler>();
+
+// D. Register the Global HttpClient Override
+//    (Now safe because "WomAPI" is definitely defined above)
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("WomAPI"));
+
+// ==========================================
+// 3. AUTH & DOMAIN SERVICES
+// ==========================================
+
+// Auth Provider (Needs TokenService & the HttpClient we just configured)
 builder.Services.AddScoped<SimpleAuthProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(p => p.GetRequiredService<SimpleAuthProvider>());
 
-// token store
-builder.Services.AddScoped<ITokenService, TokenServiceImpl>();
-
-// domain services
+// Domain Services
 builder.Services.AddScoped<IMilkService, MilkServiceImpl>();
 builder.Services.AddScoped<IContainerService, ContainerServiceImpl>();
-
-// (you can also register IUserService, ICowService, etc. later)
+builder.Services.AddScoped<IUserService, UserServiceImpl>();
 
 var app = builder.Build();
+
+// ==========================================
+// 4. MIDDLEWARE PIPELINE (Order is Critical Here)
+// ==========================================
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    app.UseHsts();
+    // app.UseHsts(); // Disabled for local HTTP dev
 }
 
 app.UseStatusCodePagesWithReExecute("/not-found");
 
-    //createScopeForErrors is neither a defined variable
-    //nor a valid named parameter for UseStatusCodePagesWithReExecute.
-//replaced with above
-//app.UseStatusCodePagesWithReExecute("/not-found", createScopeForErrors: true);
+// app.UseHttpsRedirection(); // Disabled for local HTTP dev
 
-app.UseHttpsRedirection();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

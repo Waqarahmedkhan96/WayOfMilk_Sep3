@@ -1,7 +1,94 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Home - Way of Milk</PageTitle>
 
-<h1>Hello, world!</h1>
+<AuthorizeView>
+    @* --- VIEW FOR LOGGED IN USERS --- *@
+    <Authorized>
+        <div class="p-5 mb-4 bg-light rounded-3 border">
+            <div class="container-fluid py-2">
+                <h1 class="display-5 fw-bold">Welcome back, @context.User.Identity?.Name!</h1>
+                <p class="col-md-8 fs-4">You are logged in as a <strong>@GetRole(context.User)</strong>.</p>
+                <p>Select a module below to get started.</p>
+            </div>
+        </div>
 
-Welcome to your new app.
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @* Users Module *@
+            <div class="col">
+                <div class="card h-100 border-primary">
+                    <div class="card-body text-center">
+                        <i class="bi bi-people-fill text-primary display-4 mb-3"></i>
+                        <h5 class="card-title">Manage Users</h5>
+                        <p class="card-text text-muted">View, add, or remove farm employees and vets.</p>
+                        <a href="users" class="btn btn-outline-primary stretched-link">Go to Users</a>
+                    </div>
+                </div>
+            </div>
+
+            @* Cows Module *@
+            <div class="col">
+                <div class="card h-100 border-success">
+                    <div class="card-body text-center">
+                        <i class="bi bi-heart-pulse-fill text-success display-4 mb-3"></i>
+                        <h5 class="card-title">Cows & Health</h5>
+                        <p class="card-text text-muted">Track cow registration and health checkups.</p>
+                        <a href="cows" class="btn btn-outline-success stretched-link">Go to Cows</a>
+                    </div>
+                </div>
+            </div>
+
+            @* Milk Module *@
+            <div class="col">
+                <div class="card h-100 border-info">
+                    <div class="card-body text-center">
+                        <i class="bi bi-droplet-fill text-info display-4 mb-3"></i>
+                        <h5 class="card-title">Milk Production</h5>
+                        <p class="card-text text-muted">Record milking sessions and storage.</p>
+                        <a href="milk" class="btn btn-outline-info stretched-link">Go to Milk</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </Authorized>
+
+    @* --- VIEW FOR ANONYMOUS GUESTS --- *@
+    <NotAuthorized>
+        <div class="px-4 py-5 my-5 text-center">
+            <i class="bi bi-box-seam display-1 text-primary mb-4"></i>
+            <h1 class="display-5 fw-bold">Way of Milk</h1>
+            <div class="col-lg-6 mx-auto">
+                <p class="lead mb-4">
+                    Welcome to the Way of Milk Management System. <br />
+                    Please sign in to access farm data, manage livestock, and track production.
+                </p>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a href="login" class="btn btn-primary btn-lg px-4 gap-3">Login</a>
+                    <a href="register" class="btn btn-outline-secondary btn-lg px-4">Register</a>
+                </div>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@* --- DEBUGGING --- *@
+<AuthorizeView>
+    <Authorized>
+        <div>Auth: @context.User.Identity?.IsAuthenticated</div>
+        <div>Name: @context.User.Identity?.Name</div>
+        <div>Claims: @string.Join(", ", context.User.Claims.Select(c => $"{c.Type}={c.Value}"))</div>
+    </Authorized>
+    <NotAuthorized>
+        <div>Auth: false</div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    // Helper to extract specific claim for display if needed
+    private string GetRole(System.Security.Claims.ClaimsPrincipal user)
+    {
+        return user.Claims.FirstOrDefault(c => c.Type == "role" || c.Type == System.Security.Claims.ClaimTypes.Role)?.Value
+               ?? "Worker";
+    }
+}

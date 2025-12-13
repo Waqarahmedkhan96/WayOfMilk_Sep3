@@ -1,9 +1,77 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
-<CascadingAuthenticationState>
-    <Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)">
-        <Found Context="routeData">
-            <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-            <FocusOnNavigate RouteData="routeData" Selector="h1" />
-        </Found>
-    </Router>
-</CascadingAuthenticationState>
+@using WoM_BlazorApp.Components.Layout
+@using WoM_BlazorApp.Services.Implementation
+
+@rendermode InteractiveServer
+
+@inject SimpleAuthProvider AuthProvider
+
+@if (!_isAuthInitialized)
+{
+    @* While we are checking for the token, show a loading screen *@
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Restoring session...</p>
+        </div>
+    </div>
+}
+else
+{
+    @* Only render the Router once we know if we are logged in or not *@
+    <CascadingAuthenticationState>
+        <Router AppAssembly="typeof(Program).Assembly">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
+                    <NotAuthorized>
+                        @if (context.User.Identity?.IsAuthenticated != true)
+                        {
+                            <RedirectToLogin />
+                        }
+                        else
+                        {
+                            <p role="alert">You are not authorized to access this resource.</p>
+                        }
+                    </NotAuthorized>
+                </AuthorizeRouteView>
+                <FocusOnNavigate RouteData="routeData" Selector="h1" />
+            </Found>
+        </Router>
+    </CascadingAuthenticationState>
+}
+@code {
+    private bool _isAuthInitialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_isAuthInitialized)
+        {
+            // Create the task to restore the session
+            var restoreTask = AuthProvider.RestoreSessionAsync();
+
+            // Create a "timer" task that finishes in 5 seconds
+            var timeoutTask = Task.Delay(TimeSpan.FromSeconds(5));
+
+            // Race them! Wait for whichever one finishes first.
+            var completedTask = await Task.WhenAny(restoreTask, timeoutTask);
+
+            // Check who won
+            if (completedTask == timeoutTask)
+            {
+                // If the timer won, it means RestoreSessionAsync got stuck.
+                // We log a warning and proceed anyway so the user isn't trapped.
+                Console.WriteLine("Session restore timed out. Loading app as Guest.");
+            }
+            else
+            {
+                // If restoreTask won, ensure any exceptions are caught/handled
+                // (This re-throws any error that might have happened inside RestoreSessionAsync)
+                await restoreTask;
+            }
+
+            //  Allow the app to render the Router
+            _isAuthInitialized = true;
+            StateHasChanged();
+        }
+    }
+}

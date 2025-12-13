@@ -1,61 +1,101 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using WoM_BlazorApp.Services.Implementation
+
+@inject SimpleAuthProvider AuthProvider
+@inject NavigationManager Nav
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">WoM_BlazorApp</a>
+        <a class="navbar-brand" href="">Way of Milk</a>
     </div>
 </div>
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
+    <nav class="flex-column">
+        @* --- PUBLIC LINKS (Always Visible) --- *@
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
         </div>
 
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/cows" Match="NavLinkMatch.Prefix">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Cows
-            </NavLink>
-        </li>
+        <AuthorizeView>
+            <Authorized>
+                @* --- SECURED LINKS (Only Logged In) --- *@
 
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/containers" Match="NavLinkMatch.Prefix">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Containers
-            </NavLink>
-        </li>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="users">
+                        <span class="bi bi-people-fill-nav-menu" aria-hidden="true"></span> Users
+                    </NavLink>
+                </div>
 
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/customers" Match="NavLinkMatch.Prefix">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Customers
-            </NavLink>
-        </li>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="cows">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Cows
+                    </NavLink>
+                </div>
 
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/sales" Match="NavLinkMatch.Prefix">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Sales
-            </NavLink>
-        </li>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="milk">
+                        <span class="bi bi-droplet-fill-nav-menu" aria-hidden="true"></span> Milk
+                    </NavLink>
+                </div>
 
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/milk" Match="NavLinkMatch.Prefix">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Milk
-            </NavLink>
-        </li>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="containers">
+                        <span class="bi bi-box-seam-fill-nav-menu" aria-hidden="true"></span> Containers
+                    </NavLink>
+                </div>
 
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/transfer-records" Match="NavLinkMatch.Prefix">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Transfer Records
-            </NavLink>
-        </li>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="customers">
+                        <span class="bi bi-person-badge-fill-nav-menu" aria-hidden="true"></span> Customers
+                    </NavLink>
+                </div>
 
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/users" Match="NavLinkMatch.Prefix">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Users
-            </NavLink>
-        </li>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="sales">
+                        <span class="bi bi-currency-dollar-nav-menu" aria-hidden="true"></span> Sales
+                    </NavLink>
+                </div>
 
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="transfer-records">
+                        <span class="bi bi-clipboard-data-fill-nav-menu" aria-hidden="true"></span> Transfers
+                    </NavLink>
+                </div>
+
+                @* Logout Button (Separated for clarity) *@
+                <div class="nav-item px-3 mt-4 border-top pt-2">
+                    <button class="nav-link btn btn-link text-danger" @onclick="Logout">
+                        <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span> Logout
+                    </button>
+                </div>
+            </Authorized>
+
+            <NotAuthorized>
+                @* --- ANONYMOUS LINKS (Only Logged Out) --- *@
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="login">
+                        <span class="bi bi-lock-fill-nav-menu" aria-hidden="true"></span> Login
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="register">
+                        <span class="bi bi-person-plus-fill-nav-menu" aria-hidden="true"></span> Register
+                    </NavLink>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
     </nav>
 </div>
 
+@code {
+    private async Task Logout()
+    {
+        await AuthProvider.LogoutAsync();
+        Nav.NavigateTo("/login");
+    }
+}

@@ -1,25 +1,14 @@
 ﻿@inherits LayoutComponentBase
+
 @using Microsoft.AspNetCore.Components.Authorization
 @using WoM_BlazorApp.Services.Implementation
-@inject SimpleAuthProvider AuthProvider
+@using WoM_BlazorApp.Components.Layout
+
 
 @* CascadingAuthenticationState belongs in Routes.razor *@
 <div class="page">
-    <div class="sidebar bg-light border-end">
-        <nav class="nav flex-column p-3">
-            <h5>WoM</h5>
-            <a class="nav-link" href="">Home</a>
-
-            <AuthorizeView Roles="Owner,Worker">
-                <Authorized>
-                    <a class="nav-link" href="milk">Milk</a>
-                    <a class="nav-link" href="containers">Containers</a>
-                </Authorized>
-                <NotAuthorized>
-                    <span class="text-muted small">Login to see pages</span>
-                </NotAuthorized>
-            </AuthorizeView>
-        </nav>
+    <div class="sidebar border-end">
+        <NavMenu />
     </div>
 
     <main class="main">
@@ -27,10 +16,10 @@
             <span class="fw-bold">Way Of Milk – Blazor</span>
             <AuthorizeView>
                 <Authorized>
-                    <span class="small">Logged in</span>
+                    <span class="small ms-auto">Logged in as @context.User.Identity?.Name</span>
                 </Authorized>
                 <NotAuthorized>
-                    <span class="small">Not logged in</span>
+                    <span class="small ms-auto">Guest</span>
                 </NotAuthorized>
             </AuthorizeView>
         </div>
@@ -40,22 +29,6 @@
         </article>
     </main>
 </div>
-
-@* This is the missing logic to restore the login session *@
-@code {
-    private bool _isInitialized = false;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && !_isInitialized)
-        {
-            _isInitialized = true;
-            // This checks the browser's session storage to see if the user is already logged in
-            await AuthProvider.RestoreSessionAsync();
-        }
-    }
-}
-
 
 <style>
     .page { display:flex; min-height:100vh; }

@@ -3,9 +3,14 @@
 
 @using System
 @using ApiContracts
-@using WoM_BlazorApp.Http
+@using WoM_BlazorApp.Services.Interfaces
+@using Microsoft.AspNetCore.Authorization //only admin can create users, others need to register
+
 @inject IUserService UserService
 @inject NavigationManager Nav
+
+@* Security: Only Owners can see this page *@
+@attribute [Authorize(Roles = "Owner")]
 
 <PageTitle>Add User</PageTitle>
 
