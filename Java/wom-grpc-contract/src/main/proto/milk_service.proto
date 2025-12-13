@@ -30,6 +30,7 @@ message CreateMilkRequest {
   string date = 4;
   double volumeL = 5;
   MilkTestResultEnum testResult = 6;
+  bool approvedForStorage = 7; // New Added by Waqar
 }
 
 message UpdateMilkRequest {

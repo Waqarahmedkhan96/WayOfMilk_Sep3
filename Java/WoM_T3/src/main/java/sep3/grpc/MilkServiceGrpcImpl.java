@@ -35,19 +35,29 @@ public class MilkServiceGrpcImpl extends MilkServiceGrpc.MilkServiceImplBase {
             dto.setVolumeL(request.getVolumeL());
             dto.setTestResult(mapToDomainEnum(request.getTestResult()));
 
+            // NEW: approvedForStorage from proto
+            dto.setApprovedForStorage(request.getApprovedForStorage());
+
             MilkMessage reply = toGrpc(milkService.create(dto));
 
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            e.printStackTrace();
-            responseObserver.onError(
-                    Status.INTERNAL.withDescription("Create failed: " + e.getMessage())
-                            .withCause(e)
-                            .asRuntimeException()
-            );
-        }
+        e.printStackTrace();
+
+        Status status = (e instanceof IllegalStateException || e instanceof IllegalArgumentException)
+                ? Status.INVALID_ARGUMENT
+                : Status.INTERNAL;
+
+        responseObserver.onError(
+                status.withDescription("Create failed: " + e.getMessage())
+                        .withCause(e)
+                        .asRuntimeException()
+        );
     }
+
+}
+
 
     // ---------- UPDATE ----------
     @Override
@@ -89,12 +99,18 @@ public class MilkServiceGrpcImpl extends MilkServiceGrpc.MilkServiceImplBase {
 
         } catch (Exception e) {
             e.printStackTrace();
+
+            Status status = (e instanceof IllegalStateException || e instanceof IllegalArgumentException)
+                    ? Status.INVALID_ARGUMENT
+                    : Status.INTERNAL;
+
             responseObserver.onError(
-                    Status.INTERNAL.withDescription("Approve failed: " + e.getMessage())
+                    status.withDescription("Approve failed: " + e.getMessage())
                             .withCause(e)
                             .asRuntimeException()
             );
         }
+
     }
 
     // ---------- DELETE ----------
@@ -154,6 +170,7 @@ public class MilkServiceGrpcImpl extends MilkServiceGrpc.MilkServiceImplBase {
                 .setId(dto.getId())
                 .setCowId(dto.getCowId())
                 .setContainerId(dto.getContainerId())
+                .setRegisteredByUserId(dto.getRegisteredByUserId()) // NEW
                 .setVolumeL(dto.getVolumeL())
                 .setTestResult(mapFromDomainEnum(dto.getTestResult()))
                 .setApprovedForStorage(dto.isApprovedForStorage());
@@ -163,6 +180,8 @@ public class MilkServiceGrpcImpl extends MilkServiceGrpc.MilkServiceImplBase {
 
         return builder.build();
     }
+
+
 
     private sep3.entity.MilkTestResult mapToDomainEnum(MilkTestResultEnum grpcEnum) {
         return switch (grpcEnum) {

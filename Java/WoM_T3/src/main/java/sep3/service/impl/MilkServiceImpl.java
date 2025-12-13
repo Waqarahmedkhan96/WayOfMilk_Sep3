@@ -53,22 +53,40 @@ public class MilkServiceImpl implements IMilkService {
 
         if (dto.getDate() == null) dto.setDate(LocalDate.now());
 
-        Milk milk = mapper.fromCreateDto(dto, cow, container, registeredBy);
+        // cow must be healthy
+        if (!cow.isHealthy()) {
+            throw new IllegalStateException("Cow is not healthy. Cannot store milk in DB.");
+        }
+
+        // ✅ HARD RULE: if NOT approved -> DO NOT STORE
+        if (!dto.isApprovedForStorage()) {
+            throw new IllegalStateException("Milk is not approved for storage. Not saving to DB.");
+        }
+
+        // ✅ HARD RULE: only PASS may be stored
+        if (dto.getTestResult() != MilkTestResult.PASS) {
+            throw new IllegalStateException("Milk test must be PASS to store milk in DB.");
+        }
+
+        Milk milk = MilkMapper.fromCreateDto(dto, cow, container, registeredBy);
 
         // capacity check
         if (!container.hasSpaceFor(milk.getVolumeL())) {
             throw new IllegalStateException("Container has insufficient free capacity.");
         }
 
-        // default approval = false
-        milk.setApprovedForStorage(false);
-
+        // set relation
         container.addMilk(milk);
-        containerRepo.save(container);
-        milkRepo.save(milk);
 
-        return mapper.toDto(milk);
+        // ✅ Persist owning side (Milk has the FK to container)
+        milkRepo.saveAndFlush(milk);
+
+        // persist updated occupied capacity (if your container.addMilk changes it)
+        containerRepo.save(container);
+
+        return MilkMapper.toDto(milk);
     }
+
 
     // ---------- UPDATE ----------
     @Override

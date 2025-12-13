@@ -17,12 +17,12 @@ public class GrpcMilkServiceImpl : IMilkService
     }
 
     // Create milk record
-    public async Task<MilkDto> CreateAsync(CreateMilkDto dto)
-    {
-        // 1) map DTO → gRPC request
-        var request = dto.ToGrpc();
+public async Task<MilkDto> CreateAsync(CreateMilkDto dto)
+{
+    var request = dto.ToGrpc();
 
-        // 2) call Java create
+    try
+    {
         var reply = await _client.CreateMilkAsync(request);
 
         if (reply == null || reply.Id == 0)
@@ -30,6 +30,14 @@ public class GrpcMilkServiceImpl : IMilkService
 
         return reply.ToDto();
     }
+    catch (Grpc.Core.RpcException ex) when (ex.StatusCode == Grpc.Core.StatusCode.InvalidArgument)
+    {
+        // Java business-rule error (approved=false, FAIL test, capacity etc.)
+        throw new ValidationException(ex.Status.Detail);
+    }
+}
+
+
 
     // Get milk by id
     public async Task<MilkDto> GetByIdAsync(long id)

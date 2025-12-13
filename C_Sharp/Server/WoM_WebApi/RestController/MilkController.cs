@@ -54,31 +54,17 @@ public class MilkController : ControllerBase
     }
 
     // POST /milk  (Worker or Owner)
-    [HttpPost]
-    [Authorize(Policy = "WorkerOrOwner")]
-    public async Task<ActionResult<MilkDto>> Create(CreateMilkDto dto)
-    {
-        // 1) create milk in Java (approved=false initially)
-        var created = await _milkService.CreateAsync(dto);
+   // POST /milk  (Worker or Owner)
+[HttpPost]
+[Authorize(Policy = "WorkerOrOwner")]
+public async Task<ActionResult<MilkDto>> Create(CreateMilkDto dto)
+{
+    // CreateMilk already carries ApprovedForStorage now (proto field 7)
+    var created = await _milkService.CreateAsync(dto);
 
-        // 2) if user requested approval, call approval flow
-        if (dto.ApprovedForStorage)
-        {
-            var userId = GetCurrentUserId();
+    return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+}
 
-            await _milkService.ApproveStorageAsync(new ApproveMilkStorageDto
-            {
-                Id = created.Id,
-                ApprovedByUserId = userId,
-                ApprovedForStorage = true
-            });
-
-            // reload so response shows updated flag
-            created = await _milkService.GetByIdAsync(created.Id);
-        }
-
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
-    }
 
     // PUT /milk/{id}  (Owner or Worker)
     [HttpPut("{id:long}")]

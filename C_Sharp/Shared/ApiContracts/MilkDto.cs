@@ -13,7 +13,8 @@ public class CreateMilkDto
     public long ContainerId { get; set; }
     public long RegisteredByUserId { get; set; }     // proto: registeredByUserId
     // NEW: what the user *wants* as final approval state
-    public bool ApprovedForStorage { get; set; } = false;
+    public bool ApprovedForStorage { get; set; } = false; 
+    // Swagger UI “ false ” is not taken from my C# property initializer (= false). Swagger UI often auto-generates a sample and for bool it may show true unless I explicitly tell Swagger the default false.
 }
 
 // DTO: single milk record
