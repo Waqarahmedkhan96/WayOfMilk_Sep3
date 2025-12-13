@@ -1,7 +1,5 @@
 using System.Text;
 using System.Security.Claims;
-using System.Text.Json.Serialization;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -54,13 +52,6 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-
-// ---------- JSON options (enums as strings) ----------
-builder.Services.AddControllers()
-    .AddJsonOptions(o =>
-    {
-        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
 
 // ---------- JWT Options ----------
 builder.Services.Configure<JwtOptions>(
