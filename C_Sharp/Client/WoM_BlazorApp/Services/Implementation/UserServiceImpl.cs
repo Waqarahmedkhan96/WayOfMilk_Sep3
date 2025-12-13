@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 using ApiContracts;
 using WoM_BlazorApp.Services.Interfaces;
 
@@ -12,7 +13,8 @@ public class UserServiceImpl : IUserService
     // We use a custom JsonSerializerOptions to handle case-insensitivity (API returns camelCase)
     private readonly JsonSerializerOptions _options = new()
     {
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter() } // <--- converter here
     };
 
     public UserServiceImpl(HttpClient client)

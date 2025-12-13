@@ -39,20 +39,17 @@ public static class ParsingHelper
 
     public static bool IsTokenExpired(this string token)
     {
-        var claims = token.ParseClaimsFromJwt(); // Your existing helper
+        var claims = token.ParseClaimsFromJwt();
         var expClaim = claims.FirstOrDefault(c => c.Type == "exp");
 
-        if (expClaim == null) return false; // No expiration date? Assume valid (or invalid, your choice)
+        if (expClaim == null) return false;
 
-        // specific parsing for Unix timestamp
         if (long.TryParse(expClaim.Value, out long expSeconds))
         {
             var expiryDate = DateTimeOffset.FromUnixTimeSeconds(expSeconds).UtcDateTime;
-
-            // Return true if the token is expired (with a 10s buffer for safety)
+            // Return true if expired (buffer of 10s)
             return expiryDate < DateTime.UtcNow.AddSeconds(10);
         }
-
         return false;
     }
 }

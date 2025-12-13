@@ -24,7 +24,7 @@ public class CowsController : ControllerBase
 
     // POST cows
     //Owner only
-    [HttpPost(Name = "AddCow")]
+    [HttpPost("add",Name = "AddCow")]
     [Authorize(Roles = "Owner")]
     public async Task<ActionResult<CowDto>> CreateAsync(
         [FromBody] CowCreationDto dto)
@@ -119,7 +119,7 @@ public class CowsController : ControllerBase
     }
 
     // PUT cows
-    [HttpPut(Name = "UpdateCow")]
+    [HttpPut("{id:long}",Name = "UpdateCow")]
     [Authorize(Roles =
         "Owner")] //only owner can change important data fields (ex: regNo, dateOfBirth)
     public async Task<ActionResult<CowDto>> UpdateAsync([FromBody] CowDto dto)

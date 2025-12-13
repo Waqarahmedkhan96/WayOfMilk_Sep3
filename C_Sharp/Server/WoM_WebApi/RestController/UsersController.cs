@@ -77,8 +77,8 @@ public class UsersController : ControllerBase
     // -----------------------------
     // GET all users (OWNER ONLY)
     // -----------------------------
-    [HttpGet("all-users",Name = "GetAllUsers")]
-    [Authorize(Policy = "OwnerOnly")]
+    [HttpGet(Name = "GetAllUsers")]
+    [Authorize(Roles = "Owner")]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
     {
         var list = await _userService.GetAllAsync();
@@ -114,7 +114,7 @@ public class UsersController : ControllerBase
     // CREATE user (OWNER ONLY)
     // -----------------------------
     [HttpPost(Name = "CreateUser")]
-    [Authorize(Policy = "OwnerOnly")]
+    [Authorize(Roles = "Owner")]
     public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto dto)
     {
         // dto.Role is enum now
@@ -129,7 +129,7 @@ public class UsersController : ControllerBase
     // UPDATE user (OWNER ONLY)
     // -----------------------------
     [HttpPut("{id:long}", Name = "UpdateUser")]
-    [Authorize(Policy = "OwnerOnly")]
+    [Authorize(Roles = "Owner")]
     public async Task<ActionResult<UserDto>> UpdateUser(long id, UpdateUserDto dto)
     {
         ActivityLog.Instance.Log("updating user", $"{User.GetJWTNameAndId()} is attempting to update user {id}", User.GetJWTName(), id);
@@ -175,7 +175,7 @@ public class UsersController : ControllerBase
     // DELETE user (OWNER ONLY)
     // -----------------------------
     [HttpDelete("{id:long}", Name = "DeleteUser")]
-    [Authorize(Policy = "OwnerOnly")]
+    [Authorize(Roles = "Owner")]
     public async Task<IActionResult> DeleteUser(long id)
     {
         await _userService.DeleteAsync(id);

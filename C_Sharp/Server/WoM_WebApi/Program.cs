@@ -8,13 +8,19 @@ using WoM_WebApi.Configuration;         // JwtOptions class
 using WoM_WebApi.GlobalExceptionHandler;
 using WoM_WebApi.Services.Implementation;
 using WoM_WebApi.Services.Interfaces;
+using System.Text.Json.Serialization;
 //removed double imports
 using WoM_WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ---------- Controllers ----------
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Allow "Worker" string to map to UserRole.Worker enum
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 // ---------- Swagger + JWT UI ----------
 builder.Services.AddEndpointsApiExplorer();
@@ -146,7 +152,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

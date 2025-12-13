@@ -1,7 +1,6 @@
-//Dummy Code for Path: Client/WoM_BlazorApp/Services/Implementation/SimpleAuthProvider.cs
-
 using WoM_BlazorApp.Services.Helper;
 using WoM_BlazorApp.Services.Interfaces;
+using System.Text.Json.Serialization;
 
 namespace WoM_BlazorApp.Services.Implementation;
 using System.Security.Claims;
@@ -37,23 +36,21 @@ public class SimpleAuthProvider : AuthenticationStateProvider
     // async login
     public async Task LoginWithCacheAsync(string email, string password)
     {
-        // Step A: Perform the standard login (API Call + Token Update)
         var loginResponse = await LoginAsync(email, password);
 
-        // Step B: Cache the result in the browser session
-        // We serialize the entire DTO so we can restore the token later
-        string json = JsonSerializer.Serialize(loginResponse);
+        // Create options to write Enums as Strings
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(new JsonStringEnumConverter());
+
+        // Serialize with options
+        string json = JsonSerializer.Serialize(loginResponse, options);
+
         await _jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "currentUser", json);
     }
 
     public async Task<LoginResponseDto> LoginAsync(string email, string password)
     {
-        var request = new LoginRequestDto
-        {
-            Email = email,
-            Password = password
-        };
-
+        var request = new LoginRequestDto { Email = email, Password = password };
         var response = await _httpClient.PostAsJsonAsync("auth/login", request);
 
         if (!response.IsSuccessStatusCode)
@@ -62,16 +59,17 @@ public class SimpleAuthProvider : AuthenticationStateProvider
             throw new Exception($"Login failed: {errorContent}");
         }
 
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponseDto>(new JsonSerializerOptions
+        var options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
-        });
+        };
+        options.Converters.Add(new JsonStringEnumConverter()); // To handle UserRole enum
+
+        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponseDto>(options);
 
         if (loginResponse == null) throw new Exception("Login response was empty.");
 
-        // Update the application state immediately
         UpdateAuthenticationState(loginResponse);
-
         return loginResponse;
     }
 
@@ -105,8 +103,10 @@ public class SimpleAuthProvider : AuthenticationStateProvider
 
             var dto = JsonSerializer.Deserialize<LoginResponseDto>(json, new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
             });
+
 
             if (dto == null || string.IsNullOrEmpty(dto.Token))
                 return;
