@@ -18,7 +18,7 @@ public class SaleController : ControllerBase
 
     // GET /sales   (Owner only)
     [HttpGet]
-    [Authorize(Policy = "OwnerOnly")]
+    [Authorize(Roles = "Owner")]
     public async Task<ActionResult<SaleListDto>> GetAll()
     {
         // 1) fetch all sales
@@ -29,7 +29,7 @@ public class SaleController : ControllerBase
 
     // GET /sales/{id}   (Owner only)
     [HttpGet("{id:long}")]
-    [Authorize(Policy = "OwnerOnly")]
+    [Authorize(Roles = "Owner")]
     public async Task<ActionResult<SaleDto>> GetById(long id)
     {
         // 1) fetch sale
@@ -40,7 +40,8 @@ public class SaleController : ControllerBase
 
     // POST /sales   (Worker or Owner)
     [HttpPost]
-    [Authorize(Policy = "WorkerOrOwner")]
+    [Authorize(Roles =
+        "Owner, Worker")]
     public async Task<ActionResult<SaleDto>> Create(CreateSaleDto dto)
     {
         // 1) create via service
@@ -51,7 +52,7 @@ public class SaleController : ControllerBase
 
     // DELETE /sales/{id}   (Owner only)
     [HttpDelete("{id:long}")]
-    [Authorize(Policy = "OwnerOnly")]
+    [Authorize(Roles = "Owner")]
     public async Task<IActionResult> Delete(long id)
     {
         // 1) delete via service

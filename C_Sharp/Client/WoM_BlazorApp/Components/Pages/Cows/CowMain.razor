@@ -93,7 +93,7 @@ else
                             }
                             else
                             {
-                                <span class="badge bg-danger">Sick</span>
+                                <span class="badge bg-danger">Suspect</span>
                             }
                         </td>
                         <td>
@@ -130,10 +130,10 @@ else
                                 @* 2. HEALTH CONTROLS *@
                                 @if (cow.Healthy)
                                 {
-                                    @* Anyone can mark as sick *@
+                                    @* Anyone can mark as Suspect *@
                                     <button class="btn btn-outline-warning"
                                             @onclick="@(() => UpdateHealth(cow, false))">
-                                        Mark Sick
+                                        Mark Suspect
                                     </button>
                                 }
                                 else
@@ -193,18 +193,22 @@ else
 
         protected override async Task OnInitializedAsync()
         {
+                await LoadCows();
+        }
+
+
+        private async Task LoadCows()
+        {
+            isLoading = true;
             try
             {
-                // 1. Determine Roles
                 var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-                var user = authState.User;
+                isOwner = authState.User.IsInRole("Owner");
+                isVet = authState.User.IsInRole("Vet");
 
-                // Check specific roles
-                isOwner = user.IsInRole("Owner");
-                isVet = user.IsInRole("Vet");
-
-                // 2. Load Data
+                // Default load: All cows
                 cows = await CowService.GetAllAsync();
+                isFiltered = false;
             }
             catch (Exception e)
             {
@@ -257,30 +261,6 @@ else
             searchDeptId = null;
             await LoadCows(); // Reload all
         }
-
-        private async Task LoadCows()
-        {
-            isLoading = true;
-            try
-            {
-                var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-                isOwner = authState.User.IsInRole("Owner");
-                isVet = authState.User.IsInRole("Vet");
-
-                // Default load: All cows
-                cows = await CowService.GetAllAsync();
-                isFiltered = false;
-            }
-            catch (Exception e)
-            {
-                error = e.Message;
-            }
-            finally
-            {
-                isLoading = false;
-            }
-        }
-
 
         private async Task DeleteAsync(long id)
         {

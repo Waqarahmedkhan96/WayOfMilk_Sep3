@@ -9,4 +9,7 @@ public interface ICustomerService
     Task<CustomerDto> CreateAsync(CreateCustomerDto dto);
     Task UpdateAsync(int id, UpdateCustomerDto dto);
     Task DeleteAsync(long id);
+
+    //mock relevant
+    Task<IEnumerable<CustomerDto>> GetAllTrackedAsync();
 }
