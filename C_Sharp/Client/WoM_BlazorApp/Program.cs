@@ -1,5 +1,7 @@
-using WoM_BlazorApp;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components;
+using WoM_BlazorApp;
 using WoM_BlazorApp.Components;
 using WoM_BlazorApp.Services.Http;
 using WoM_BlazorApp.Services.Interfaces;
@@ -17,27 +19,26 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 
 // ==========================================
-// 2. INFRASTRUCTURE (Token & Http)
+// 2. INFRASTRUCTURE (Token & Http) - THE FIX
 // ==========================================
 
-// A. Register TokenService first (The Handler needs this!)
+// A. TokenService (Scoped to the User Circuit)
 builder.Services.AddScoped<ITokenService, TokenServiceImpl>();
 
-// B. Register the Handler (The HttpClient needs this!)
+// B. The Handler (Scoped to the User Circuit)
 builder.Services.AddScoped<JwtAuthHandler>();
 
-// C. THE FIX: Register HttpClient MANUALLY
-// This forces the Client + Handler + TokenService to all live in the same "Scope Bucket"
+// C. THE MANUAL HTTP CLIENT REGISTRATION
+// This ensures the Client uses the specific Handler instance from THIS scope.
 builder.Services.AddScoped(sp =>
 {
-    // Get the Handler from the current user's scope
+    // 1. Get the Handler from the current user's scope
     var handler = sp.GetRequiredService<JwtAuthHandler>();
 
-    // Important: The "InnerHandler" is usually null when manually creating.
-    // We must set it to a standard HttpClientHandler to actually send network requests.
+    // 2. Important: Set the inner handler to handle the actual network call
     handler.InnerHandler = new HttpClientHandler();
 
-    // Create the Client manually
+    // 3. Create the Client manually with the Base Address
     var client = new HttpClient(handler)
     {
         BaseAddress = new Uri("http://localhost:5098")
@@ -50,34 +51,29 @@ builder.Services.AddScoped(sp =>
 // 3. AUTH & DOMAIN SERVICES
 // ==========================================
 
-// Auth Provider (Needs TokenService & the HttpClient we just configured)
+// Auth Provider
 builder.Services.AddScoped<SimpleAuthProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(p => p.GetRequiredService<SimpleAuthProvider>());
 
-// Domain Services
+// Domain Services (Injects the Scoped HttpClient we defined above)
 builder.Services.AddScoped<IMilkService, MilkServiceImpl>();
 builder.Services.AddScoped<IContainerService, ContainerServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
-//builder.Services.AddScoped<ICowService, CowServiceImpl>
+// Add other services here...
 
 var app = builder.Build();
 
 // ==========================================
-// 4. MIDDLEWARE PIPELINE (Order is Critical Here)
+// 4. MIDDLEWARE PIPELINE
 // ==========================================
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // app.UseHsts(); // Disabled for local HTTP dev
 }
 
 app.UseStatusCodePagesWithReExecute("/not-found");
-
-// app.UseHttpsRedirection(); // Disabled for local HTTP dev
-
 app.UseAntiforgery();
-
 app.MapStaticAssets();
 
 app.MapRazorComponents<App>()
