@@ -26,6 +26,32 @@
     }
 </div>
 
+<div class="card bg-light mb-4">
+    <div class="card-body py-2">
+        <div class="row g-2 align-items-center">
+            <div class="col-auto">
+                <label class="col-form-label fw-bold">Filter by Department:</label>
+            </div>
+            <div class="col-auto">
+                <input type="number" class="form-control" @bind="searchDeptId" placeholder="Dept ID..." />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" @onclick="FilterByDept">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+            @if (isFiltered)
+            {
+                <div class="col-auto">
+                    <button class="btn btn-outline-secondary" @onclick="ClearFilter">
+                        <i class="bi bi-x-circle"></i> Clear
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
 @if (isLoading)
 {
     <div class="spinner-border text-primary"></div>
@@ -50,7 +76,7 @@ else
                     <th>Reg No</th>
                     <th>Birth Date</th>
                     <th>Health</th>
-                    <th>Dept ID</th>
+                    <th>Department</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -70,9 +96,32 @@ else
                                 <span class="badge bg-danger">Sick</span>
                             }
                         </td>
-                        <td>@(cow.DepartmentName ?? cow.DepartmentId.ToString() ?? "-")</td>
                         <td>
-                            <div class="btn-group btn-group-sm">
+                            @* Show Name if it exists *@
+                            @if (!string.IsNullOrEmpty(cow.DepartmentName))
+                            {
+                                <span>@cow.DepartmentName</span>
+                            }
+
+                            @* Show ID if it exists *@
+                            @if (cow.DepartmentId != null)
+                            {
+                                @* Add a space if we also showed the name *@
+                                @if (!string.IsNullOrEmpty(cow.DepartmentName))
+                                {
+                                    <text> </text>
+                                }
+                                <span class="badge bg-secondary text-white ms-1">@cow.DepartmentId</span>
+                            }
+
+                            @* Fallback if both are missing *@
+                            @if (string.IsNullOrEmpty(cow.DepartmentName) && cow.DepartmentId == null)
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1 flex-wrap">
                                 @* 1. TRANSFER (Visible to All) *@
                                 <button class="btn btn-outline-secondary" @onclick="TransferCow">
                                     <i class="bi bi-arrow-left-right"></i> Transfer
@@ -105,7 +154,7 @@ else
 
                                 @* find milk from cow -- ADD navigation when ready*@
                                 <button class="btn btn-outline-primary" @onclick="@(() => Nav.NavigateTo($"#"))">
-                                    See Last Milk Collections
+                                    Milk History
                                 </button>
 
                                 @* 3. OWNER ACTIONS *@
@@ -137,6 +186,10 @@ else
         // Permission Flags
         private bool isOwner = false;
         private bool isVet = false;
+
+        //Filter logic
+        private long? searchDeptId;
+        private bool isFiltered = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -177,6 +230,57 @@ else
                 error = $"Failed to update health: {ex.Message}";
             }
         }
+        private async Task FilterByDept()
+        {
+            if (searchDeptId == null || searchDeptId <= 0) return;
+
+            isLoading = true;
+            try
+            {
+                cows = await CowService.GetCowsByDepartmentAsync(searchDeptId.Value);
+                isFiltered = true;
+                error = null;
+            }
+            catch (Exception e)
+            {
+                error = $"Failed to find department: {e.Message}";
+                cows = new List<CowDto>(); // Show empty list on error
+            }
+            finally
+            {
+                isLoading = false;
+            }
+        }
+
+        private async Task ClearFilter()
+        {
+            searchDeptId = null;
+            await LoadCows(); // Reload all
+        }
+
+        private async Task LoadCows()
+        {
+            isLoading = true;
+            try
+            {
+                var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+                isOwner = authState.User.IsInRole("Owner");
+                isVet = authState.User.IsInRole("Vet");
+
+                // Default load: All cows
+                cows = await CowService.GetAllAsync();
+                isFiltered = false;
+            }
+            catch (Exception e)
+            {
+                error = e.Message;
+            }
+            finally
+            {
+                isLoading = false;
+            }
+        }
+
 
         private async Task DeleteAsync(long id)
         {

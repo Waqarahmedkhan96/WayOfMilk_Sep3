@@ -19,15 +19,17 @@ public final class CowMapper
 
   public static CowDataDTO convertCowToDto(Cow cow)
   {
-    // Check if department exists before asking for its ID
+    // Check if department exists before asking for its ID and name
     //shouldn't be null, but just in case the database chokes on this specifically
     Long deptId = (cow.getDepartment() != null) ?
         cow.getDepartment().getId() :
         null;
+    String deptName = (cow.getDepartment() != null) ?
+        cow.getDepartment().getName() : null;
 
     // You use the parameterized constructor of the CowDataDTO
     return new CowDataDTO(cow.getId(), cow.getRegNo(), cow.getBirthDate(),
-        cow.isHealthy(), deptId);
+        cow.isHealthy(), deptId, deptName);
   }
 
   public static Cow convertDtoToEntity(CowDataDTO dto, Cow cowToConvert,
@@ -87,6 +89,8 @@ public final class CowMapper
     {
       entityToUpdate.setDepartment(department);
     }
+
+    //department name is irrelevant here, so we don't parse it
 
     // boolean is no longer a primitive so null checks can be made
     //this is now handled in the service layer, after the user is checked for role

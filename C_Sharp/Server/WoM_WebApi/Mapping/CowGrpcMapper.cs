@@ -16,7 +16,7 @@ public static class CowGrpcMapper
             BirthDate = DateGrpcMapping.FromGrpcDate(data.BirthDate), // Safe Date Parse
             Healthy = data.IsHealthy,
             DepartmentId = data.DepartmentId == 0 ? null : data.DepartmentId,
-            DepartmentName = null // Placeholder for UI enrichment
+            DepartmentName = data.DepartmentName
         };
     }
 

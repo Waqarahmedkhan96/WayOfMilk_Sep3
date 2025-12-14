@@ -51,6 +51,7 @@ message CowData {
   optional string birthDate = 3;
   optional bool isHealthy = 4;
   optional int64 departmentId = 5;
+  optional string departmentName = 6;
 }
 
 message CowIdRequest {
