@@ -1,0 +1,86 @@
+﻿@page "/cows/edit/{Id:long}"
+@rendermode InteractiveServer
+
+@using ApiContracts
+@using WoM_BlazorApp.Services.Interfaces
+@using Microsoft.AspNetCore.Authorization
+
+@inject ICowService CowService
+@inject NavigationManager Nav
+
+@attribute [Authorize(Roles = "Owner")]
+
+<h3>Edit Cow</h3>
+
+@if (model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    @if (error != null)
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+
+    <div class="row">
+        <div class="col-md-6">
+            <EditForm Model="model" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="mb-3">
+                    <label class="form-label">Registration Number</label>
+                    <InputText @bind-Value="model.RegNo" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Birth Date</label>
+                    <InputDate @bind-Value="model.BirthDate" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Department ID</label>
+                    <InputNumber @bind-Value="model.DepartmentId" class="form-control" />
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" @onclick="@(() => Nav.NavigateTo("/cows"))">Cancel</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public long Id { get; set; }
+
+    private CowDto? model;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            model = await CowService.GetByIdAsync(Id);
+        }
+        catch(Exception ex)
+        {
+            error = "Cow not found.";
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (model == null) return;
+        try
+        {
+            await CowService.UpdateAsync(Id, model);
+            Nav.NavigateTo("/cows");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+}

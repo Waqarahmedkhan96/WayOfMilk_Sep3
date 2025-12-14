@@ -7,12 +7,15 @@
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Way of Milk</a>
+        @* Use the C# Toggle Method here *@
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
     </div>
 </div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+@* NavMenuCssClass hides/shows the menu *@
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         @* --- PUBLIC LINKS (Always Visible) --- *@
         <div class="nav-item px-3">
@@ -67,7 +70,6 @@
                     </NavLink>
                 </div>
 
-                @* Logout Button (Separated for clarity) *@
                 <div class="nav-item px-3 mt-4 border-top pt-2">
                     <button class="nav-link btn btn-link text-danger" @onclick="Logout">
                         <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span> Logout
@@ -76,7 +78,7 @@
             </Authorized>
 
             <NotAuthorized>
-                @* --- ANONYMOUS LINKS (Only Logged Out) --- *@
+                @* --- ANONYMOUS LINKS --- *@
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="login">
                         <span class="bi bi-lock-fill-nav-menu" aria-hidden="true"></span> Login
@@ -93,6 +95,16 @@
 </div>
 
 @code {
+    private bool collapseNavMenu = true;
+
+    // This property checks the boolean and adds the "collapse" CSS class to hide the menu
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
     private async Task Logout()
     {
         await AuthProvider.LogoutAsync();

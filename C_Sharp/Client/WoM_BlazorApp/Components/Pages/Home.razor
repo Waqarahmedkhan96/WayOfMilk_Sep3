@@ -73,6 +73,7 @@
 </AuthorizeView>
 
 @* --- DEBUGGING --- *@
+@*
 <AuthorizeView>
     <Authorized>
         <div>Auth: @context.User.Identity?.IsAuthenticated</div>
@@ -83,6 +84,7 @@
         <div>Auth: false</div>
     </NotAuthorized>
 </AuthorizeView>
+*@
 
 @code {
     // Helper to extract specific claim for display if needed

@@ -1,4 +1,4 @@
-// File: Server/WoM_WebApi/Services/Interfaces/ICowService.cs
+
 using ApiContracts;
 
 namespace WoM_WebApi.Services.Interfaces;

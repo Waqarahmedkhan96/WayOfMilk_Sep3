@@ -4,8 +4,9 @@
 @using WoM_BlazorApp.Services.Implementation
 @using WoM_BlazorApp.Components.Layout
 
+@inject SimpleAuthProvider AuthProvider
+@inject NavigationManager Nav
 
-@* CascadingAuthenticationState belongs in Routes.razor *@
 <div class="page">
     <div class="sidebar border-end">
         <NavMenu />
@@ -14,12 +15,34 @@
     <main class="main">
         <div class="top-row px-4">
             <span class="fw-bold">Way Of Milk – Blazor</span>
+
             <AuthorizeView>
                 <Authorized>
-                    <span class="small ms-auto">Logged in as @context.User.Identity?.Name</span>
+                    <div class="dropdown">
+                        <button class="btn btn-link dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                            Hello, @context.User.Identity?.Name
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                            @* Link to Profile / User Management *@
+                            <li><a class="dropdown-item" href="users">My Profile</a></li>
+
+                            @* Link to Change Password *@
+                            <li><a class="dropdown-item" href="change-password">Change Password</a></li>
+
+                            <li><hr class="dropdown-divider"></li>
+
+                            @* Logout *@
+                            <li>
+                                <button class="dropdown-item" @onclick="Logout">Logout</button>
+                            </li>
+                        </ul>
+                    </div>
                 </Authorized>
                 <NotAuthorized>
-                    <span class="small ms-auto">Guest</span>
+                    <div class="d-flex gap-2">
+                         <a href="login" class="btn btn-sm btn-outline-primary">Login</a>
+                         <a href="register" class="btn btn-sm btn-primary">Register</a>
+                    </div>
                 </NotAuthorized>
             </AuthorizeView>
         </div>
@@ -32,9 +55,16 @@
 
 <style>
     .page { display:flex; min-height:100vh; }
-    .sidebar { width:220px; }
+    .sidebar { width:250px; background-color: #f8f9fa; }
     .main { flex:1; display:flex; flex-direction:column; }
-    .top-row { border-bottom:1px solid #ddd; height:56px;
-               display:flex; align-items:center; justify-content:space-between; }
-    .content { flex:1; }
+    .top-row { border-bottom:1px solid #ddd; height:56px; display:flex; align-items:center; justify-content:space-between; background-color:white; }
+    .content { flex:1; background-color: #fcfcfc; }
 </style>
+
+@code {
+    private async Task Logout()
+    {
+        await AuthProvider.LogoutAsync();
+        Nav.NavigateTo("/login");
+    }
+}

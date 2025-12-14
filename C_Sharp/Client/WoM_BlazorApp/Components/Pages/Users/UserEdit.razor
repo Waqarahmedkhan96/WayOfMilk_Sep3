@@ -1,0 +1,83 @@
+﻿@page "/users/edit/{Id:long}"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Owner")]
+
+@using ApiContracts
+@using Microsoft.AspNetCore.Authorization
+@using WoM_BlazorApp.Services.Interfaces
+@inject IUserService UserService
+@inject NavigationManager Nav
+
+<h3>Edit User</h3>
+
+@if (model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label>Name</label>
+                <InputText @bind-Value="model.Name" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label>Email</label>
+                <InputText @bind-Value="model.Email" class="form-control" />
+            </div>
+             <div class="mb-3">
+                <label>Role</label>
+                <InputSelect @bind-Value="model.Role" class="form-control">
+                    @foreach (UserRole r in Enum.GetValues(typeof(UserRole)))
+                    {
+                        <option value="@r">@r.ToString()</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+        <div class="col-md-6">
+             <div class="mb-3">
+                <label>Phone</label>
+                <InputText @bind-Value="model.Phone" class="form-control" />
+            </div>
+             <div class="mb-3">
+                <label>Address</label>
+                <InputText @bind-Value="model.Address" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-success" @onclick="Save">Save Changes</button>
+    <button class="btn btn-secondary" @onclick="@(() => Nav.NavigateTo("/users"))">Cancel</button>
+}
+
+@code {
+    [Parameter] public long Id { get; set; }
+    private UpdateUserDto? model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await UserService.GetByIdAsync(Id);
+        // Map UserDto -> UpdateUserDto
+        model = new UpdateUserDto
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Email = user.Email,
+            Phone = user.Phone,
+            Address = user.Address,
+            Role = Enum.Parse<UserRole>(user.Role.ToString() ?? "Worker"),
+            LicenseNumber = user.LicenseNumber
+        };
+    }
+
+    private async Task Save()
+    {
+        if (model != null)
+        {
+            await UserService.UpdateAsync(Id, model);
+            Nav.NavigateTo("/users");
+        }
+    }
+}

@@ -52,6 +52,10 @@ public final class GrpcMapper
     {
       builder.setDepartmentId(dto.getDepartmentId());
     }
+    if (dto.getDepartmentName() != null)
+    {
+      builder.setDepartmentName(dto.getDepartmentName());
+    }
 
     return builder.build();
   }

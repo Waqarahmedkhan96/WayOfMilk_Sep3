@@ -10,6 +10,7 @@ public class CowDataDTO
   private LocalDate birthDate;
   private Boolean isHealthy;
   private Long departmentId;
+  private String departmentName;
 
   //using Boolean instead of boolean and Long instead of long to allow null values
   //and avoid conversion errors
@@ -17,13 +18,14 @@ public class CowDataDTO
   {
   }
 
-  public CowDataDTO(Long id, String regNo, LocalDate birthDate, Boolean isHealthy, Long departmentId)
+  public CowDataDTO(Long id, String regNo, LocalDate birthDate, Boolean isHealthy, Long departmentId, String departmentName)
   {
     this.id = id;
     this.regNo = regNo;
     this.birthDate = birthDate;
     this.isHealthy = isHealthy;
     this.departmentId = departmentId;
+    this.departmentName = departmentName;
   }
 
   //Getters
@@ -52,6 +54,11 @@ public class CowDataDTO
     return departmentId;
   }
 
+  public String getDepartmentName()
+  {
+    return departmentName;
+  }
+
   //Setters
 
   public void setId(Long id)
@@ -77,6 +84,11 @@ public class CowDataDTO
   public void setDepartmentId(Long departmentId)
   {
     this.departmentId = departmentId;
+  }
+
+  public void setDepartmentName(String departmentName)
+  {
+    this.departmentName = departmentName;
   }
 }
 
