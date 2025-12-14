@@ -8,16 +8,17 @@ namespace WoM_WebApi.Mapping;
 // Mapper: Milk DTOs ↔ gRPC
 public static class MilkGrpcMapper
 {
-    // helper: DateOnly → "yyyy-MM-dd"
+    // DateOnly → "yyyy-MM-dd"
     private static string ToGrpcDate(DateOnly date)
         => date.ToString("yyyy-MM-dd");
 
-    // helper: string → DateOnly
+    // string → DateOnly (fallback value if empty)
     private static DateOnly FromGrpcDate(string? dateString)
         => string.IsNullOrWhiteSpace(dateString)
             ? new DateOnly(2000, 1, 1)
             : DateOnly.Parse(dateString);
 
+    // ---------------- CREATE ----------------
     // DTO (create) → gRPC
     public static CreateMilkRequest ToGrpc(this CreateMilkDto dto)
         => new CreateMilkRequest
@@ -29,16 +30,20 @@ public static class MilkGrpcMapper
             VolumeL = dto.VolumeL,
             TestResult = dto.TestResult switch
             {
-                MilkTestResult.Pass    => MilkTestResultEnum.MilkTestPass,
-                MilkTestResult.Fail    => MilkTestResultEnum.MilkTestFail,
-                _                      => MilkTestResultEnum.MilkTestUnknown
-            }
+                MilkTestResult.Pass => MilkTestResultEnum.MilkTestPass,
+                MilkTestResult.Fail => MilkTestResultEnum.MilkTestFail,
+                _ => MilkTestResultEnum.MilkTestUnknown
+            },
+
+            // IMPORTANT: keep aligned with proto field "approvedForStorage"
+            ApprovedForStorage = dto.ApprovedForStorage
         };
 
+    // ---------------- UPDATE ----------------
     // DTO (update) + current → gRPC
     public static UpdateMilkRequest ToUpdateRequest(this UpdateMilkDto dto, MilkMessage current)
     {
-        // 1) copy current values
+        // 1) start from current values
         var result = new UpdateMilkRequest
         {
             Id = current.Id,
@@ -62,16 +67,17 @@ public static class MilkGrpcMapper
         {
             result.TestResult = dto.TestResult.Value switch
             {
-                MilkTestResult.Pass    => MilkTestResultEnum.MilkTestPass,
-                MilkTestResult.Fail    => MilkTestResultEnum.MilkTestFail,
+                MilkTestResult.Pass => MilkTestResultEnum.MilkTestPass,
+                MilkTestResult.Fail => MilkTestResultEnum.MilkTestFail,
                 MilkTestResult.Unknown => MilkTestResultEnum.MilkTestUnknown,
-                _                      => result.TestResult
+                _ => result.TestResult
             };
         }
 
         return result;
     }
 
+    // ---------------- APPROVE ----------------
     // DTO (approve storage) → gRPC
     public static ApproveMilkStorageRequest ToGrpc(this ApproveMilkStorageDto dto)
         => new ApproveMilkStorageRequest
@@ -81,6 +87,7 @@ public static class MilkGrpcMapper
             ApprovedForStorage = dto.ApprovedForStorage
         };
 
+    // ---------------- READ ----------------
     // gRPC (single) → DTO
     public static MilkDto ToDto(this MilkMessage grpc)
         => new MilkDto
@@ -90,9 +97,9 @@ public static class MilkGrpcMapper
             VolumeL = grpc.VolumeL,
             TestResult = grpc.TestResult switch
             {
-                MilkTestResultEnum.MilkTestPass   => MilkTestResult.Pass,
-                MilkTestResultEnum.MilkTestFail   => MilkTestResult.Fail,
-                _                                 => MilkTestResult.Unknown
+                MilkTestResultEnum.MilkTestPass => MilkTestResult.Pass,
+                MilkTestResultEnum.MilkTestFail => MilkTestResult.Fail,
+                _ => MilkTestResult.Unknown
             },
             CowId = grpc.CowId,
             ContainerId = grpc.ContainerId,
@@ -105,9 +112,8 @@ public static class MilkGrpcMapper
     {
         var result = new MilkListDto();
         foreach (var m in grpc.Milk)
-        {
             result.Milks.Add(m.ToDto());
-        }
+
         return result;
     }
 }

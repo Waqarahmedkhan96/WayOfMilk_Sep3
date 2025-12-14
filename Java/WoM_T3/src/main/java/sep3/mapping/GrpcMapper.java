@@ -435,65 +435,88 @@ public final class GrpcMapper
         return dto;
     }
 
-  //Milk mappers
+    // =================== MILK MAPPERS ===================
 
-  public static MilkDto convertMilkProtoToDto(MilkMessage proto)
-  {
-
-    MilkDto dto = new MilkDto();
-    dto.setId(proto.getId());
-    dto.setVolumeL(proto.getVolumeL());
-    dto.setDate(LocalDate.parse(proto.getDate()));
-    dto.setContainerId(proto.getContainerId());
-    dto.setCowId(proto.getCowId());
-    //no registeredBy field in this dto, although the proto has it
-    dto.setTestResult(convertProtoMilkTestResult(proto.getTestResult()));
-    return dto;
-  }
-
-  public static MilkMessage convertMilkDtoToProto(MilkDto dto)
-  {
-    MilkMessage.Builder builder = MilkMessage.newBuilder();
-    builder.setId(dto.getId());
-    builder.setVolumeL(dto.getVolumeL());
-    builder.setDate(dto.getDate().toString());
-    builder.setContainerId(dto.getContainerId());
-    builder.setCowId(dto.getCowId());
-    builder.setTestResult(convertDtoMilkTestResult(dto.getTestResult()));
-
-    //no registeredBy field in this dto, so remember to set it up manually in the grpc implementation
-    return builder.build();
-  }
-
-  //helper method to parse one enum to the other
-
-  public static MilkTestResult convertProtoMilkTestResult(MilkTestResultEnum proto)
-  {
-    if (proto == null)
-      return null;
-    try
+    // Proto -> DTO
+    // Converts gRPC MilkMessage into internal MilkDto
+    // Proto -> DTO
+    public static MilkDto convertMilkProtoToDto(MilkMessage proto)
     {
-      // map by enum name; falls back to null if no matching value exists
-      return MilkTestResult.valueOf(proto.name());
-    }
-    catch (IllegalArgumentException e)
-    {
-      return null;
-    }
-  }
+        MilkDto dto = new MilkDto();
 
-  public static MilkTestResultEnum convertDtoMilkTestResult(MilkTestResult dto)
-  {
-    if (dto == null)
-      return null;
-    try
-    {
-      return MilkTestResultEnum.valueOf(dto.toString());
+        dto.setId(proto.getId());
+        dto.setVolumeL(proto.getVolumeL());
+
+        if (proto.getDate() != null && !proto.getDate().isBlank())
+            dto.setDate(LocalDate.parse(proto.getDate()));
+
+        dto.setContainerId(proto.getContainerId());
+        dto.setCowId(proto.getCowId());
+
+        // ✅ NEW: this now exists in MilkDto
+        dto.setRegisteredByUserId(proto.getRegisteredByUserId());
+
+        dto.setTestResult(convertProtoMilkTestResult(proto.getTestResult()));
+
+        dto.setApprovedForStorage(proto.getApprovedForStorage());
+
+        return dto;
     }
-    catch (IllegalArgumentException e)
+
+    // DTO -> Proto
+    public static MilkMessage convertMilkDtoToProto(MilkDto dto)
     {
-      return null;
+        MilkMessage.Builder builder = MilkMessage.newBuilder();
+
+        builder.setId(dto.getId());
+        builder.setVolumeL(dto.getVolumeL());
+
+        if (dto.getDate() != null)
+            builder.setDate(dto.getDate().toString());
+
+        builder.setContainerId(dto.getContainerId());
+        builder.setCowId(dto.getCowId());
+
+        // ✅ NEW: send it back to gRPC clients
+        builder.setRegisteredByUserId(dto.getRegisteredByUserId());
+
+        builder.setTestResult(convertDtoMilkTestResult(dto.getTestResult()));
+        builder.setApprovedForStorage(dto.isApprovedForStorage());
+
+        return builder.build();
     }
-  }
+
+
+    //helper method to parse one enum to the other
+
+    // gRPC enum -> domain enum
+    public static MilkTestResult convertProtoMilkTestResult(MilkTestResultEnum proto)
+    {
+        if (proto == null)
+            return null;
+
+        return switch (proto)
+        {
+            case MILK_TEST_PASS -> MilkTestResult.PASS;
+            case MILK_TEST_FAIL -> MilkTestResult.FAIL;
+            default -> MilkTestResult.UNKNOWN;
+        };
+    }
+
+    // domain enum -> gRPC enum
+    public static MilkTestResultEnum convertDtoMilkTestResult(MilkTestResult dto)
+    {
+        if (dto == null)
+            return MilkTestResultEnum.MILK_TEST_UNKNOWN;
+
+        return switch (dto)
+        {
+            case PASS -> MilkTestResultEnum.MILK_TEST_PASS;
+            case FAIL -> MilkTestResultEnum.MILK_TEST_FAIL;
+            default -> MilkTestResultEnum.MILK_TEST_UNKNOWN;
+        };
+    }
+
+
 
 }

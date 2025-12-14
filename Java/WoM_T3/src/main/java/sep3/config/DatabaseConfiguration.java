@@ -29,7 +29,7 @@ public class DatabaseConfiguration
         owner.setPassword(passwordEncoder.encode("1234")); // hashed pass since we do this directly in the DB
 
         userRepository.save(owner);
-        System.out.println(">>> Seeded default OWNER: Waqar@gmail.com / 12345");
+        System.out.println(">>> Seeded default OWNER: Owner@gmail.com / 1234");
       }
     };
   }
