@@ -7,7 +7,6 @@ namespace ApiContracts;
 public class CreateDepartmentDto
 {
     public DepartmentType Type { get; set; } // QUARANTINE/MILKING/RESTING
-    public string Name { get; set; } = string.Empty;
 }
 
 // DTO: single department
@@ -15,14 +14,12 @@ public class DepartmentDto
 {
     public long Id { get; set; }
     public DepartmentType Type { get; set; }
-    public string Name { get; set; } = string.Empty;
 }
 
 // DTO: update department
 public class UpdateDepartmentDto
 {
     public DepartmentType Type { get; set; }
-    public string Name { get; set; } = string.Empty;
 }
 
 // DTO: delete departments batch
@@ -41,7 +38,6 @@ public class DepartmentListDto
 public class DepartmentQueryParameters
 {
     public DepartmentType? Type { get; set; }
-    public string? NameContains { get; set; }
     public int? Page { get; set; }
     public int? PageSize { get; set; }
 }

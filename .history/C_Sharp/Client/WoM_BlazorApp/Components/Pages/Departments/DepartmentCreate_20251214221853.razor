@@ -1,0 +1,38 @@
+@page "/departments/create"
+@rendermode InteractiveServer
+
+@using ApiContracts
+@using WoM_BlazorApp.Services.Interfaces
+
+@inject IDepartmentService DepartmentService
+@inject NavigationManager Nav
+
+<h3>Create Department</h3>
+
+<div>
+    <label>Department Type</label><br />
+    <select @bind="type">
+        @foreach (var t in Enum.GetValues<DepartmentType>())
+        {
+            <option value="@t">@t</option>
+        }
+    </select>
+</div>
+
+<br />
+<button @onclick="Create">Create</button>
+
+@code {
+    DepartmentType type = DepartmentType.Milking;
+
+    async Task Create()
+    {
+        var dto = new CreateDepartmentDto
+        {
+            Type = type
+        };
+
+        await DepartmentService.CreateAsync(dto);
+        Nav.NavigateTo("/departments");
+    }
+}
