@@ -10,23 +10,22 @@ public class UserServiceImpl : IUserService
 {
     private readonly HttpClient _client;
 
-    // We use a custom JsonSerializerOptions to handle case-insensitivity (API returns camelCase)
+    // Options to handle Enum "Worker" vs Integer 0 mismatch
     private readonly JsonSerializerOptions _options = new()
     {
         PropertyNameCaseInsensitive = true,
-        Converters = { new JsonStringEnumConverter() } // <--- converter here
+        Converters = { new JsonStringEnumConverter() }
     };
 
-    public UserServiceImpl(IHttpClientFactory factory)
+    // FIX: Inject HttpClient directly (Program.cs handles the wiring now)
+    public UserServiceImpl(HttpClient client)
     {
-        // This ensures we get the BaseAddress + JwtAuthHandler
-        _client = factory.CreateClient("WomAPI");
+        _client = client;
     }
 
     // READ
     public async Task<UserDto> GetCurrentUserAsync()
     {
-        // GET /users/current-user
         var response = await _client.GetAsync("users/current-user");
         await HandleErrors(response);
 
@@ -36,7 +35,6 @@ public class UserServiceImpl : IUserService
 
     public async Task<IEnumerable<UserDto>> GetAllAsync()
     {
-        // GET /users
         var response = await _client.GetAsync("users");
         await HandleErrors(response);
 
@@ -46,7 +44,6 @@ public class UserServiceImpl : IUserService
 
     public async Task<UserDto> GetByIdAsync(long id)
     {
-        // GET /users/{id}
         var response = await _client.GetAsync($"users/{id}");
         await HandleErrors(response);
 
@@ -57,7 +54,7 @@ public class UserServiceImpl : IUserService
     // CREATE
     public async Task CreateAsync(CreateUserDto dto)
     {
-        // POST /users
+        // Pass options to ensure Enums are serialized as Strings
         var response = await _client.PostAsJsonAsync("users", dto, _options);
         await HandleErrors(response);
     }
@@ -65,14 +62,12 @@ public class UserServiceImpl : IUserService
     // UPDATE
     public async Task UpdateAsync(long id, UpdateUserDto dto)
     {
-        // PUT /users/{id}
         var response = await _client.PutAsJsonAsync($"users/{id}", dto, _options);
         await HandleErrors(response);
     }
 
     public async Task UpdateProfileAsync(UpdateUserDto dto)
     {
-        // PUT /users/profile
         var response = await _client.PutAsJsonAsync("users/profile", dto, _options);
         await HandleErrors(response);
     }
@@ -80,12 +75,10 @@ public class UserServiceImpl : IUserService
     // DELETE
     public async Task DeleteAsync(long id)
     {
-        // DELETE /users/{id}
         var response = await _client.DeleteAsync($"users/{id}");
         await HandleErrors(response);
     }
 
-    //helper
     private async Task HandleErrors(HttpResponseMessage response)
     {
         if (!response.IsSuccessStatusCode)
@@ -94,5 +87,4 @@ public class UserServiceImpl : IUserService
             throw new Exception(string.IsNullOrEmpty(error) ? response.ReasonPhrase : error);
         }
     }
-
 }

@@ -4,10 +4,12 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using WoM_BlazorApp.Services.Implementation
 @using ApiContracts
+@using System.Text.Json
+@using System.Text.Json.Serialization
+
 @inject HttpClient Http
 @inject NavigationManager Nav
 @inject SimpleAuthProvider AuthProvider
-
 
 <PageTitle>Register</PageTitle>
 
@@ -69,8 +71,6 @@
 </div>
 
 @code {
-
-    // Initialize required fields to empty strings to avoid null errors in the form
     private CreateUserDto registerModel = new()
     {
         Name = "",
@@ -91,8 +91,15 @@
 
         try
         {
-            // Call the Public Register Endpoint (AuthController)
-            var response = await Http.PostAsJsonAsync("auth/register", registerModel);
+            // FIX: Create options to ensure Enum "Worker" is sent as a string, not '0'
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+
+            // Call the Public Register Endpoint (AuthController) passing the options
+            var response = await Http.PostAsJsonAsync("auth/register", registerModel, options);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -112,5 +119,4 @@
             isLoading = false;
         }
     }
-
 }
