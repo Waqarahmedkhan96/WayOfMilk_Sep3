@@ -312,4 +312,12 @@ public class CowsController : ControllerBase
         }
 
     }
+
+    [HttpGet("query", Name = "QueryCows")]
+    [Authorize]
+    public async Task<ActionResult<IEnumerable<CowDto>>> GetQueryAsync(
+        [FromQuery] CowQueryParameters query)
+    {
+        throw new NotImplementedException("Not implemented yet.");
+    }
 }

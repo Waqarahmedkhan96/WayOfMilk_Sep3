@@ -1,0 +1,203 @@
+@page "/cows"
+@rendermode InteractiveServer
+
+@using ApiContracts
+@using WoM_BlazorApp.Services.Interfaces
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject ICowService CowService
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IJSRuntime JS
+
+@attribute [Authorize]
+
+<PageTitle>Cows</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Cows</h1>
+    @if (isOwner)
+    {
+        <button class="btn btn-primary" @onclick="@(() => Nav.NavigateTo("/cows/create"))">
+            + Add new cow
+        </button>
+    }
+</div>
+
+@if (isLoading)
+{
+    <div class="spinner-border text-primary"></div>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @error
+        <button type="button" class="btn-close" @onclick="() => error = null"></button>
+    </div>
+}
+else if (cows is null || !cows.Any())
+{
+    <p>No cows yet.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Reg No</th>
+                    <th>Birth Date</th>
+                    <th>Health</th>
+                    <th>Dept ID</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cow in cows)
+                {
+                    <tr>
+                        <td>@cow.RegNo</td>
+                        <td>@cow.BirthDate.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            @if (cow.Healthy)
+                            {
+                                <span class="badge bg-success">Healthy</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Sick</span>
+                            }
+                        </td>
+                        <td>@(cow.DepartmentName ?? cow.DepartmentId.ToString() ?? "-")</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                @* 1. TRANSFER (Visible to All) *@
+                                <button class="btn btn-outline-secondary" @onclick="TransferCow">
+                                    <i class="bi bi-arrow-left-right"></i> Transfer
+                                </button>
+
+                                @* 2. HEALTH CONTROLS *@
+                                @if (cow.Healthy)
+                                {
+                                    @* Anyone can mark as sick *@
+                                    <button class="btn btn-outline-warning"
+                                            @onclick="@(() => UpdateHealth(cow, false))">
+                                        Mark Sick
+                                    </button>
+                                }
+                                else
+                                {
+                                    @* Only Vets can mark as healthy *@
+                                    @if (isVet)
+                                    {
+                                        <button class="btn btn-outline-success"
+                                                @onclick="@(() => UpdateHealth(cow, true))">
+                                            Mark Healthy
+                                        </button>
+                                    }
+                                }
+                                @* add milk collection button -- ADD navigation when ready *@
+                                <button class="btn btn-outline-primary" @onclick="@(() => Nav.NavigateTo($"#"))">
+                                    Add Milk
+                                </button>
+
+                                @* find milk from cow -- ADD navigation when ready*@
+                                <button class="btn btn-outline-primary" @onclick="@(() => Nav.NavigateTo($"#"))">
+                                    See Last Milk Collections
+                                </button>
+
+                                @* 3. OWNER ACTIONS *@
+                                @if (isOwner)
+                                {
+                                    <button class="btn btn-primary"
+                                            @onclick="@(() => Nav.NavigateTo($"/cows/edit/{cow.Id}"))">
+                                        Edit
+                                    </button>
+                                    <button class="btn btn-danger"
+                                            @onclick="@(() => DeleteAsync(cow.Id))">
+                                        Delete
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+        private bool isLoading = true;
+        private string? error;
+        private IEnumerable<CowDto>? cows;
+
+        // Permission Flags
+        private bool isOwner = false;
+        private bool isVet = false;
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                // 1. Determine Roles
+                var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User;
+
+                // Check specific roles
+                isOwner = user.IsInRole("Owner");
+                isVet = user.IsInRole("Vet");
+
+                // 2. Load Data
+                cows = await CowService.GetAllAsync();
+            }
+            catch (Exception e)
+            {
+                error = e.Message;
+            }
+            finally
+            {
+                isLoading = false;
+            }
+        }
+
+        private async Task UpdateHealth(CowDto cow, bool newStatus)
+        {
+            try
+            {
+                // Update on server
+                await CowService.UpdateHealthAsync(new[] { cow.Id }, newStatus);
+                // Update locally to refresh UI instantly
+                cow.Healthy = newStatus;
+            }
+            catch (Exception ex)
+            {
+                error = $"Failed to update health: {ex.Message}";
+            }
+        }
+
+        private async Task DeleteAsync(long id)
+        {
+            if (!await JS.InvokeAsync<bool>("confirm", "Are you sure you want to delete this cow?"))
+                return;
+
+            error = null;
+            try
+            {
+                await CowService.DeleteAsync(id);
+                cows = await CowService.GetAllAsync();
+            }
+            catch (Exception e)
+            {
+                error = e.Message;
+            }
+        }
+
+        private async Task TransferCow()
+        {
+            await JS.InvokeVoidAsync("alert", "Transfer functionality is coming soon!");
+        }
+    }
+}

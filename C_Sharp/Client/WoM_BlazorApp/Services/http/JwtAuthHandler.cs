@@ -27,7 +27,7 @@ public class JwtAuthHandler : DelegatingHandler
 
         if (!string.IsNullOrWhiteSpace(token))
         {
-            Console.WriteLine($"[JwtAuthHandler] Attaching Token: {token.Substring(0, 10)}...");
+            Console.WriteLine($"[JwtAuthHandler] Attaching Token"); // add  {token.Substring(0, 10)}... for debugging
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
         else

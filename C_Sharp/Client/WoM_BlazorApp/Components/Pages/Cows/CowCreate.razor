@@ -3,42 +3,83 @@
 
 @using WoM_BlazorApp.Services.Interfaces
 @using ApiContracts
+@using Microsoft.AspNetCore.Authorization
+
 @inject ICowService CowService
 @inject NavigationManager Nav
 
+@* Only Owners can enter this page *@
+@attribute [Authorize(Roles = "Owner")]
+
 <PageTitle>Add Cow</PageTitle>
 
-<h1>Add new cow</h1>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3>Add new cow</h3>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <div class="alert alert-danger">@error</div>
+                }
 
-<div class="mb-3">
-    <label class="form-label">Birth date</label>
-    <InputDate @bind-Value="birthDate" class="form-control" />
+                <EditForm Model="model" OnValidSubmit="CreateAsync">
+
+                    <div class="mb-3">
+                        <label class="form-label">Registration Number</label>
+                        <InputText @bind-Value="regNo" class="form-control" placeholder="e.g. DK-12345" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Birth date</label>
+                        <InputDate @bind-Value="birthDate" class="form-control" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Department ID (Optional)</label>
+                        <InputNumber @bind-Value="departmentId" class="form-control" />
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-secondary" @onclick="@(() => Nav.NavigateTo("/cows"))">Cancel</button>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
 </div>
 
-@if (!string.IsNullOrEmpty(error))
-{
-    <p style="color:red">@error</p>
-}
-
-<button class="btn btn-success" @onclick="CreateAsync">Save</button>
-<button class="btn btn-secondary ms-2" @onclick="@(() => Nav.NavigateTo("/cows"))">
-    Cancel
-</button>
-
 @code {
+    private string regNo = "";
     private DateOnly birthDate = DateOnly.FromDateTime(DateTime.Today);
-    private string regNo;
+    private long? departmentId; // Optional
     private string? error;
+
+    // Create a dummy model object just to satisfy EditForm,
+    // or create the DTO directly inside the logic.
+    private object model = new();
 
     private async Task CreateAsync()
     {
         error = null;
+
+        if (string.IsNullOrWhiteSpace(regNo))
+        {
+            error = "Registration Number is required.";
+            return;
+        }
+
         try
         {
             var dto = new CowCreationDto
             {
                 RegNo = regNo,
-                BirthDate = birthDate
+                BirthDate = birthDate,
+                DepartmentId = departmentId,
+                // RegisteredByUserId is handled by the Server from the Token
             };
 
             await CowService.CreateAsync(dto);

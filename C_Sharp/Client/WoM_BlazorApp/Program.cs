@@ -60,6 +60,8 @@ builder.Services.AddScoped<IAuthService, AuthServiceImpl>();
 builder.Services.AddScoped<IMilkService, MilkServiceImpl>();
 builder.Services.AddScoped<IContainerService, ContainerServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
+builder.Services.AddScoped<ICowService, CowServiceImpl>();
+
 // Add other services here...
 
 var app = builder.Build();
