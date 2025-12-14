@@ -1,0 +1,53 @@
+@page "/transfer-records/create"
+@rendermode InteractiveServer
+
+@using ApiContracts
+@using WoM_BlazorApp.Services.Interfaces
+@inject ITransferRecordService TransferService
+@inject NavigationManager Nav
+
+<h3>Create Transfer Record</h3>
+
+<div>
+    <label>Cow Id</label><br />
+    <input type="number" @bind="cowId" />
+</div>
+
+<div>
+    <label>From Department (id)</label><br />
+    <input type="number" @bind="fromDepartmentId" />
+</div>
+
+<div>
+    <label>To Department (id)</label><br />
+    <input type="number" @bind="toDepartmentId" />
+</div>
+
+<div>
+    <label>Moved At</label><br />
+    <input type="datetime-local" @bind="movedAt" />
+</div>
+
+<br />
+<button @onclick="Create">Create</button>
+
+@code {
+    long cowId;
+    int fromDepartmentId;
+    int toDepartmentId;
+    DateTime movedAt = DateTime.Now;
+
+    async Task Create()
+    {
+        var dto = new CreateTransferRecordDto
+        {
+            CowId = cowId,
+            FromDepartmentId = fromDepartmentId,
+            ToDepartmentId = toDepartmentId,
+            MovedAt = movedAt
+        };
+
+        await TransferService.CreateAsync(dto);
+        Nav.NavigateTo("/transfer-records");
+    }
+}

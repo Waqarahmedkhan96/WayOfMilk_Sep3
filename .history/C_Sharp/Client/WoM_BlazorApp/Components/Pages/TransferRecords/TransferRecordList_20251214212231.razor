@@ -1,0 +1,55 @@
+@page "/transfer-records"
+@rendermode InteractiveServer
+
+@using ApiContracts
+@using WoM_BlazorApp.Services.Interfaces
+@inject ITransferRecordService TransferRecordService
+@inject NavigationManager Nav
+
+<PageTitle>Transfer Records </PageTitle>
+
+<h1>Transfer Records</h1>
+
+<button class="btn btn-primary mb-3"
+        @onclick="@(() => Nav.NavigateTo("/transfer-records/create"))">
+    Add new transfer record
+</button>
+
+@if (records == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Cow id</th>
+                <th>From Department (id)</th>
+                <th>To Department (id)</th>
+                <th>Moved At</th>
+                <th>Requested By User (id)</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var r in records)
+        {
+            <tr>
+                <td>@r.CowId</td>
+                <td>@r.FromDepartmentId</td>
+                <td>@r.ToDepartmentId</td>
+                <td>@r.MovedAt</td>
+
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+@code {
+    ICollection<TransferRecordDto>? records;
+
+    protected override async Task OnInitializedAsync()
+    {
+        records = await TransferRecordService.GetAllAsync();
+    }
+}
