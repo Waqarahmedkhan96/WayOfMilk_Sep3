@@ -56,6 +56,7 @@ builder.Services.AddScoped<SimpleAuthProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(p => p.GetRequiredService<SimpleAuthProvider>());
 
 // Domain Services (Injects the Scoped HttpClient we defined above)
+builder.Services.AddScoped<IAuthService, AuthServiceImpl>();
 builder.Services.AddScoped<IMilkService, MilkServiceImpl>();
 builder.Services.AddScoped<IContainerService, ContainerServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();

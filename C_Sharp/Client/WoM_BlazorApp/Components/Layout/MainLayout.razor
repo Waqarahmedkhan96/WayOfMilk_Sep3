@@ -1,6 +1,8 @@
 ﻿@inherits LayoutComponentBase
 
 @using Microsoft.AspNetCore.Components.Authorization
+@inject SimpleAuthProvider AuthProvider
+@inject NavigationManager Nav
 @using WoM_BlazorApp.Services.Implementation
 @using WoM_BlazorApp.Components.Layout
 
@@ -16,7 +18,23 @@
             <span class="fw-bold">Way Of Milk – Blazor</span>
             <AuthorizeView>
                 <Authorized>
-                    <span class="small ms-auto">Logged in as @context.User.Identity?.Name</span>
+                    <div class="dropdown">
+                        <button class="btn btn-link dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                            Hello, @context.User.Identity?.Name
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                            @* Link to Profile (if they are NOT an owner, they see profile at /users) *@
+                            <li><a class="dropdown-item" href="users">My Profile</a></li>
+
+                            @* Link to Change Password *@
+                            <li><a class="dropdown-item" href="change-password">Change Password</a></li>
+
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <button class="dropdown-item" @onclick="Logout">Logout</button>
+                            </li>
+                        </ul>
+                    </div>
                 </Authorized>
                 <NotAuthorized>
                     <span class="small ms-auto">Guest</span>
@@ -38,3 +56,11 @@
                display:flex; align-items:center; justify-content:space-between; }
     .content { flex:1; }
 </style>
+
+@code {
+    private async Task Logout()
+    {
+        await AuthProvider.LogoutAsync();
+        Nav.NavigateTo("/login");
+    }
+}
