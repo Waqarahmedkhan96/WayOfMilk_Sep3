@@ -24,18 +24,27 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<ITokenService, TokenServiceImpl>();
 
 // B. Register the Handler (The HttpClient needs this!)
-builder.Services.AddTransient<JwtAuthHandler>();
+builder.Services.AddScoped<JwtAuthHandler>();
 
-// C. Register the Named Client (Configures the Base Address + Handler)
-builder.Services.AddHttpClient("WomAPI", client =>
+// C. THE FIX: Register HttpClient MANUALLY
+// This forces the Client + Handler + TokenService to all live in the same "Scope Bucket"
+builder.Services.AddScoped(sp =>
 {
-    client.BaseAddress = new Uri("http://localhost:5098");
-})
-.AddHttpMessageHandler<JwtAuthHandler>();
+    // Get the Handler from the current user's scope
+    var handler = sp.GetRequiredService<JwtAuthHandler>();
 
-// D. Register the Global HttpClient Override
-//    (Now safe because "WomAPI" is definitely defined above)
-builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("WomAPI"));
+    // Important: The "InnerHandler" is usually null when manually creating.
+    // We must set it to a standard HttpClientHandler to actually send network requests.
+    handler.InnerHandler = new HttpClientHandler();
+
+    // Create the Client manually
+    var client = new HttpClient(handler)
+    {
+        BaseAddress = new Uri("http://localhost:5098")
+    };
+
+    return client;
+});
 
 // ==========================================
 // 3. AUTH & DOMAIN SERVICES

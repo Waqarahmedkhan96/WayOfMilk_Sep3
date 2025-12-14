@@ -4,7 +4,7 @@ namespace WoM_BlazorApp.Services.Interfaces;
 
 public interface ICowService
 {
-    Task<ICollection<CowDto>> GetAllAsync();
+    Task<IEnumerable<CowDto>> GetAllAsync();
     Task<CowDto> GetByIdAsync(int id);
     Task<CowDto> CreateAsync(CowCreationDto dto);
     Task UpdateAsync(int id, CowDto dto);

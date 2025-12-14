@@ -8,68 +8,43 @@
 
 @if (!_isAuthInitialized)
 {
-    @* While we are checking for the token, show a loading screen *@
+    @* BLOCK the app until Auth is restored *@
     <div class="d-flex justify-content-center align-items-center vh-100">
-        <div class="text-center">
-            <div class="spinner-border text-primary" role="status"></div>
-            <p class="mt-2">Restoring session...</p>
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
     </div>
 }
 else
 {
-    @* Only render the Router once we know if we are logged in or not *@
+    @* Only render the Router AFTER RestoreSessionAsync finishes *@
     <CascadingAuthenticationState>
-        <Router AppAssembly="typeof(Program).Assembly">
+        <Router AppAssembly="@typeof(Program).Assembly">
             <Found Context="routeData">
-                <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                     <NotAuthorized>
-                        @if (context.User.Identity?.IsAuthenticated != true)
-                        {
-                            <RedirectToLogin />
-                        }
-                        else
-                        {
-                            <p role="alert">You are not authorized to access this resource.</p>
-                        }
+                        <RedirectToLogin />
                     </NotAuthorized>
                 </AuthorizeRouteView>
-                <FocusOnNavigate RouteData="routeData" Selector="h1" />
             </Found>
+            <NotFound>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p>Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </NotFound>
         </Router>
     </CascadingAuthenticationState>
 }
+
 @code {
     private bool _isAuthInitialized = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && !_isAuthInitialized)
+        if (firstRender)
         {
-            // Create the task to restore the session
-            var restoreTask = AuthProvider.RestoreSessionAsync();
-
-            // Create a "timer" task that finishes in 5 seconds
-            var timeoutTask = Task.Delay(TimeSpan.FromSeconds(5));
-
-            // Race them! Wait for whichever one finishes first.
-            var completedTask = await Task.WhenAny(restoreTask, timeoutTask);
-
-            // Check who won
-            if (completedTask == timeoutTask)
-            {
-                // If the timer won, it means RestoreSessionAsync got stuck.
-                // We log a warning and proceed anyway so the user isn't trapped.
-                Console.WriteLine("Session restore timed out. Loading app as Guest.");
-            }
-            else
-            {
-                // If restoreTask won, ensure any exceptions are caught/handled
-                // (This re-throws any error that might have happened inside RestoreSessionAsync)
-                await restoreTask;
-            }
-
-            //  Allow the app to render the Router
+            // This ensures the TokenService is populated BEFORE the Router loads any page
+            await AuthProvider.RestoreSessionAsync();
             _isAuthInitialized = true;
             StateHasChanged();
         }

@@ -24,7 +24,7 @@ else if (!string.IsNullOrEmpty(error))
 {
     <p style="color:red">@error</p>
 }
-else if (cows is null || cows.Count == 0)
+else if (cows is null || !cows.Any())
 {
     <p>No cows yet.</p>
 }
@@ -65,7 +65,7 @@ else
 @code {
     private bool isLoading = true;
     private string? error;
-    private ICollection<CowDto>? cows;
+    private IEnumerable<CowDto>? cows;
 
     protected override async Task OnInitializedAsync()
     {

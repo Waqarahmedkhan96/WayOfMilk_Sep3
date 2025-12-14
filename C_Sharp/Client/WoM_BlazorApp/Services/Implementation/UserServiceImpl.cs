@@ -17,10 +17,10 @@ public class UserServiceImpl : IUserService
         Converters = { new JsonStringEnumConverter() } // <--- converter here
     };
 
-    public UserServiceImpl(IHttpClientFactory factory)
+    public UserServiceImpl(HttpClient client)
     {
         // This ensures we get the BaseAddress + JwtAuthHandler
-        _client = factory.CreateClient("WomAPI");
+        _client = client;
     }
 
     // READ
