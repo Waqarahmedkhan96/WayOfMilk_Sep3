@@ -65,7 +65,6 @@ builder.Services.AddScoped<IActivityLogService, ActivityLogServiceImpl>();
 builder.Services.AddScoped<ISaleService, SaleServiceImpl>();
 builder.Services.AddScoped<ICustomerService, CustomerServiceImpl>();
 builder.Services.AddScoped<IDepartmentService, DepartmentServiceImpl>();
-builder.Services.AddScoped<ITransferRecordService, TransferRecordServiceImpl>();
 
 //mock tracking service
 builder.Services.AddScoped<ITrackerService, TrackingServiceImpl>();

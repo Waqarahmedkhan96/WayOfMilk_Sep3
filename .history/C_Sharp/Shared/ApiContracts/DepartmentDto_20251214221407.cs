@@ -7,7 +7,6 @@ namespace ApiContracts;
 public class CreateDepartmentDto
 {
     public DepartmentType Type { get; set; } // QUARANTINE/MILKING/RESTING
-    public string Name { get; set; } = string.Empty;
 }
 
 // DTO: single department

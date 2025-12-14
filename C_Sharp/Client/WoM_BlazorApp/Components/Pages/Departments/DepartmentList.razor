@@ -1,0 +1,51 @@
+@page "/departments"
+@rendermode InteractiveServer
+
+@using ApiContracts
+@using WoM_BlazorApp.Services.Interfaces
+@inject IDepartmentService DepartmentService
+
+@inject NavigationManager Nav
+
+<h3>Departments</h3>
+
+<button class="btn btn-primary mb-3"
+        @onclick="@(() => Nav.NavigateTo("/departments/create"))">
+    Add new department
+</button>
+
+@if (departments == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Type</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var d in departments)
+        {
+            <tr>
+                <td>@d.Id</td>
+                <td>@d.Type</td>
+                <td>@d.Name</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    ICollection<DepartmentDto>? departments;
+
+    protected override async Task OnInitializedAsync()
+    {
+        departments = await DepartmentService.GetAllAsync();
+    }
+}

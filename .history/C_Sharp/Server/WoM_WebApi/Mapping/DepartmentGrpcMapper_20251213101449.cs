@@ -31,8 +31,7 @@ public static class DepartmentGrpcMapper
     public static DepartmentCreationRequest ToGrpc(this CreateDepartmentDto dto)
         => new DepartmentCreationRequest
         {
-            Type = ToGrpcString(dto.Type),
-            Name = dto.Name
+            Type = ToGrpcString(dto.Type)
         };
 
     // DTO (update) → gRPC
@@ -40,8 +39,7 @@ public static class DepartmentGrpcMapper
         => new DepartmentData
         {
             Id = id,
-            Type = ToGrpcString(dto.Type),
-            Name = dto.Name
+            Type = ToGrpcString(dto.Type)
         };
 
     // gRPC → DTO
@@ -49,8 +47,7 @@ public static class DepartmentGrpcMapper
         => new DepartmentDto
         {
             Id = grpc.Id,
-            Type = FromGrpcString(grpc.Type), 
-            Name = grpc.Name
+            Type = FromGrpcString(grpc.Type)
         };
 
     // gRPC list → DTO list
