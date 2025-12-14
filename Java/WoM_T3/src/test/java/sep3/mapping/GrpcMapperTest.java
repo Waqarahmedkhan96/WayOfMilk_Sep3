@@ -48,7 +48,8 @@ class GrpcMapperTest {
         "COW-001",
         LocalDate.of(2022, 5, 5),
         true, // isHealthy
-        10L   // departmentId
+        10L,   // departmentId
+        null
     );
 
     // Act

@@ -1,0 +1,332 @@
+﻿@page "/tracking"
+@rendermode InteractiveServer
+
+@using ApiContracts
+@using WoM_BlazorApp.Services.Interfaces
+@using Microsoft.AspNetCore.Authorization
+
+@inject ITrackerService Tracker
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+@attribute [Authorize(Roles = "Owner")]
+
+<PageTitle>Traceability Dashboard</PageTitle>
+
+<div class="container mt-4">
+    <h1 class="mb-4"><i class="bi bi-search"></i> Traceability Dashboard</h1>
+
+    @* --- STEP 1: INPUTS --- *@
+    <div class="row mb-4">
+        @* Input: TRACK SALE *@
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <label class="form-label fw-bold">Track by Sale ID:</label>
+                    <div class="input-group mb-3">
+                        <input type="number" class="form-control" @bind="searchSaleId" placeholder="Enter Sale ID..." />
+                        <button class="btn btn-primary" @onclick="LoadSale">Track Sale</button>
+                    </div>
+                    @if (currentSale != null)
+                    {
+                        <div class="alert alert-info mb-0">
+                            <strong>Active:</strong> Sale #@currentSale.Id <br/>
+                            <small>@currentSale.DateTime.ToString("g")</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* Input: TRACK COW *@
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <label class="form-label fw-bold">Track by Cow ID:</label>
+                    <div class="input-group mb-3">
+                        <input type="number" class="form-control" @bind="searchCowId" placeholder="Enter Cow ID..." />
+                        @* FIXED: Calls LoadCow now *@
+                        <button class="btn btn-primary" @onclick="LoadCow">Track Cow</button>
+                    </div>
+                    @if (currentCow != null)
+                    {
+                        <div class="alert alert-info mb-0">
+                            <strong>Active:</strong> Cow #@currentCow.Id <br/>
+                            <small>Reg: @currentCow.RegNo</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* ERROR DISPLAY *@
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @error
+            <button type="button" class="btn-close" @onclick="() => error = null"></button>
+        </div>
+    }
+
+    @* --- STEP 2: PANELS (Dependent on what is being tracked) --- *@
+
+    @* === MODE A: TRACKING A SALE === *@
+    @if (currentSale != null)
+    {
+        <h4 class="mb-3 text-muted border-bottom pb-2">Results for Sale #@currentSale.Id</h4>
+        <div class="row g-4">
+
+            @* 1. CUSTOMERS *@
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-people-fill"></i> Customers</span>
+                        <button class="btn btn-sm btn-light text-primary" @onclick="LoadCustomers">Load</button>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (customers != null)
+                        {
+                            <ul class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
+                                @foreach (var c in customers)
+                                {
+                                    <li class="list-group-item @(c.Id == currentSale.CustomerId ? "bg-warning-subtle" : "")">
+                                        <strong>@c.CompanyName</strong>
+                                        <div class="small text-muted">ID: @c.Id</div>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @* 2. CONTAINERS *@
+            <div class="col-md-4">
+                <div class="card h-100 border-secondary">
+                    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-box-seam-fill"></i> Containers</span>
+                        <button class="btn btn-sm btn-light text-secondary" @onclick="LoadContainers">Load</button>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (containers != null)
+                        {
+                            <ul class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
+                                @foreach (var c in containers)
+                                {
+                                    <li class="list-group-item @(c.Id == currentSale.ContainerId ? "bg-warning-subtle" : "")">
+                                        <strong>Container #@c.Id</strong>
+                                        <div class="small text-muted">@c.OccupiedCapacityL L</div>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @* 3. COWS (With Suspect Button) *@
+            <div class="col-md-4">
+                <div class="card h-100 border-danger">
+                    <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-bug-fill"></i> Source Cows</span>
+                        <button class="btn btn-sm btn-light text-danger" @onclick="LoadCows">Load</button>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (cows != null)
+                        {
+                            <ul class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
+                                @foreach (var cow in cows)
+                                {
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between">
+                                            <span>#@cow.Id (@cow.RegNo)</span>
+                                            @if(!cow.Healthy) { <span class="badge bg-danger">Suspect</span> }
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                            <div class="p-2 border-top bg-light text-center">
+                                <button class="btn btn-sm btn-outline-danger w-100" @onclick="MarkAllSuspect">
+                                    Mark All Suspect
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @* === MODE B: TRACKING A COW === *@
+    @if (currentCow != null)
+    {
+        <h4 class="mb-3 text-muted border-bottom pb-2">Results for Cow #@currentCow.Id</h4>
+        <div class="row g-4">
+
+            @* 1. INVOLVED SALES *@
+            <div class="col-md-6">
+                <div class="card h-100 border-success">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-currency-dollar"></i> Involved Sales</span>
+                        <button class="btn btn-sm btn-light text-success" @onclick="LoadSales">Load</button>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (sales != null)
+                        {
+                            <ul class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
+                                @foreach (var s in sales)
+                                {
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between">
+                                            <strong>Sale #@s.Id</strong>
+                                            <span>@s.Price kr</span>
+                                        </div>
+                                        <div class="small text-muted">@s.DateTime.ToString("g")</div>
+                                    </li>
+                                }
+                            </ul>
+                            <div class="p-2 text-center border-top bg-light">
+                                <small class="text-muted">Total: @sales.Count()</small>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="p-4 text-muted text-center">Click load to see sales</div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @* 2. Containers (Optional context for Cow) *@
+            <div class="col-md-6">
+                <div class="card h-100 border-secondary">
+                    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-box-seam-fill"></i> Involved Containers</span>
+                        <button class="btn btn-sm btn-light text-secondary" @onclick="LoadContainers">Load</button>
+                    </div>
+                    <div class="card-body p-0">
+                         @if (containers != null)
+                        {
+                            <ul class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
+                                @foreach (var c in containers)
+                                {
+                                    <li class="list-group-item">
+                                        <strong>Container #@c.Id</strong>
+                                        <div class="small text-muted">@c.OccupiedCapacityL L</div>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    // Inputs
+    private long? searchSaleId;
+    private long? searchCowId;
+
+    // Active Objects
+    private SaleDto? currentSale;
+    private CowDto? currentCow;
+    private string? error;
+
+    // Lists
+    private IEnumerable<CowDto>? cows;
+    private IEnumerable<CustomerDto>? customers;
+    private IEnumerable<ContainerDto>? containers;
+    private IEnumerable<SaleDto>? sales; // Added this missing list
+
+    // --- MODE: LOAD SALE ---
+    private async Task LoadSale()
+    {
+        error = null;
+        // Reset COW mode
+        currentCow = null; sales = null;
+        // Reset panels
+        cows = null; customers = null; containers = null;
+
+        if (searchSaleId == null || searchSaleId <= 0) return;
+
+        try
+        {
+            currentSale = await Tracker.GetSaleByIdAsync(searchSaleId.Value);
+        }
+        catch (Exception ex)
+        {
+            error = "Sale not found.";
+            currentSale = null;
+        }
+    }
+
+    // --- MODE: LOAD COW ---
+    private async Task LoadCow()
+    {
+        error = null;
+        // Reset SALE mode
+        currentSale = null; customers = null; cows = null;
+        // Reset panels
+        sales = null; containers = null;
+
+        if (searchCowId == null || searchCowId <= 0) return;
+
+        try
+        {
+            // Requires the new method in ITrackerService
+            currentCow = await Tracker.GetCowByIdAsync(searchCowId.Value);
+        }
+        catch (Exception ex)
+        {
+            error = "Cow not found.";
+            currentCow = null;
+        }
+    }
+
+    // --- DATA LOADING HELPERS ---
+
+    private async Task LoadCows()
+    {
+        try { cows = await Tracker.GetInvolvedCowsAsync(); }
+        catch (Exception ex) { error = ex.Message; }
+    }
+
+    private async Task LoadCustomers()
+    {
+        try { customers = await Tracker.GetInvolvedCustomersAsync(); }
+        catch (Exception ex) { error = ex.Message; }
+    }
+
+    private async Task LoadContainers()
+    {
+        try { containers = await Tracker.GetInvolvedContainersAsync(); }
+        catch (Exception ex) { error = ex.Message; }
+    }
+
+    private async Task LoadSales()
+    {
+        try { sales = await Tracker.GetAllTrackedSalesAsync(); }
+        catch (Exception ex) { error = ex.Message; }
+    }
+
+    // --- ACTIONS ---
+
+    private async Task MarkAllSuspect()
+    {
+        if (cows == null || !cows.Any()) return;
+
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", "Mark ALL displayed cows as Sick?");
+        if (!confirmed) return;
+
+        try
+        {
+            var ids = cows.Select(c => c.Id).ToList();
+            await Tracker.MarkCowsAsSuspectAsync(ids);
+            await LoadCows(); // Refresh
+        }
+        catch (Exception ex) { error = ex.Message; }
+    }
+}

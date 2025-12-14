@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Net.Http.Headers;
+using System.Text.Json;
 using ApiContracts;
 using WoM_BlazorApp.Services.Interfaces;
 
@@ -10,7 +11,11 @@ public class ContainerServiceImpl : IContainerService
 {
     private readonly HttpClient _http;
     private readonly ITokenService _tokenService;
-
+    //this function is used to deserialize the json response from the server (token relevant)
+    private readonly JsonSerializerOptions _options = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
     public ContainerServiceImpl(HttpClient http, ITokenService tokenService)
     {
         _http = http;
@@ -34,6 +39,8 @@ public class ContainerServiceImpl : IContainerService
         var result = await _http.GetFromJsonAsync<ContainerListDto>("containers");
         return result ?? new ContainerListDto();
     }
+
+
 
     public async Task<ContainerDto> GetByIdAsync(long id)
     {
@@ -65,5 +72,18 @@ public class ContainerServiceImpl : IContainerService
         AttachToken(); // add jwt
         var response = await _http.DeleteAsync($"containers/{id}");
         response.EnsureSuccessStatusCode();
+    }
+
+    //added for mock tracing
+    public async Task<IEnumerable<ContainerDto>> GetAllTrackedAsync()
+    {
+        var result = await GetAllAsync();
+        var response = await _http.GetAsync("cows");
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception(await response.Content.ReadAsStringAsync());
+        }
+        return await response.Content.ReadFromJsonAsync<IEnumerable<ContainerDto>>(_options)
+               ?? new List<ContainerDto>();
     }
 }

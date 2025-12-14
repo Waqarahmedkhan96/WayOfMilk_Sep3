@@ -9,4 +9,7 @@ public interface IContainerService
     Task<ContainerDto> CreateAsync(CreateContainerDto dto);
     Task<ContainerDto> UpdateAsync(long id, UpdateContainerDto dto);
     Task DeleteAsync(long id);
+
+    //mock relevant
+    Task<IEnumerable<ContainerDto>> GetAllTrackedAsync();
 }

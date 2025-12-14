@@ -61,8 +61,12 @@ builder.Services.AddScoped<IMilkService, MilkServiceImpl>();
 builder.Services.AddScoped<IContainerService, ContainerServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<ICowService, CowServiceImpl>();
-builder.Services.AddScoped<ITransferRecordService, TransferRecordServiceImpl>();
+builder.Services.AddScoped<IActivityLogService, ActivityLogServiceImpl>();
+builder.Services.AddScoped<ISaleService, SaleServiceImpl>();
+builder.Services.AddScoped<ICustomerService, CustomerServiceImpl>();
 
+//mock tracking service
+builder.Services.AddScoped<ITrackerService, TrackingServiceImpl>();
 
 // Add other services here...
 
