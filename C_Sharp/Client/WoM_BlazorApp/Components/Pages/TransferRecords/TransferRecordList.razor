@@ -15,89 +15,41 @@
     Add new transfer record
 </button>
 
-@if (isLoading)
+@if (records == null)
 {
     <p>Loading...</p>
 }
-else if (!string.IsNullOrEmpty(error))
-{
-    <p style="color:red">@error</p>
-}
-else if (transferRecords is null || transferRecords.Count == 0)
-{
-    <p>No transfer records yet.</p>
-}
 else
 {
-    <table class="table">
+    <table>
         <thead>
-        <tr>
-            <th>Id</th>
-            <th>Cow (id)</th>
-            <th>Move Date</th>
-            <th>From Department</th>
-            <th>To Department</th>
-            <th>Requested By Employee (id)</th>
-            <th>Approved By Vet (employee id)</th>
-            <th>Department</th>
-        </tr>
+            <tr>
+                <th>Cow id</th>
+                <th>From Department (id)</th>
+                <th>To Department (id)</th>
+                <th>Moved At</th>
+                <th>Requested By User (id)</th>
+            </tr>
         </thead>
         <tbody>
-        @foreach (var transferRecord in transferRecords)
+        @foreach (var r in records)
         {
             <tr>
-                <td>@transferRecord.Id</td>
-                <td>@transferRecord.CowId</td>
-                <td>@transferRecord.MovedAt</td>
-                <td>@transferRecord.FromDepartmentId</td>
-                <td>@transferRecord.ToDepartmentId</td>
-                <td>@transferRecord.RequestedByUserId</td>
-                <td>@transferRecord.ApprovedByVetUserId</td>
-                <td>@transferRecord.DepartmentId</td>
-                <td>
-                    <button class="btn btn-sm btn-danger"
-                            @onclick="() => DeleteAsync(transferRecord.Id)">
-                        Delete
-                    </button>
-                </td>
+                <td>@r.CowId</td>
+                <td>@r.FromDepartmentId</td>
+                <td>@r.ToDepartmentId</td>
+                <td>@r.MovedAt</td>
+                <td>@r.RequestedByUserId</td>
             </tr>
         }
         </tbody>
     </table>
 }
-
 @code {
-    private bool isLoading = true;
-    private string? error;
-    private ICollection<TransferRecordDto>? transferRecords;
+    ICollection<TransferRecordDto>? records;
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            transferRecords = await TransferRecordService.GetAllAsync();
-        }
-        catch (Exception e)
-        {
-            error = e.Message;
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
-
-    private async Task DeleteAsync(long id)
-    {
-        error = null;
-        try
-        {
-            await TransferRecordService.DeleteAsync(id);
-            transferRecords = await TransferRecordService.GetAllAsync();
-        }
-        catch (Exception e)
-        {
-            error = e.Message;
-        }
+        records = await TransferRecordService.GetAllAsync();
     }
 }

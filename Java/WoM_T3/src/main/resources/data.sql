@@ -112,7 +112,7 @@ VALUES
 -- ===========================
 
 INSERT INTO transfer_record
-(moved_at,              from_dept_id, to_dept_id, department_id, requested_by_id, approved_by_vet_id, cow_id)
+(moved_at,              from_deptartment_id, to_department_id, requested_by_id, approved_by_vet_id, cow_id)
 VALUES
     ('2025-12-01 08:00:00', 1,           2,          2,             2,               3,                 1),
     ('2025-12-02 09:30:00', 2,           3,          3,             2,               3,                 3);

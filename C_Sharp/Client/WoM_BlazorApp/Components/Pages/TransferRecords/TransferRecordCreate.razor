@@ -3,86 +3,51 @@
 
 @using ApiContracts
 @using WoM_BlazorApp.Services.Interfaces
-@inject ITransferRecordService TransferRecordService
+@inject ITransferRecordService TransferService
 @inject NavigationManager Nav
 
-<PageTitle>Add Transfer Record</PageTitle>
+<h3>Create Transfer Record</h3>
 
-<h1>Add new transfer record</h1>
-
-<div class="mb-3">
-    <label class="form-label">Cow Id</label>
-    <InputNumber @bind-Value="cowId" class="form-control" />
+<div>
+    <label>Cow Id</label><br />
+    <input type="number" @bind="cowId" />
 </div>
 
-<div class="mb-3">
-    <label class="form-label">Move Date</label>
-    <InputDate @bind-Value="moveDate" TValue="DateTime" class="form-control" />
+<div>
+    <label>From Department (id)</label><br />
+    <input type="number" @bind="fromDepartmentId" />
 </div>
 
-<div class="mb-3">
-    <label class="form-label">From Department</label>
-    <InputSelect @bind-Value="fromDept" class="form-control">
-        @foreach (var deptName in Enum.GetNames(typeof(DepartmentType)))
-        {
-            <option value="@deptName">@deptName</option>
-        }
-    </InputSelect>
+<div>
+    <label>To Department (id)</label><br />
+    <input type="number" @bind="toDepartmentId" />
 </div>
 
-<div class="mb-3">
-    <label class="form-label">To Department</label>
-    <InputSelect @bind-Value="toDept" class="form-control">
-        @foreach (var deptName in Enum.GetNames(typeof(DepartmentType)))
-        {
-            <option value="@deptName">@deptName</option>
-        }
-    </InputSelect>
+<div>
+    <label>Moved At</label><br />
+    <input type="datetime-local" @bind="movedAt" />
 </div>
 
-<div class="mb-3">
-    <label class="form-label">Requested By Employee Id</label>
-    <InputNumber @bind-Value="requestedByUserId" class="form-control" />
-</div>
-
-@if (!string.IsNullOrEmpty(error))
-{
-    <p style="color:red">@error</p>
-}
-
-<button class="btn btn-success" @onclick="CreateAsync">Save</button>
-<button class="btn btn-secondary ms-2" @onclick="@(() => Nav.NavigateTo("/transfer-records"))">
-    Cancel
-</button>
+<br />
+<button @onclick="Create">Create</button>
 
 @code {
-    private int cowId;
-    private DateTime moveDate = DateTime.Today;
-    private long fromDept;
-    private long toDept;
-    private int requestedByUserId;
-    private string? error;
+    long cowId;
+    int fromDepartmentId;
+    int toDepartmentId;
+    DateTime movedAt = DateTime.Now;
 
-    private async Task CreateAsync()
+    async Task Create()
     {
-        error = null;
-        try
+        var dto = new CreateTransferRecordDto
         {
-            var dto = new CreateTransferRecordDto
-            {
-                CowId = cowId,
-                MovedAt = moveDate,
-                FromDepartmentId = fromDept,
-                ToDepartmentId = toDept,
-                RequestedByUserId = requestedByUserId
-            };
+            CowId = cowId,
+            FromDepartmentId = fromDepartmentId,
+            ToDepartmentId = toDepartmentId,
+            MovedAt = movedAt
+        };
 
-            await TransferRecordService.CreateAsync(dto);
-            Nav.NavigateTo("/transfer-records");
-        }
-        catch (Exception e)
-        {
-            error = e.Message;
-        }
+        await TransferService.CreateAsync(dto);
+        Nav.NavigateTo("/transfer-records");
     }
 }

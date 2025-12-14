@@ -1,6 +1,7 @@
 using ApiContracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WoM_WebApi.Helper;
 using WoM_WebApi.Services.Interfaces;
 
 namespace WoM_WebApi.RestController;
@@ -54,6 +55,9 @@ public class TransferRecordController : ControllerBase
     [Authorize(Policy = "WorkerOrOwner")]
     public async Task<ActionResult<TransferRecordDto>> Create(CreateTransferRecordDto dto)
     {
+    
+        dto.RequestedByUserId = User.GetJWTId();
+
         // 1) create new transfer
         var created = await _transferService.CreateAsync(dto);
         // 2) return 201

@@ -61,6 +61,8 @@ builder.Services.AddScoped<IMilkService, MilkServiceImpl>();
 builder.Services.AddScoped<IContainerService, ContainerServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<ICowService, CowServiceImpl>();
+builder.Services.AddScoped<ITransferRecordService, TransferRecordServiceImpl>();
+
 
 // Add other services here...
 
