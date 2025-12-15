@@ -1,90 +1,80 @@
 using System.Net.Http.Json;
-using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using ApiContracts;
 using WoM_BlazorApp.Services.Interfaces;
 
 namespace WoM_BlazorApp.Services.Implementation;
 
-// Calls /milk endpoints
 public class MilkServiceImpl : IMilkService
 {
     private readonly HttpClient _http;
-    private readonly ITokenService _tokenService;
+    private readonly JsonSerializerOptions _json;
 
-    public MilkServiceImpl(HttpClient http, ITokenService tokenService)
+    public MilkServiceImpl(HttpClient http)
     {
         _http = http;
-        _tokenService = tokenService;
-    }
 
-    // attach JWT header
-    private void AttachToken()
-    {
-        var token = _tokenService.JwtToken;
-        if (!string.IsNullOrWhiteSpace(token))
+        _json = new JsonSerializerOptions
         {
-            _http.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
-        }
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter() } // supports enum-as-string if needed
+        };
     }
 
     public async Task<MilkListDto> GetAllAsync()
     {
-        AttachToken(); // add jwt
-        var result = await _http.GetFromJsonAsync<MilkListDto>("milk");
+        var result = await _http.GetFromJsonAsync<MilkListDto>("milk", _json);
         return result ?? new MilkListDto();
     }
 
     public async Task<MilkDto> GetByIdAsync(long id)
     {
-        AttachToken(); // add jwt
-        var result = await _http.GetFromJsonAsync<MilkDto>($"milk/{id}");
-        return result!;
+        var result = await _http.GetFromJsonAsync<MilkDto>($"milk/{id}", _json);
+        return result ?? throw new Exception("Milk record not found.");
     }
 
-    public async Task<MilkListDto> GetByContainerAsync(long id)
+    public async Task<MilkListDto> GetByContainerAsync(long containerId)
     {
-        AttachToken(); // add jwt
-        var result = await _http.GetFromJsonAsync<MilkListDto>($"milk/by-container/{id}");
+        var result = await _http.GetFromJsonAsync<MilkListDto>($"milk/by-container/{containerId}", _json);
         return result ?? new MilkListDto();
     }
 
     public async Task<MilkDto> CreateAsync(CreateMilkDto dto)
     {
-        AttachToken(); // add jwt
-        var response = await _http.PostAsJsonAsync("milk", dto);
-        response.EnsureSuccessStatusCode();
-        var created = await response.Content.ReadFromJsonAsync<MilkDto>();
-        return created!;
+        var response = await _http.PostAsJsonAsync("milk", dto, _json);
+        if (!response.IsSuccessStatusCode)
+            throw new Exception(await response.Content.ReadAsStringAsync());
+
+        var created = await response.Content.ReadFromJsonAsync<MilkDto>(_json);
+        return created ?? throw new Exception("Create milk returned empty response.");
     }
 
     public async Task<MilkDto> UpdateAsync(long id, UpdateMilkDto dto)
     {
-        AttachToken(); // add jwt
-        var response = await _http.PutAsJsonAsync($"milk/{id}", dto);
-        response.EnsureSuccessStatusCode();
-        var updated = await response.Content.ReadFromJsonAsync<MilkDto>();
-        return updated!;
+        dto.Id = id;
+
+        var response = await _http.PutAsJsonAsync($"milk/{id}", dto, _json);
+        if (!response.IsSuccessStatusCode)
+            throw new Exception(await response.Content.ReadAsStringAsync());
+
+        var updated = await response.Content.ReadFromJsonAsync<MilkDto>(_json);
+        return updated ?? throw new Exception("Update milk returned empty response.");
     }
 
-    public async Task ApproveAsync(long id, bool approved)
+    public async Task ApproveAsync(long id, ApproveMilkStorageDto dto)
     {
-        AttachToken(); // add jwt
+        dto.Id = id;
 
-        var dto = new ApproveMilkStorageDto
-        {
-            // ApprovedByUserId ignored in WebApi, taken from JWT
-            ApprovedForStorage = approved
-        };
-
-        var response = await _http.PostAsJsonAsync($"milk/{id}/approve", dto);
-        response.EnsureSuccessStatusCode();
+        var response = await _http.PostAsJsonAsync($"milk/{id}/approve", dto, _json);
+        if (!response.IsSuccessStatusCode)
+            throw new Exception(await response.Content.ReadAsStringAsync());
     }
 
     public async Task DeleteAsync(long id)
     {
-        AttachToken(); // add jwt
         var response = await _http.DeleteAsync($"milk/{id}");
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+            throw new Exception(await response.Content.ReadAsStringAsync());
     }
 }
