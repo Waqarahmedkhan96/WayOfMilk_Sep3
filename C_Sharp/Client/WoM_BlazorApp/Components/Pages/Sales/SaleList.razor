@@ -1,12 +1,9 @@
-@page "/sales"
 @rendermode InteractiveServer
 
 @using ApiContracts
 @using WoM_BlazorApp.Services.Interfaces
 @inject ISaleService SaleService
 @inject NavigationManager Nav
-
-<PageTitle>Sales</PageTitle>
 
 <h1>Sales</h1>
 
@@ -39,6 +36,7 @@ else
             <th>Customer (id)</th>
             <th>Employee (id)</th>
             <th>Recall case</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>

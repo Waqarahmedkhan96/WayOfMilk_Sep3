@@ -1,12 +1,9 @@
-@page "/customers"
 @rendermode InteractiveServer
 
 @using ApiContracts
 @using WoM_BlazorApp.Services.Interfaces
 @inject ICustomerService CustomerService
 @inject NavigationManager Nav
-
-<PageTitle>Customers</PageTitle>
 
 <h1>Customers</h1>
 
@@ -37,6 +34,7 @@ else
             <th>PhoneNo</th>
             <th>Email</th>
             <th>CompanyCVR</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
