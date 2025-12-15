@@ -56,4 +56,12 @@ public class ContainerServiceImpl : IContainerService
         if (!response.IsSuccessStatusCode)
             throw new Exception(await response.Content.ReadAsStringAsync());
     }
+
+    // mock relevant
+   public async Task<IEnumerable<ContainerDto>> GetAllTrackedAsync()
+{
+    var list = await GetAllAsync(); // GET /containers
+    return list.Containers;
+}
+
 }

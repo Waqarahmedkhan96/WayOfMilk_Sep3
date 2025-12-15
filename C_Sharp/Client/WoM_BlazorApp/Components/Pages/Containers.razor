@@ -1,56 +1,157 @@
 @page "/containers"
+@using System.Security.Claims
 @using ApiContracts
-@using WoM_BlazorApp.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Authorization
+@using WoM_BlazorApp.Services.Interfaces
+
 @inject IContainerService ContainerService
 @inject AuthenticationStateProvider AuthStateProvider
+@inject IJSRuntime JS
 
-<h3>Containers</h3>
+<PageTitle>Containers</PageTitle>
 
-@if (!string.IsNullOrEmpty(_error))
+<h2 class="mb-3">Containers</h2>
+
+@if (!string.IsNullOrWhiteSpace(_error))
 {
-    <div class="alert alert-danger">@_error</div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @_error
+        <button type="button" class="btn-close" @onclick="() => _error = null"></button>
+    </div>
 }
 
-<div class="card p-3 mb-3">
-    <h5>Add Container</h5>
-    <input class="form-control mb-2" type="number" step="0.1" @bind="_capacity" />
-    <button class="btn btn-primary" @onclick="Create">Create</button>
+@if (!string.IsNullOrWhiteSpace(_success))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @_success
+        <button type="button" class="btn-close" @onclick="() => _success = null"></button>
+    </div>
+}
+
+<div class="d-flex gap-2 mb-3 flex-wrap">
+    <button class="btn btn-primary" @onclick="ToggleAdd">
+        @(_showAdd ? "Close Add" : "+ Add Container")
+    </button>
+
+    <button class="btn btn-outline-secondary" @onclick="Reload">
+        Refresh
+    </button>
 </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Capacity</th>
-            <th>Occupied</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var c in _containers)
-        {
+@if (_showAdd)
+{
+    <div class="card p-3 mb-3">
+        <h5 class="mb-3">Add Container</h5>
+
+        <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Capacity (L)</label>
+                <input class="form-control" type="number" step="0.1" @bind="_createCapacity" />
+            </div>
+
+            <div class="col-md-8 d-flex gap-2">
+                <button class="btn btn-success" @onclick="CreateContainer">
+                    Create
+                </button>
+                <button class="btn btn-outline-secondary" @onclick="() => _createCapacity = 0">
+                    Reset
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (_editing != null)
+{
+    <div class="card p-3 mb-3 border border-primary">
+        <h5 class="mb-3">Update Container</h5>
+
+        <div class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label">Id</label>
+                <input class="form-control" type="number" value="@_editing.Id" disabled /> @* id lock *@
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Capacity (L)</label>
+                <input class="form-control" type="number" step="0.1" @bind="_editCapacity" />
+            </div>
+
+            <div class="col-md-6 d-flex gap-2">
+                <button class="btn btn-success" @onclick="UpdateContainer">
+                    Save
+                </button>
+                <button class="btn btn-outline-secondary" @onclick="CancelEdit">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
             <tr>
-                <td>@c.Id</td>
-                <td>@c.CapacityL</td>
-                <td>@c.OccupiedCapacityL</td>
-                <td>
-                    <button class="btn btn-danger btn-sm"
-                            disabled="@(!_isOwner)"
-                            @onclick="() => Delete(c.Id)">
-                        Delete
-                    </button>
-                </td>
+                <th>Id</th>
+                <th>Capacity</th>
+                <th>Occupied</th>
+                <th style="width: 220px;">Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @if (_containers.Count == 0)
+            {
+                <tr>
+                    <td colspan="4" class="text-muted">No containers.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var c in _containers)
+                {
+                    <tr>
+                        <td>@c.Id</td>
+                        <td>@c.CapacityL</td>
+                        <td>@c.OccupiedCapacityL</td>
+                        <td>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button class="btn btn-outline-primary btn-sm" @onclick="() => BeginEdit(c)">
+                                    Update
+                                </button>
+
+                                <button class="btn btn-danger btn-sm"
+                                        disabled="@(!_isOwner)"
+                                        @onclick="() => DeleteContainer(c.Id)">
+                                    Delete
+                                </button>
+                            </div>
+
+                            @if (!_isOwner)
+                            {
+                                <small class="text-muted">Only Owner can delete.</small>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
 
 @code {
     private readonly List<ContainerDto> _containers = new();
+
     private string? _error;
+    private string? _success;
+
     private bool _isOwner;
-    private double _capacity;
+
+    private bool _showAdd;
+    private double _createCapacity;
+
+    private ContainerDto? _editing;
+    private double _editCapacity;
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,18 +161,38 @@
         await Reload();
     }
 
+    private void ToggleAdd()
+    {
+        _showAdd = !_showAdd;
+        _error = null;
+        _success = null;
+    }
+
     private async Task Reload()
     {
+        _error = null;
+        _success = null;
+
         var list = await ContainerService.GetAllAsync();
         _containers.Clear();
         _containers.AddRange(list.Containers);
     }
 
-    private async Task Create()
+    private async Task CreateContainer()
     {
+        _error = null;
+        _success = null;
+
+        if (_createCapacity <= 0)
+        {
+            _error = "Capacity must be > 0.";
+            return;
+        }
+
         try
         {
-            await ContainerService.CreateAsync(new CreateContainerDto { CapacityL = _capacity });
+            var created = await ContainerService.CreateAsync(new CreateContainerDto { CapacityL = _createCapacity });
+            _success = $"Container created (Id={created.Id}).";
             await Reload();
         }
         catch (Exception ex)
@@ -80,11 +201,68 @@
         }
     }
 
-    private async Task Delete(long id)
+    private void BeginEdit(ContainerDto c)
+    {
+        _editing = c;
+        _editCapacity = c.CapacityL;
+        _error = null;
+        _success = null;
+    }
+
+    private void CancelEdit()
+    {
+        _editing = null;
+        _error = null;
+        _success = null;
+    }
+
+    private async Task UpdateContainer()
+    {
+        if (_editing == null) return;
+
+        _error = null;
+        _success = null;
+
+        if (_editCapacity <= 0)
+        {
+            _error = "Capacity must be > 0.";
+            return;
+        }
+
+        try
+        {
+            await ContainerService.UpdateAsync(_editing.Id, new UpdateContainerDto
+            {
+                Id = _editing.Id,
+                CapacityL = _editCapacity
+            });
+
+            _success = "Container updated.";
+            _editing = null;
+            await Reload();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+
+    private async Task DeleteContainer(long id)
     {
         if (!_isOwner) return;
 
-        await ContainerService.DeleteAsync(id);
-        await Reload();
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"Delete container {id}?");
+        if (!confirmed) return;
+
+        try
+        {
+            await ContainerService.DeleteAsync(id);
+            _success = "Deleted.";
+            await Reload();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
     }
 }

@@ -1,109 +1,478 @@
 @page "/milk"
+@using System.Security.Claims
 @using ApiContracts
 @using Microsoft.AspNetCore.Components.Authorization
 @using WoM_BlazorApp.Services.Interfaces
 
 @inject IMilkService MilkService
+@inject ICowService CowService
+@inject IContainerService ContainerService
 @inject AuthenticationStateProvider AuthStateProvider
+@inject IJSRuntime JS
 
-<h3>Milk Records</h3>
+<PageTitle>Milk</PageTitle>
 
-@if (!string.IsNullOrEmpty(_error))
+<h2 class="mb-3">Milk Records</h2>
+
+@if (!string.IsNullOrWhiteSpace(_error))
 {
-    <div class="alert alert-danger">@_error</div>
+    <div class="alert alert-danger alert-dismissible fade show">
+        @_error
+        <button class="btn-close" @onclick="() => _error = null"></button>
+    </div>
 }
 
+@if (!string.IsNullOrWhiteSpace(_success))
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @_success
+        <button class="btn-close" @onclick="() => _success = null"></button>
+    </div>
+}
+
+<div class="d-flex gap-2 mb-3 flex-wrap">
+    <button class="btn btn-primary"
+            @onclick="ToggleAdd"
+            disabled="@(!_canUseMilk)">
+        @(_showAdd ? "Close Add" : "+ Add Milk")
+    </button>
+
+    <button class="btn btn-outline-secondary" @onclick="Reload">
+        Refresh
+    </button>
+</div>
+
+@if (!_canUseMilk)
+{
+    <div class="alert alert-warning">
+        Only Owner and Worker can access Milk features.
+    </div>
+}
+
+<!-- ✅ FILTERS (ADDED from your other version) -->
 <div class="card p-3 mb-3">
-    <h5>Add Milk</h5>
+    <h5 class="mb-3">Filters</h5>
 
-    <div class="row g-2">
-        <input class="form-control col" placeholder="CowId" type="number" @bind="_cowId" />
-        <input class="form-control col" placeholder="ContainerId" type="number" @bind="_containerId" />
-        <input class="form-control col" placeholder="Volume (L)" type="number" step="0.1" @bind="_volume" />
+    <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">Milk Id</label>
+            <input class="form-control" type="number" @bind="_filterMilkId" placeholder="e.g. 1" />
+        </div>
 
-        <select class="form-select col" @bind="_testResult">
-            @foreach (var v in Enum.GetValues<MilkTestResult>())
-            {
-                <option value="@v">@v</option>
-            }
-        </select>
+        <div class="col-md-3">
+            <label class="form-label">Container Id</label>
+            <input class="form-control" type="number" @bind="_filterContainerId" placeholder="e.g. 2" />
+        </div>
 
-        <button class="btn btn-primary col" @onclick="Create">Create</button>
+        <div class="col-md-6 d-flex gap-2 flex-wrap">
+            <button class="btn btn-outline-primary" @onclick="FilterByMilkId">
+                Get by Id
+            </button>
+            <button class="btn btn-outline-primary" @onclick="FilterByContainerId">
+                Get by Container
+            </button>
+            <button class="btn btn-outline-secondary" @onclick="ClearFilters">
+                Clear
+            </button>
+        </div>
     </div>
 </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Cow</th>
-            <th>Container</th>
-            <th>Volume</th>
-            <th>Test</th>
-            <th>Approved</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var m in _milks)
-        {
+@if (_showAdd)
+{
+    <div class="card p-3 mb-3">
+        <h5>Add Milk</h5>
+
+        <!-- align fix -->
+        <div class="row g-2 align-items-end">
+
+            <!-- Cow -->
+            <div class="col-md-3">
+                <label class="form-label">Cow Id</label>
+                <input class="form-control" type="number"
+                       list="cowIds"
+                       @bind="_createCowId" />
+                @if (!string.IsNullOrWhiteSpace(_cowMsg))
+                {
+                    <small class="text-danger">@_cowMsg</small>
+                }
+            </div>
+
+            <!-- Container -->
+            <div class="col-md-3">
+                <label class="form-label">Container Id</label>
+                <input class="form-control" type="number"
+                       list="containerIds"
+                       @bind="_createContainerId" />
+                @if (!string.IsNullOrWhiteSpace(_containerMsg))
+                {
+                    <small class="text-danger">@_containerMsg</small>
+                }
+            </div>
+
+            <!-- Volume -->
+            <div class="col-md-3">
+                <label class="form-label">Volume (L)</label>
+                <input class="form-control" type="number" step="0.1"
+                       @bind="_createVolume" />
+            </div>
+
+            <!-- Test -->
+            <div class="col-md-3">
+                <label class="form-label">Test Result</label>
+                <select class="form-select" @bind="_createTestResult">
+                    @foreach (var v in Enum.GetValues<MilkTestResult>())
+                    {
+                        <option value="@v">@v</option>
+                    }
+                </select>
+            </div>
+
+            <!-- ✅ REGISTERED BY (READ ONLY) -->
+            <div class="col-md-3">
+                <label class="form-label">Registered By (You)</label>
+
+                <!-- read-only -->
+                <input class="form-control"
+                       type="number"
+                       value="@_currentUserId"
+                       disabled />
+
+                <small class="text-muted">
+                    Automatically set from logged-in user
+                </small>
+
+                @if (!string.IsNullOrWhiteSpace(_authMsg))
+                {
+                    <small class="text-danger d-block">@_authMsg</small>
+                }
+            </div>
+
+            <!-- Approved -->
+            <div class="col-md-3">
+                <label class="form-label">Approved For Storage</label>
+                <select class="form-select"
+                        @bind="_createApproved"
+                        disabled="true">
+                    <option value="true">True</option>
+                </select>
+
+                <small class="text-muted">Must be approved to be stored</small>
+            </div>
+
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button class="btn btn-success"
+                        @onclick="CreateMilk"
+                        disabled="@(!_canUseMilk)">
+                    Create
+                </button>
+
+                <button class="btn btn-outline-secondary" @onclick="ResetCreateForm">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- DATALISTS -->
+        <datalist id="cowIds">
+            @foreach (var id in _cowIds)
+            {
+                <option value="@id"></option>
+            }
+        </datalist>
+
+        <datalist id="containerIds">
+            @foreach (var id in _containerIds)
+            {
+                <option value="@id"></option>
+            }
+        </datalist>
+    </div>
+}
+
+<!-- TABLE -->
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
             <tr>
-                <td>@m.Id</td>
-                <td>@m.CowId</td>
-                <td>@m.ContainerId</td>
-                <td>@m.VolumeL</td>
-                <td>@m.TestResult</td>
-                <td>@m.ApprovedForStorage</td>
-                <td>
-                    <button class="btn btn-danger btn-sm"
-                            disabled="@(!_isOwner)"
-                            @onclick="() => Delete(m.Id)">
-                        Delete
-                    </button>
-                </td>
+                <th>Id</th>
+                <th>Cow</th>
+                <th>Container</th>
+                <th>Volume</th>
+                <th>Test</th>
+                <th>Approved</th>
+                <th>Registered By</th>
+                <th style="width: 220px;">Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @if (_milks.Count == 0)
+            {
+                <tr>
+                    <td colspan="8" class="text-muted">No records.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var m in _milks)
+                {
+                    <tr>
+                        <td>@m.Id</td>
+                        <td>@m.CowId</td>
+                        <td>@m.ContainerId</td>
+                        <td>@m.VolumeL</td>
+                        <td>@m.TestResult</td>
+                        <td>@m.ApprovedForStorage</td>
+                        <td>@m.RegisteredByUserId</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm"
+                                    disabled="@(!_canDelete)"
+                                    @onclick="() => DeleteMilk(m.Id)">
+                                Delete
+                            </button>
+
+                            @if (!_canDelete)
+                            {
+                                <small class="text-muted d-block">
+                                    Worker cannot delete
+                                </small>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
 
 @code {
-    private readonly List<MilkDto> _milks = new();
-    private string? _error;
-    private bool _isOwner;
 
-    private long _cowId;
-    private long _containerId;
-    private double _volume;
-    private MilkTestResult _testResult = MilkTestResult.Pass;
+    private readonly List<MilkDto> _milks = new();
+
+    private readonly List<long> _cowIds = new();
+    private readonly List<long> _containerIds = new();
+
+    private string? _error;
+    private string? _success;
+
+    private bool _showAdd;
+
+    private bool _isOwner;
+    private bool _isWorker;
+
+    private bool _canUseMilk => _isOwner || _isWorker;   // ✅ only these roles can CRUD
+    private bool _canDelete => _isOwner;                 // delete lock
+
+    // ✅ CURRENT USER ID (SOURCE OF TRUTH)
+    private long _currentUserId;
+
+    // small message for auth problems
+    private string? _authMsg;
+
+    // ✅ FILTERS (ADDED)
+    private long? _filterMilkId;
+    private long? _filterContainerId;
+
+    // CREATE FIELDS
+    private long _createCowId;
+    private long _createContainerId;
+    private double _createVolume;
+    private MilkTestResult _createTestResult = MilkTestResult.Pass;
+    private bool _createApproved = true; // ✅ must be true because Java requires it
+
+    // Validation messages
+    private string? _cowMsg;
+    private string? _containerMsg;
 
     protected override async Task OnInitializedAsync()
     {
-        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
-        _isOwner = auth.User.IsInRole("Owner");
-
+        await LoadAuth();
+        await LoadLookups();
         await Reload();
+    }
+
+    private async Task LoadAuth()
+    {
+        var auth = await AuthStateProvider.GetAuthenticationStateAsync();
+
+        _isOwner  = auth.User.IsInRole("Owner");
+        _isWorker = auth.User.IsInRole("Worker");
+
+        var idClaim =
+            auth.User.FindFirst(ClaimTypes.NameIdentifier)
+            ?? auth.User.FindFirst("id")
+            ?? auth.User.FindFirst("sub");
+
+        if (idClaim != null && long.TryParse(idClaim.Value, out var uid))
+        {
+            _currentUserId = uid;
+            _authMsg = null;
+        }
+        else
+        {
+            _currentUserId = 0;
+            _authMsg = "User id not found in token. Please logout/login again (token missing).";
+        }
+    }
+
+    private async Task LoadLookups()
+    {
+        try
+        {
+            var cows = await CowService.GetAllAsync();
+            _cowIds.Clear();
+            _cowIds.AddRange(cows.Select(c => c.Id).Distinct().OrderBy(x => x));
+
+            var containers = await ContainerService.GetAllAsync();
+            _containerIds.Clear();
+            _containerIds.AddRange(containers.Containers.Select(c => c.Id).Distinct().OrderBy(x => x));
+        }
+        catch
+        {
+            // lookup soft-fail
+        }
     }
 
     private async Task Reload()
     {
+        _error = null;
+        _success = null;
+
         var list = await MilkService.GetAllAsync();
         _milks.Clear();
         _milks.AddRange(list.Milks);
     }
 
-    private async Task Create()
+    private void ToggleAdd()
     {
+        if (!_canUseMilk)
+        {
+            _error = "Only Owner and Worker can create milk.";
+            return;
+        }
+
+        _showAdd = !_showAdd;
+        _error = null;
+        _success = null;
+    }
+
+    private void ResetCreateForm()
+    {
+        _createCowId = 0;
+        _createContainerId = 0;
+        _createVolume = 0;
+        _createTestResult = MilkTestResult.Pass;
+        _createApproved = true;
+
+        _cowMsg = null;
+        _containerMsg = null;
+        _error = null;
+        _success = null;
+    }
+
+    private async Task FilterByMilkId()
+    {
+        _error = null;
+        _success = null;
+
+        if (_filterMilkId is null || _filterMilkId <= 0)
+        {
+            _error = "Enter a valid Milk Id.";
+            return;
+        }
+
         try
         {
-            await MilkService.CreateAsync(new CreateMilkDto
+            var one = await MilkService.GetByIdAsync(_filterMilkId.Value);
+            _milks.Clear();
+            _milks.Add(one);
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+
+    private async Task FilterByContainerId()
+    {
+        _error = null;
+        _success = null;
+
+        if (_filterContainerId is null || _filterContainerId <= 0)
+        {
+            _error = "Enter a valid Container Id.";
+            return;
+        }
+
+        try
+        {
+            var list = await MilkService.GetByContainerAsync(_filterContainerId.Value);
+            _milks.Clear();
+            _milks.AddRange(list.Milks);
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+
+    private async Task ClearFilters()
+    {
+        _filterMilkId = null;
+        _filterContainerId = null;
+        await Reload();
+    }
+
+    private async Task CreateMilk()
+    {
+        _cowMsg = null;
+        _containerMsg = null;
+        _error = null;
+        _success = null;
+
+        if (!_canUseMilk)
+        {
+            _error = "Only Owner and Worker can create milk.";
+            return;
+        }
+
+        if (_currentUserId <= 0)
+        {
+            _error = "You are not authenticated properly (RegisteredBy = 0). Logout/login again.";
+            return;
+        }
+
+        // ✅ must be TRUE (Java rule)
+        var approvedToSend = true;
+
+        if (!_cowIds.Contains(_createCowId))
+            _cowMsg = "Cow not found.";
+
+        if (!_containerIds.Contains(_createContainerId))
+            _containerMsg = "Container not found.";
+
+        if (_createVolume <= 0)
+        {
+            _error = "Volume must be greater than 0.";
+            return;
+        }
+
+        if (_cowMsg != null || _containerMsg != null)
+            return;
+
+        try
+        {
+            var created = await MilkService.CreateAsync(new CreateMilkDto
             {
-                CowId = _cowId,
-                ContainerId = _containerId,
-                VolumeL = _volume,
-                TestResult = _testResult,
-                RegisteredByUserId = 0 // backend overrides if needed
+                CowId = _createCowId,
+                ContainerId = _createContainerId,
+                VolumeL = _createVolume,
+                TestResult = _createTestResult,
+                RegisteredByUserId = _currentUserId,
+                ApprovedForStorage = approvedToSend
             });
 
+            _success = $"Milk created (Id={created.Id})";
             await Reload();
         }
         catch (Exception ex)
@@ -112,11 +481,21 @@
         }
     }
 
-    private async Task Delete(long id)
+    private async Task DeleteMilk(long id)
     {
-        if (!_isOwner) return;
+        if (!_canDelete) return;
 
-        await MilkService.DeleteAsync(id);
-        await Reload();
+        bool ok = await JS.InvokeAsync<bool>("confirm", $"Delete milk {id}?");
+        if (!ok) return;
+
+        try
+        {
+            await MilkService.DeleteAsync(id);
+            await Reload();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
     }
 }

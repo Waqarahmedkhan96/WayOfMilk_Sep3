@@ -11,5 +11,5 @@ public interface IContainerService
     Task DeleteAsync(long id);
 
     //mock relevant
-    //Task<IEnumerable<ContainerDto>> GetAllTrackedAsync();
+    Task<IEnumerable<ContainerDto>> GetAllTrackedAsync();
 }
