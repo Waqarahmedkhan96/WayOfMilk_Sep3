@@ -1,0 +1,90 @@
+﻿@page "/customers/edit/{Id:long}"
+@rendermode InteractiveServer
+
+@using ApiContracts
+@using WoM_BlazorApp.Services.Interfaces
+@inject ICustomerService CustomerService
+@inject NavigationManager Nav
+
+<h3>Edit Customer</h3>
+
+@if (model == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+
+    <EditForm Model="model" OnValidSubmit="HandleSubmit">
+        <DataAnnotationsValidator />
+
+        <div class="mb-3">
+            <label class="form-label">Company Name</label>
+            <InputText @bind-Value="model.CompanyName" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Phone No</label>
+            <InputText @bind-Value="model.PhoneNo" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <InputText @bind-Value="model.Email" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Company CVR</label>
+            <InputText @bind-Value="model.CompanyCVR" class="form-control" />
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-secondary" @onclick="@(() => Nav.NavigateTo("/customers"))">Cancel</button>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public long Id { get; set; }
+
+    private CustomerDto? model;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // interface takes int, so cast
+            model = await CustomerService.GetByIdAsync((int)Id);
+        }
+        catch
+        {
+            error = "Customer not found.";
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (model == null) return;
+
+        try
+        {
+            var dto = new UpdateCustomerDto
+            {
+                CompanyName = model.CompanyName,
+                PhoneNo = model.PhoneNo,
+                Email = model.Email,
+                CompanyCVR = model.CompanyCVR
+            };
+
+            await CustomerService.UpdateAsync((int)Id, dto);
+            Nav.NavigateTo("/customers");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+}

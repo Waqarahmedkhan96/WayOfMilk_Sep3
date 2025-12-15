@@ -29,7 +29,7 @@
 
 @if (!string.IsNullOrEmpty(error))
 {
-    <p style="color:red">@error</p>
+    <div class="alert alert-danger">@error</div>
 }
 
 <button class="btn btn-success" @onclick="CreateAsync">Save</button>
@@ -47,6 +47,13 @@
     private async Task CreateAsync()
     {
         error = null;
+
+        if (string.IsNullOrWhiteSpace(companyName))
+        {
+            error = "Company name is required.";
+            return;
+        }
+
         try
         {
             var dto = new CreateCustomerDto
@@ -55,6 +62,7 @@
                 PhoneNo = phoneNo,
                 Email = email,
                 CompanyCVR = companyCVR
+                // RegisteredByUserId handled on server from token
             };
 
             await CustomerService.CreateAsync(dto);

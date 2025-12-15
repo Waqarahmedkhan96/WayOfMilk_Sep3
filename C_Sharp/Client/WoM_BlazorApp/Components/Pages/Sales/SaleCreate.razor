@@ -3,26 +3,26 @@
 
 @using ApiContracts
 @using WoM_BlazorApp.Services.Interfaces
+@using Microsoft.AspNetCore.Authorization
+
 @inject ISaleService SaleService
+@inject IUserService UserService
 @inject NavigationManager Nav
+
+@attribute [Authorize]
 
 <PageTitle>Add Sale</PageTitle>
 
 <h1>Add new sale</h1>
 
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
 <div class="mb-3">
     <label class="form-label">Date</label>
-    <InputDate @bind-Value="dateOnly" class="form-control" />
-</div>
-
-<div class="mb-3">
-    <label class="form-label">Quantity (l)</label>
-    <InputNumber @bind-Value="quantityL" class="form-control" />
-</div>
-
-<div class="mb-3">
-    <label class="form-label">Price</label>
-    <InputNumber @bind-Value="price" class="form-control" />
+    <InputDate @bind-Value="date" class="form-control" />
 </div>
 
 <div class="mb-3">
@@ -31,14 +31,24 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Employee ID</label>
-    <InputNumber @bind-Value="createdByUserId" class="form-control" />
+    <label class="form-label">Container ID</label>
+    <InputNumber @bind-Value="containerId" class="form-control" />
 </div>
 
-@if (!string.IsNullOrEmpty(error))
-{
-    <p style="color:red">@error</p>
-}
+<div class="mb-3">
+    <label class="form-label">Quantity (L)</label>
+    <InputNumber @bind-Value="quantityL" class="form-control" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Price</label>
+    <InputNumber @bind-Value="price" class="form-control" />
+</div>
+
+<div class="form-check mb-3">
+    <InputCheckbox @bind-Value="recallCase" class="form-check-input" id="recallCaseChk" />
+    <label class="form-check-label" for="recallCaseChk">Recall case</label>
+</div>
 
 <button class="btn btn-success" @onclick="CreateAsync">Save</button>
 <button class="btn btn-secondary ms-2" @onclick="@(() => Nav.NavigateTo("/sales"))">
@@ -46,33 +56,53 @@
 </button>
 
 @code {
-    private DateTime dateOnly = DateTime.Today;
-    private double quantityL;
-    private double price;
-    private int customerId;
-    private int createdByUserId;
+    private DateTime date = DateTime.Today;
+    private long customerId = 1;
+    private long containerId = 1;
+    private double quantityL = 1;
+    private double price = 1;
+    private bool recallCase = false;
+
+    private long currentUserId;
     private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var user = await UserService.GetCurrentUserAsync();
+            currentUserId = user.Id;
+        }
+        catch (Exception ex)
+        {
+            // You can still type in the form, but creation will fail until this works
+            error = $"Failed to load current user: {ex.Message}";
+        }
+    }
 
     private async Task CreateAsync()
     {
         error = null;
+
         try
         {
-            var dto = new CreateSaleDto()
+            var dto = new CreateSaleDto
             {
-                DateTime = dateOnly,
+                CustomerId = customerId,
+                ContainerId = containerId,
                 QuantityL = quantityL,
                 Price = price,
-                CustomerId = customerId,
-                CreatedByUserId = createdByUserId,
+                DateTime = date,
+                RecallCase = recallCase,
+                CreatedByUserId = currentUserId
             };
 
             await SaleService.CreateAsync(dto);
             Nav.NavigateTo("/sales");
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            error = e.Message;
+            error = ex.Message;
         }
     }
 }
