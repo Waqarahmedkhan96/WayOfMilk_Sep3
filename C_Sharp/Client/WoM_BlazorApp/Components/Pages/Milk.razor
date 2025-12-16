@@ -152,12 +152,12 @@
             <div class="col-md-3">
                 <label class="form-label">Approved For Storage</label>
                 <select class="form-select"
-                        @bind="_createApproved"
-                        disabled="true">
+                        @bind="_createApproved">
                     <option value="true">True</option>
+                    <option value="false">False</option>
                 </select>
 
-                <small class="text-muted">Must be approved to be stored</small>
+                <small class="text-muted">Milk will be saved only if approved is True</small>
             </div>
 
             <div class="col-12 mt-2 d-flex gap-2">
@@ -181,6 +181,71 @@
             }
         </datalist>
 
+        <datalist id="containerIds">
+            @foreach (var id in _containerIds)
+            {
+                <option value="@id"></option>
+            }
+        </datalist>
+    </div>
+}
+
+@if (_showEdit)
+{
+    <div class="card p-3 mb-3">
+        <h5>Edit Milk (Id=@_editId)</h5>
+
+        <div class="row g-2 align-items-end">
+
+            <div class="col-md-3">
+                <label class="form-label">Container Id</label>
+                <input class="form-control" type="number"
+                       list="containerIds"
+                       @bind="_editContainerId" />
+                @if (!string.IsNullOrWhiteSpace(_containerMsg))
+                {
+                    <small class="text-danger">@_containerMsg</small>
+                }
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Volume (L)</label>
+                <input class="form-control" type="number" step="0.1"
+                       @bind="_editVolume" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Test Result</label>
+                <select class="form-select" @bind="_editTestResult">
+                    @foreach (var v in Enum.GetValues<MilkTestResult>())
+                    {
+                        <option value="@v">@v</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Approved For Storage</label>
+                <select class="form-select" @bind="_editApproved">
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                </select>
+            </div>
+
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button class="btn btn-success"
+                        @onclick="UpdateMilk"
+                        disabled="@(!_canUseMilk)">
+                    Update
+                </button>
+
+                <button class="btn btn-outline-secondary" @onclick="CancelEdit">
+                    Cancel
+                </button>
+            </div>
+        </div>
+
+        <!-- DATALISTS -->
         <datalist id="containerIds">
             @foreach (var id in _containerIds)
             {
@@ -225,6 +290,12 @@
                         <td>@m.ApprovedForStorage</td>
                         <td>@m.RegisteredByUserId</td>
                         <td>
+                            <button class="btn btn-outline-primary btn-sm me-2"
+                                    disabled="@(!_canUseMilk)"
+                                    @onclick="() => StartEdit(m)">
+                                Update
+                            </button>
+
                             <button class="btn btn-danger btn-sm"
                                     disabled="@(!_canDelete)"
                                     @onclick="() => DeleteMilk(m.Id)">
@@ -283,6 +354,14 @@
     // Validation messages
     private string? _cowMsg;
     private string? _containerMsg;
+
+    // EDIT FIELDS
+    private bool _showEdit;
+    private long _editId;
+    private long? _editContainerId;
+    private double? _editVolume;
+    private MilkTestResult? _editTestResult;
+    private bool? _editApproved;
 
     protected override async Task OnInitializedAsync()
     {
@@ -442,6 +521,12 @@
             return;
         }
 
+        if (!_createApproved)
+        {
+            _error = "Milk must be Approved For Storage = True before saving.";
+            return;
+        }
+
         // ✅ must be TRUE (Java rule)
         var approvedToSend = true;
 
@@ -473,6 +558,79 @@
             });
 
             _success = $"Milk created (Id={created.Id})";
+            await Reload();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+
+    private void StartEdit(MilkDto m)
+    {
+        if (!_canUseMilk) return;
+
+        _error = null;
+        _success = null;
+        _cowMsg = null;
+        _containerMsg = null;
+
+        _showEdit = true;
+
+        _editId = m.Id;
+        _editContainerId = m.ContainerId;
+        _editVolume = m.VolumeL;
+        _editTestResult = m.TestResult;
+        _editApproved = m.ApprovedForStorage;
+    }
+
+    private void CancelEdit()
+    {
+        _showEdit = false;
+        _error = null;
+        _success = null;
+    }
+
+    private async Task UpdateMilk()
+    {
+        _cowMsg = null;
+        _containerMsg = null;
+        _error = null;
+        _success = null;
+
+        if (!_canUseMilk)
+        {
+            _error = "Only Owner and Worker can update milk.";
+            return;
+        }
+
+        if (_editContainerId.HasValue && !_containerIds.Contains(_editContainerId.Value))
+            _containerMsg = "Container not found.";
+
+        if (_editVolume.HasValue && _editVolume.Value <= 0)
+        {
+            _error = "Volume must be greater than 0.";
+            return;
+        }
+
+        if (_containerMsg != null)
+            return;
+
+        try
+        {
+            var dto = new UpdateMilkDto
+            {
+                Id = _editId,
+                ContainerId = _editContainerId,
+                VolumeL = _editVolume,
+                TestResult = _editTestResult,
+                ApprovedForStorage = _editApproved
+            };
+
+            var updated = await MilkService.UpdateAsync(_editId, dto);
+
+            _success = $"Milk updated (Id={updated.Id})";
+            _showEdit = false;
             await Reload();
         }
         catch (Exception ex)
