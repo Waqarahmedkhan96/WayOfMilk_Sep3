@@ -35,6 +35,12 @@ else
                 <td>@d.Id</td>
                 <td>@d.Type</td>
                 <td>@d.Name</td>
+                <td>
+                    <button class="btn btn-sm btn-danger"
+                            @onclick="() => DeleteAsync((int)d.Id)">
+                        Delete
+                    </button>
+                </td>
             </tr>
         }
         </tbody>
@@ -46,6 +52,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        departments = await DepartmentService.GetAllAsync();
+    }
+    private async Task DeleteAsync(int id)
+    {
+        await DepartmentService.DeleteAsync(id);
         departments = await DepartmentService.GetAllAsync();
     }
 }
