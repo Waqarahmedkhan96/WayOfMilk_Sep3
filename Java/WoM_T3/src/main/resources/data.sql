@@ -1,76 +1,76 @@
--- ==========================================
--- CLEAN START (respect FK order)
--- ==========================================
-DELETE FROM transfer_record;
-DELETE FROM milk;
-DELETE FROM sale;
-DELETE FROM cow;
-DELETE FROM customer;
-DELETE FROM container;
-DELETE FROM departments;
-DELETE FROM users;
-
--- ==========================================
--- USERS (OWNER, VET, WORKER)
--- ==========================================
-INSERT INTO users (id, user_type, name, email, password, phone, address, role, license_number)
-VALUES
-    (1, 'OWNER',  'Farm Owner', 'owner@wom.dk',  '12345', '11111111', 'Farm HQ', 'OWNER',  NULL),
-    (2, 'VET',    'Dr. Vet',    'vet@wom.dk',    '11111', '22222222', 'Vet Clinic', 'VET', 'VET-123'),
-    (3, 'WORKER', 'Worker One', 'worker@wom.dk', '00000', '33333333', 'Farm Area', 'WORKER', NULL);
-
--- ==========================================
--- DEPARTMENTS
--- ==========================================
-INSERT INTO departments (id, name, type)
-VALUES
-    (1, 'Quarantine Dept', 'QUARANTINE'),
-    (2, 'Milking Dept',    'MILKING'),
-    (3, 'Resting Dept',    'RESTING');
-
--- ==========================================
--- CONTAINERS
--- ==========================================
-INSERT INTO container (id, capacity_l, occupied_capacity_l)
-VALUES
-    (1, 1000, 200),
-    (2, 1500, 500);
-
--- ==========================================
--- COWS
--- ==========================================
-INSERT INTO cow (id, reg_no, birth_date, is_healthy, department_id, registered_by)
-VALUES
-    (1, 'VJ-001', '2021-01-10', true,  2, 3),
-    (2, 'VJ-002', '2020-06-15', false, 1, 3),
-    (3, 'VJ-003', '2019-03-20', true,  3, 3);
-
--- ==========================================
--- MILK RECORDS
--- ==========================================
-INSERT INTO milk (id, approved_for_storage, date, milk_test_result, volumel, container_id, cow_id, registered_by_id)
-VALUES
-    (1, true,  '2025-12-10', 'PASS',  50, 1, 1, 3),
-    (2, false, '2025-12-11', 'FAIL',  30, 2, 2, 3);
-
--- ==========================================
--- CUSTOMER
--- ==========================================
-INSERT INTO customer (id, companycvr, company_name, email, phone_no, registered_by_id)
-VALUES
-    (1, 'DK12345678', 'Danish Dairy', 'contact@dairy.dk', '88888888', 1);
-
--- ==========================================
--- SALE
--- ==========================================
-INSERT INTO sale (id, date_time, price, quantityl, recall_case, container_id, created_by_id, customer_id)
-VALUES
-    (1, '2025-12-12 10:30:00', 1200, 100, false, 1, 1, 1);
-
--- ==========================================
--- TRANSFER RECORD
--- ==========================================
-INSERT INTO transfer_record
-(id, moved_at, cow_id, from_department_id, to_department_id, requested_by_id, approved_by_vet_id)
-VALUES
-    (1, '2025-12-14 09:00:00', 2, 1, 2, 3, 2);
+-- -- ==========================================
+-- -- CLEAN START (respect FK order)
+-- -- ==========================================
+-- DELETE FROM transfer_record;
+-- DELETE FROM milk;
+-- DELETE FROM sale;
+-- DELETE FROM cow;
+-- DELETE FROM customer;
+-- DELETE FROM container;
+-- DELETE FROM departments;
+-- DELETE FROM users;
+--
+-- -- ==========================================
+-- -- USERS (OWNER, VET, WORKER)
+-- -- ==========================================
+-- INSERT INTO users (id, user_type, name, email, password, phone, address, role, license_number)
+-- VALUES
+--     (1, 'OWNER',  'Farm Owner', 'owner@wom.dk',  '12345', '11111111', 'Farm HQ', 'OWNER',  NULL),
+--     (2, 'VET',    'Dr. Vet',    'vet@wom.dk',    '11111', '22222222', 'Vet Clinic', 'VET', 'VET-123'),
+--     (3, 'WORKER', 'Worker One', 'worker@wom.dk', '00000', '33333333', 'Farm Area', 'WORKER', NULL);
+--
+-- -- ==========================================
+-- -- DEPARTMENTS
+-- -- ==========================================
+-- INSERT INTO departments (id, name, type)
+-- VALUES
+--     (1, 'Quarantine Dept', 'QUARANTINE'),
+--     (2, 'Milking Dept',    'MILKING'),
+--     (3, 'Resting Dept',    'RESTING');
+--
+-- -- ==========================================
+-- -- CONTAINERS
+-- -- ==========================================
+-- INSERT INTO container (id, capacity_l, occupied_capacity_l)
+-- VALUES
+--     (1, 1000, 200),
+--     (2, 1500, 500);
+--
+-- -- ==========================================
+-- -- COWS
+-- -- ==========================================
+-- INSERT INTO cow (id, reg_no, birth_date, is_healthy, department_id, registered_by)
+-- VALUES
+--     (1, 'VJ-001', '2021-01-10', true,  2, 3),
+--     (2, 'VJ-002', '2020-06-15', false, 1, 3),
+--     (3, 'VJ-003', '2019-03-20', true,  3, 3);
+--
+-- -- ==========================================
+-- -- MILK RECORDS
+-- -- ==========================================
+-- INSERT INTO milk (id, approved_for_storage, date, milk_test_result, volumel, container_id, cow_id, registered_by_id)
+-- VALUES
+--     (1, true,  '2025-12-10', 'PASS',  50, 1, 1, 3),
+--     (2, false, '2025-12-11', 'FAIL',  30, 2, 2, 3);
+--
+-- -- ==========================================
+-- -- CUSTOMER
+-- -- ==========================================
+-- INSERT INTO customer (id, companycvr, company_name, email, phone_no, registered_by_id)
+-- VALUES
+--     (1, 'DK12345678', 'Danish Dairy', 'contact@dairy.dk', '88888888', 1);
+--
+-- -- ==========================================
+-- -- SALE
+-- -- ==========================================
+-- INSERT INTO sale (id, date_time, price, quantityl, recall_case, container_id, created_by_id, customer_id)
+-- VALUES
+--     (1, '2025-12-12 10:30:00', 1200, 100, false, 1, 1, 1);
+--
+-- -- ==========================================
+-- -- TRANSFER RECORD
+-- -- ==========================================
+-- INSERT INTO transfer_record
+-- (id, moved_at, cow_id, from_department_id, to_department_id, requested_by_id, approved_by_vet_id)
+-- VALUES
+--     (1, '2025-12-14 09:00:00', 2, 1, 2, 3, 2);
