@@ -1,89 +1,67 @@
 using System.Net.Http.Json;
-using System.Net.Http.Headers;
 using System.Text.Json;
 using ApiContracts;
 using WoM_BlazorApp.Services.Interfaces;
 
 namespace WoM_BlazorApp.Services.Implementation;
 
-// Calls /containers endpoints
 public class ContainerServiceImpl : IContainerService
 {
     private readonly HttpClient _http;
-    private readonly ITokenService _tokenService;
-    //this function is used to deserialize the json response from the server (token relevant)
-    private readonly JsonSerializerOptions _options = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
-    public ContainerServiceImpl(HttpClient http, ITokenService tokenService)
+    private readonly JsonSerializerOptions _json;
+
+    public ContainerServiceImpl(HttpClient http)
     {
         _http = http;
-        _tokenService = tokenService;
-    }
-
-    // attach JWT header
-    private void AttachToken()
-    {
-        var token = _tokenService.JwtToken;
-        if (!string.IsNullOrWhiteSpace(token))
-        {
-            _http.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
-        }
+        _json = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
     }
 
     public async Task<ContainerListDto> GetAllAsync()
     {
-        AttachToken(); // add jwt
-        var result = await _http.GetFromJsonAsync<ContainerListDto>("containers");
+        var result = await _http.GetFromJsonAsync<ContainerListDto>("containers", _json);
         return result ?? new ContainerListDto();
     }
 
-
-
     public async Task<ContainerDto> GetByIdAsync(long id)
     {
-        AttachToken(); // add jwt
-        var result = await _http.GetFromJsonAsync<ContainerDto>($"containers/{id}");
-        return result!;
+        var result = await _http.GetFromJsonAsync<ContainerDto>($"containers/{id}", _json);
+        return result ?? throw new Exception("Container not found.");
     }
 
     public async Task<ContainerDto> CreateAsync(CreateContainerDto dto)
     {
-        AttachToken(); // add jwt
-        var response = await _http.PostAsJsonAsync("containers", dto);
-        response.EnsureSuccessStatusCode();
-        var created = await response.Content.ReadFromJsonAsync<ContainerDto>();
-        return created!;
+        var response = await _http.PostAsJsonAsync("containers", dto, _json);
+        if (!response.IsSuccessStatusCode)
+            throw new Exception(await response.Content.ReadAsStringAsync());
+
+        var created = await response.Content.ReadFromJsonAsync<ContainerDto>(_json);
+        return created ?? throw new Exception("Create container returned empty response.");
     }
 
     public async Task<ContainerDto> UpdateAsync(long id, UpdateContainerDto dto)
     {
-        AttachToken(); // add jwt
-        var response = await _http.PutAsJsonAsync($"containers/{id}", dto);
-        response.EnsureSuccessStatusCode();
-        var updated = await response.Content.ReadFromJsonAsync<ContainerDto>();
-        return updated!;
+        dto.Id = id;
+
+        var response = await _http.PutAsJsonAsync($"containers/{id}", dto, _json);
+        if (!response.IsSuccessStatusCode)
+            throw new Exception(await response.Content.ReadAsStringAsync());
+
+        var updated = await response.Content.ReadFromJsonAsync<ContainerDto>(_json);
+        return updated ?? throw new Exception("Update container returned empty response.");
     }
 
     public async Task DeleteAsync(long id)
     {
-        AttachToken(); // add jwt
         var response = await _http.DeleteAsync($"containers/{id}");
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+            throw new Exception(await response.Content.ReadAsStringAsync());
     }
 
-    //added for mock tracing
-    public async Task<IEnumerable<ContainerDto>> GetAllTrackedAsync()
-    {
-        var result = await GetAllAsync();
-        var response = await _http.GetAsync("cows");
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new Exception(await response.Content.ReadAsStringAsync());
-        }
-        return await response.Content.ReadFromJsonAsync<IEnumerable<ContainerDto>>(_options)
-               ?? new List<ContainerDto>();
-    }
+    // mock relevant
+   public async Task<IEnumerable<ContainerDto>> GetAllTrackedAsync()
+{
+    var list = await GetAllAsync(); // GET /containers
+    return list.Containers;
+}
+
 }
