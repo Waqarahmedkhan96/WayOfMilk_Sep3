@@ -41,7 +41,7 @@ import java.util.List;
   public CowDataDTO addCow(CowCreationDTO cow)
   {
     //making sure new cows are added to a quarrantine department
-    Department quarantine = departmentRepository.findById(cow.getDepartmentId()).orElseThrow(() -> new RuntimeException("Department not found"));
+    Department quarantine = departmentRepository.findById(cow.getDepartmentId()).orElse(null);
     if (quarantine == null)
     {
       //if no specific department is provided, find the first 'available' quarantine department

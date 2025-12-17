@@ -6,19 +6,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sep3.repository.CowRepository;
-import sep3.repository.UserRepository;
-import sep3.repository.DepartmentRepository;
 import sep3.dto.cowDTO.CowCreationDTO;
 import sep3.dto.cowDTO.CowDataDTO;
-import sep3.entity.*;
-import sep3.entity.user.Owner;
-import sep3.entity.user.User;
+import sep3.entity.Cow;
+import sep3.entity.Department;
+import sep3.entity.DepartmentType;
+import sep3.entity.user.*;
+import sep3.repository.CowRepository;
+import sep3.repository.DepartmentRepository;
+import sep3.repository.UserRepository;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -34,47 +36,55 @@ class CowServiceImplTest {
 
   @InjectMocks
   private CowServiceImpl cowDataService;
-/*
+
   @Test
   void testAddCow_Success() {
-    // 1. Arrange
-    long userId = 99L;
-      // Prepare dummy dependencies
-      Department mockQuarantine = new Department(DepartmentType.QUARANTINE);
-      mockQuarantine.setId(1L);
-      User mockUser = new Owner("Owie", "owie@email.com", "25648454", "Street 123", "password");
-      mockUser.setId(userId);
-    CowCreationDTO newCowDto = new CowCreationDTO("Reg123", LocalDate.now(), userId, mockQuarantine.getId());
-    // Define Mock Behavior
-    when(mockDepartmentRepository.findByType(DepartmentType.QUARANTINE))
-        .thenReturn(List.of(mockQuarantine));
+    // 1. ARRANGE (Setup data)
+    long deptId = 1L;
+    long userId = 100L;
+    String regNo = "12345";
+    LocalDate birthDate = LocalDate.now();
 
-    when(mockUserRepository.findById(userId))
-        .thenReturn(Optional.of(mockUser));
+    // Create the input DTO
+    CowCreationDTO newCowDto = new CowCreationDTO();
+    newCowDto.setDepartmentId(deptId);
+    newCowDto.setRegisteredByUserId(userId);
+    newCowDto.setRegNo(regNo);
+    newCowDto.setBirthDate(birthDate);
 
-    // Simulate the "Saved" cow returned by the DB
-    // Note: We use the constructor that accepts Department and User
-    Cow savedCow = new Cow("Reg123", LocalDate.now(), mockQuarantine, mockUser);
-    savedCow.setId(1L); // DB assigns ID
+    // Create the mocked entities that the repositories will return
+    Department mockDepartment = new Department( DepartmentType.QUARANTINE, "Quarantine Dept");
+    mockDepartment.setId(deptId);
+    mockDepartment.setType(DepartmentType.QUARANTINE); // Critical: Must be Quarantine to pass logic
 
+    User mockUser = new Owner();
+    mockUser.setId(userId);
+
+    // Create the cow that acts as the "saved" result
+    Cow savedCow = new Cow(regNo, birthDate, mockDepartment, mockUser);
+    savedCow.setId(50L); // simulate DB assigning an ID
+
+    // TELLING MOCKITO WHAT TO DO:
+    // When the service asks for a Department, give it the mockDepartment
+    when(mockDepartmentRepository.findById(deptId)).thenReturn(Optional.of(mockDepartment));
+
+    // When the service asks for a User, give it the mockUser
+    when(mockUserRepository.findById(userId)).thenReturn(Optional.of(mockUser));
+
+    // When the service saves ANY cow, return the savedCow we created above
     when(mockCowRepository.save(any(Cow.class))).thenReturn(savedCow);
 
-    // 2. Act
-    CowDataDTO resultDto = cowDataService.addCow(newCowDto);
+    // 2. ACT (Run the method)
+    CowDataDTO result = cowDataService.addCow(newCowDto);
 
-    // 3. Assert
-    verify(mockDepartmentRepository, times(1)).findByType(DepartmentType.QUARANTINE);
-    verify(mockUserRepository, times(1)).findById(userId);
+    // 3. ASSERT (Verify results)
+    assertNotNull(result);
+    assertEquals(regNo, result.getRegNo());
+    // Verify the repository was actually called
     verify(mockCowRepository, times(1)).save(any(Cow.class));
-
-    Assertions.assertNotNull(resultDto);
-    Assertions.assertEquals(1L, resultDto.getId());
-    Assertions.assertEquals("Reg123", resultDto.getRegNo());
-    // Verify defaults
-    Assertions.assertFalse(resultDto.isHealthy());
   }
 
- */
+
 
   @Test
   void testGetCowById_Success() {
