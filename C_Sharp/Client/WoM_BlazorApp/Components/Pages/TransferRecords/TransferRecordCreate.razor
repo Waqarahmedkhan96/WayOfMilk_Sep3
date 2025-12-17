@@ -6,48 +6,68 @@
 @inject ITransferRecordService TransferService
 @inject NavigationManager Nav
 
-<h3>Create Transfer Record</h3>
+<PageTitle>Add Transfer Record</PageTitle>
 
-<div>
-    <label>Cow Id</label><br />
-    <input type="number" @bind="cowId" />
+<h1>Add new transfer record</h1>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="mb-3">
+    <label class="form-label">Cow ID</label>
+    <InputNumber @bind-Value="cowId" class="form-control" />
 </div>
 
-<div>
-    <label>From Department (id)</label><br />
-    <input type="number" @bind="fromDepartmentId" />
+<div class="mb-3">
+    <label class="form-label">From Department ID</label>
+    <InputNumber @bind-Value="fromDepartmentId" class="form-control" />
 </div>
 
-<div>
-    <label>To Department (id)</label><br />
-    <input type="number" @bind="toDepartmentId" />
+<div class="mb-3">
+    <label class="form-label">To Department ID</label>
+    <InputNumber @bind-Value="toDepartmentId" class="form-control" />
 </div>
 
-<div>
-    <label>Moved At</label><br />
-    <input type="datetime-local" @bind="movedAt" />
+<div class="mb-3">
+    <label class="form-label">Moved At</label>
+    <InputDate @bind-Value="movedAt" class="form-control" />
 </div>
 
-<br />
-<button @onclick="Create">Create</button>
+<button class="btn btn-success" @onclick="CreateAsync">Save</button>
+<button class="btn btn-secondary ms-2" @onclick="@(() => Nav.NavigateTo("/transfer-records"))">
+    Cancel
+</button>
 
 @code {
-    long cowId;
-    int fromDepartmentId;
-    int toDepartmentId;
-    DateTime movedAt = DateTime.Now;
+    private long cowId;
+    private int fromDepartmentId;
+    private int toDepartmentId;
+    private DateTime movedAt = DateTime.Now;
 
-    async Task Create()
+    private string? error;
+
+    private async Task CreateAsync()
     {
-        var dto = new CreateTransferRecordDto
-        {
-            CowId = cowId,
-            FromDepartmentId = fromDepartmentId,
-            ToDepartmentId = toDepartmentId,
-            MovedAt = movedAt
-        };
+        error = null;
 
-        await TransferService.CreateAsync(dto);
-        Nav.NavigateTo("/transfer-records");
+        try
+        {
+            var dto = new CreateTransferRecordDto
+            {
+                CowId = cowId,
+                FromDepartmentId = fromDepartmentId,
+                ToDepartmentId = toDepartmentId,
+                MovedAt = movedAt
+            };
+
+            await TransferService.CreateAsync(dto);
+            Nav.NavigateTo("/transfer-records");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
     }
 }

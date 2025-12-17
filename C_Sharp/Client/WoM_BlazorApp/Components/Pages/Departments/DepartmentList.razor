@@ -18,9 +18,17 @@
 {
     <p>Loading...</p>
 }
+else if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+else if (departments is null || departments.Count == 0)
+{
+    <p>No departments yet.</p>
+}
 else
 {
-    <table>
+    <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
@@ -48,6 +56,7 @@ else
 }
 
 @code {
+    private string? error;
     ICollection<DepartmentDto>? departments;
 
     protected override async Task OnInitializedAsync()

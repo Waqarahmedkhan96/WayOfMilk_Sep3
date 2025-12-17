@@ -3,39 +3,62 @@
 
 @using ApiContracts
 @using WoM_BlazorApp.Services.Interfaces
-
 @inject IDepartmentService DepartmentService
 @inject NavigationManager Nav
 
-<h3>Create Department</h3>
+<PageTitle>Add Department</PageTitle>
 
-<div>
-    <label>Department Type</label><br />
-    <select @bind="type">
+<h1>Add new department</h1>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="mb-3">
+    <label class="form-label">Department Type</label>
+    <InputSelect @bind-Value="type" class="form-control">
         @foreach (var t in Enum.GetValues<DepartmentType>())
         {
             <option value="@t">@t</option>
         }
-    </select>
-    <input type="text" @bind="name" placeholder="Department Name" />
+    </InputSelect>
 </div>
 
-<br />
-<button @onclick="Create">Create</button>
+<div class="mb-3">
+    <label class="form-label">Department Name</label>
+    <InputText @bind-Value="name" class="form-control" placeholder="Department Name" />
+</div>
+
+<button class="btn btn-success" @onclick="CreateAsync">Save</button>
+<button class="btn btn-secondary ms-2" @onclick="@(() => Nav.NavigateTo("/departments"))">
+    Cancel
+</button>
 
 @code {
-    DepartmentType type = DepartmentType.Milking;
-    string name = string.Empty;
+    private DepartmentType type = DepartmentType.Milking;
+    private string name = string.Empty;
 
-    async Task Create()
+    private string? error;
+
+    private async Task CreateAsync()
     {
-        var dto = new CreateDepartmentDto
-        {
-            Type = type, 
-            Name = name
-        };
+        error = null;
 
-        await DepartmentService.CreateAsync(dto);
-        Nav.NavigateTo("/departments");
+        try
+        {
+            var dto = new CreateDepartmentDto
+            {
+                Type = type,
+                Name = name
+            };
+
+            await DepartmentService.CreateAsync(dto);
+            Nav.NavigateTo("/departments");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
     }
 }

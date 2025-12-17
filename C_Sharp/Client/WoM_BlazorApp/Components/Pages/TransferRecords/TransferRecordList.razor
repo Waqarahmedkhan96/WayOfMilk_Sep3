@@ -19,9 +19,17 @@
 {
     <p>Loading...</p>
 }
+else if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+else if (records is null || records.Count == 0)
+{
+    <p>No transfer records yet.</p>
+}
 else
 {
-    <table>
+    <table class="table">
         <thead>
             <tr>
                 <th>Cow id</th>
@@ -46,6 +54,7 @@ else
     </table>
 }
 @code {
+    private string? error;
     ICollection<TransferRecordDto>? records;
 
     protected override async Task OnInitializedAsync()
