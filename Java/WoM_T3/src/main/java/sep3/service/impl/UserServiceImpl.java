@@ -15,7 +15,8 @@ import java.util.List;
 
 @Service public class UserServiceImpl implements IUserService
 {
-  private final String DEFAULT_PASSWORD = "0000"; //placed here for easy access
+  public static final String DEFAULT_PASSWORD = "0000"; //placed here for easy access
+  //made public static for ease of testing
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder; // Inject the tool
 
@@ -144,4 +145,6 @@ import java.util.List;
     user.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
     userRepository.save(user);
   }
+
+
 }

@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import sep3.dto.userDTO.UserCreationDTO;
 import sep3.dto.userDTO.UserDataDTO;
 import sep3.dto.userDTO.UserLoginDTO;
-import sep3.entity.user.Owner; // Assuming Owner is a concrete implementation of User
+import sep3.entity.user.Owner; // Owner is a concrete implementation of User
 import sep3.entity.user.User;
 import sep3.entity.user.UserRole;
 import sep3.repository.UserRepository;
@@ -38,7 +38,7 @@ class UserServiceImplTest {
 
   @Test
   void testRegisterUser_Success_And_HashesPassword() {
-    // 1. ARRANGE
+    // 1. Arrange
     String rawPassword = "mySecretPassword";
     String encodedPassword = "encoded_mySecretPassword_123";
 
@@ -67,10 +67,10 @@ class UserServiceImplTest {
     //Mock returning the saved user from the repository
     when(mockUserRepository.save(any(User.class))).thenReturn(savedUser);
 
-    // 2. ACT
+    // 2. Act
     UserDataDTO result = userService.registerUser(creationDTO);
 
-    // 3. ASSERT
+    // 3. Assert
     assertNotNull(result);
 
     // --- HASHED PASSWORD VERIFICATION ---
@@ -127,7 +127,7 @@ class UserServiceImplTest {
 
     when(mockUserRepository.findByEmail(email)).thenReturn(Optional.of(dbUser));
 
-    // Important: Mock matches() to return TRUE
+    // Important: Mock matches() return TRUE here to simulate correct password
     when(mockPasswordEncoder.matches(rawPass, dbHash)).thenReturn(true);
 
     // 2. Act
@@ -195,24 +195,124 @@ class UserServiceImplTest {
     verify(mockUserRepository).save(dbUser);
   }
 
+  @Test
+  void testResetPassword_Success() {
+    // 1. Arrange
+    long userId = 5L;
+    String expectedHash = "hashed_default_secret";
+
+    User mockUser = new Owner();
+    mockUser.setId(userId);
+    // User starts with some random old password
+    mockUser.setPassword("old_random_pass");
+
+    when(mockUserRepository.findById(userId)).thenReturn(Optional.of(mockUser));
+
+    // Use the class constant (DEFAULT_PASSWORD)
+    // We tell the encoder: "When you are asked to encode the DEFAULT PASSWORD, return this hash"
+    when(mockPasswordEncoder.encode(UserServiceImpl.DEFAULT_PASSWORD)).thenReturn(expectedHash);
+
+    // 2. Act
+    userService.resetPassword(userId);
+
+    // 3. Assert
+    // Capture the saved user to check what password ended up in the DB
+    ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+    verify(mockUserRepository).save(userCaptor.capture());
+
+    User savedUser = userCaptor.getValue();
+
+    // Verify the saved user has the HASHED version of the default password
+    assertEquals(expectedHash, savedUser.getPassword());
+  }
+
  // BASIC CRUD TESTS
+  //CREATE was already tested above,
+  // technically UPDATE too, but we'll test some other U scenarios anyway
 
   @Test
   void testGetUserById_NotFound() {
+    //1. Arrange
     when(mockUserRepository.findById(99L)).thenReturn(Optional.empty());
-
+    //2. Act & Assert
     assertThrows(EntityNotFoundException.class, () -> {
       userService.getUserById(99L);
     });
   }
 
   @Test
+  void testUpdateUser_Success() {
+    // 1. Arrange
+    long userId = 1L;
+
+    // A. Create the "Old" User currently in the Database
+    User existingUser = new Owner(); // or new Worker/Vet
+    existingUser.setId(userId);
+    existingUser.setName("Old Name");
+    existingUser.setEmail("old@email.com");
+    existingUser.setRole(UserRole.OWNER); // Important: Role determines DTO creation
+
+    // B. Create the DTO containing the "New" changes
+    UserDataDTO changesDTO = new UserDataDTO();
+    changesDTO.setId(userId);
+    changesDTO.setName("New Updated Name");   // We want to change this
+    changesDTO.setEmail("new@email.com");     // We want to change this
+    // We leave phone/address null to verify they don't overwrite existing data (mapper handles that)
+
+    // C. Mocking
+    // When Service asks for ID 1, give it the existing user
+    when(mockUserRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+
+    // When Service saves the user, return the user (which will be modified by then)
+    when(mockUserRepository.save(any(User.class))).thenReturn(existingUser);
+
+    // 2. Act
+    UserDataDTO result = userService.updateUser(changesDTO);
+
+    // 3. Assert
+    assertNotNull(result);
+
+    // Check that the returned DTO has the NEW values
+    assertEquals("New Updated Name", result.getName());
+    assertEquals("new@email.com", result.getEmail());
+
+    // Verify the repository save was called
+    verify(mockUserRepository).save(existingUser);
+  }
+
+  //Exception (error) situation test
+  @Test
+  void testUpdateUser_NotFound() {
+    // 1. Arrange
+    long nonExistentId = 999L;
+
+    UserDataDTO changesDTO = new UserDataDTO();
+    changesDTO.setId(nonExistentId);
+    changesDTO.setName("Ghost User");
+
+    // Mock the repository to return Empty
+    when(mockUserRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+
+    // 2. Act & Assert
+    // Expect the EntityNotFoundException because your service uses .orElseThrow(...)
+    assertThrows(EntityNotFoundException.class, () -> {
+      userService.updateUser(changesDTO);
+    });
+
+    // Verify we NEVER tried to save anything
+    verify(mockUserRepository, never()).save(any());
+  }
+
+  @Test
   void testDeleteUser_Success() {
+    //1. Arrange
     long id = 10L;
     when(mockUserRepository.existsById(id)).thenReturn(true);
 
+    //2. Act
     userService.deleteUser(id);
 
+    //3. Assert
     verify(mockUserRepository).deleteById(id);
   }
 }
