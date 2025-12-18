@@ -41,20 +41,16 @@ class UserServiceImplTest {
     // 1. Arrange
     String rawPassword = "mySecretPassword";
     String encodedPassword = "encoded_mySecretPassword_123";
-
     UserCreationDTO creationDTO = new UserCreationDTO();
     creationDTO.setName("name");
     creationDTO.setEmail("new@email.com");
     creationDTO.setPassword(rawPassword);
     creationDTO.setName("Test User");
     creationDTO.setRole("OWNER");
-
     // Mock the encoder to return a specific "hashed" string
     when(mockPasswordEncoder.encode(rawPassword)).thenReturn(encodedPassword);
-
     // Mock the repository to check if email exists (return false = safe to register)
     when(mockUserRepository.existsByEmail(creationDTO.getEmail())).thenReturn(false);
-
     // Mock saving the user
     // We return a dummy user to satisfy the method signature
     User savedUser = new Owner();
@@ -63,7 +59,6 @@ class UserServiceImplTest {
     savedUser.setEmail(creationDTO.getEmail());
     savedUser.setPassword(encodedPassword);
     savedUser.setRole(UserRole.OWNER);
-
     //Mock returning the saved user from the repository
     when(mockUserRepository.save(any(User.class))).thenReturn(savedUser);
 
@@ -72,19 +67,15 @@ class UserServiceImplTest {
 
     // 3. Assert
     assertNotNull(result);
-
     // --- HASHED PASSWORD VERIFICATION ---
     // We use an ArgumentCaptor to steal the object that was passed to .save()
     // so we can inspect it.
     ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
     verify(mockUserRepository).save(userCaptor.capture());
-
     User actuallySavedUser = userCaptor.getValue();
-
     // CRITICAL: The saved user must have the ENCODED password, not the raw one
     assertEquals(encodedPassword, actuallySavedUser.getPassword());
     assertNotEquals(rawPassword, actuallySavedUser.getPassword());
-
     // Verify the encoder was actually called
     verify(mockPasswordEncoder, times(1)).encode(rawPassword);
   }
