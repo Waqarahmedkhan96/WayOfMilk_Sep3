@@ -22,4 +22,14 @@
   <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
 </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Data\containers.json" />
+    <_ContentIncludedByDefault Remove="Data\cows.json" />
+    <_ContentIncludedByDefault Remove="Data\customers.json" />
+    <_ContentIncludedByDefault Remove="Data\milks.json" />
+    <_ContentIncludedByDefault Remove="Data\sales.json" />
+    <_ContentIncludedByDefault Remove="Data\transfers.json" />
+    <_ContentIncludedByDefault Remove="Data\users.json" />
+  </ItemGroup>
+
 </Project>

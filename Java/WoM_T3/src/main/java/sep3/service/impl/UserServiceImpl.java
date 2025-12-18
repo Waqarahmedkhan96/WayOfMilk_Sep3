@@ -17,7 +17,7 @@ import java.util.List;
 {
   private final String DEFAULT_PASSWORD = "0000"; //placed here for easy access
   private final UserRepository userRepository;
-  private final PasswordEncoder passwordEncoder; // 1. Inject the tool
+  private final PasswordEncoder passwordEncoder; // Inject the tool
 
   public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder)
   {

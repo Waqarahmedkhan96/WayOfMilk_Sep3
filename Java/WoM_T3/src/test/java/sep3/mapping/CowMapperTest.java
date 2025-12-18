@@ -38,9 +38,10 @@ class CowMapperTest {
     void updateCowFromDto_updatesOnlyProvidedFields() {
         Cow cow = mock(Cow.class);
         CowDataDTO dto = new CowDataDTO();
+        Department dept = mock(Department.class);
         dto.setRegNo("NEW");
 
-        CowMapper.updateCowFromDto(cow, dto, null);
+        CowMapper.updateCowFromDto(cow, dto, dept);
 
         verify(cow).setRegNo("NEW");
     }

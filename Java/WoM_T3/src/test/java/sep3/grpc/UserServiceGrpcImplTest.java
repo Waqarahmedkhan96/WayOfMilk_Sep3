@@ -53,4 +53,6 @@ class UserServiceGrpcImplTest {
         verify(observer).onNext(any(UserData.class));
         verify(observer).onCompleted();
     }
+
+
 }

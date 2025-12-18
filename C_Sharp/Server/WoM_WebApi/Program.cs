@@ -40,7 +40,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Paste only the JWT token string here (no 'Bearer ' prefix)."
+        Description = "Paste only the JWT token string here (no 'Bearer' prefix)."
     };
 
     c.AddSecurityDefinition("Bearer", securityScheme);
