@@ -5,6 +5,8 @@ The system supports dairy farm operations such as cow management, department tra
 
 The solution was designed to improve food safety, operational control, and milk traceability from cow to customer.
 
+[User guide](https://youtu.be/oN-2SvBA61U)
+
 ---
 
 ## Project Overview
